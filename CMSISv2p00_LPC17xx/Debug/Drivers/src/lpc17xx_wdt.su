@@ -1,0 +1,8 @@
+lpc17xx_wdt.c:54:16:WDT_SetTimeOut	16	static
+lpc17xx_wdt.c:157:6:WDT_Init	16	static
+lpc17xx_wdt.c:194:12:WDT_ReadTimeOutFlag	0	static
+lpc17xx_wdt.c:204:6:WDT_ClrTimeOutFlag	0	static
+lpc17xx_wdt.c:231:6:WDT_Feed	0	static
+lpc17xx_wdt.c:177:6:WDT_Start	8	static
+lpc17xx_wdt.c:214:6:WDT_UpdateTimeOut	8	static
+lpc17xx_wdt.c:246:10:WDT_GetCurrentCount	0	static

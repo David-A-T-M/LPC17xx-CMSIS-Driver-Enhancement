@@ -1,0 +1,6 @@
+lpc17xx_systick.c:51:6:SYSTICK_InternalInit	16	static
+lpc17xx_systick.c:85:6:SYSTICK_ExternalInit	16	static
+lpc17xx_systick.c:119:6:SYSTICK_Cmd	8	static
+lpc17xx_systick.c:138:6:SYSTICK_IntCmd	8	static
+lpc17xx_systick.c:155:10:SYSTICK_GetCurrentValue	0	static
+lpc17xx_systick.c:165:6:SYSTICK_ClearCounterFlag	0	static

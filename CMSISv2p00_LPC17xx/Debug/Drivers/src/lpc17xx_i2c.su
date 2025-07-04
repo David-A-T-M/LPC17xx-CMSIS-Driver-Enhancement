@@ -1,0 +1,17 @@
+lpc17xx_i2c.c:103:16:I2C_getNum	0	static
+lpc17xx_i2c.c:162:17:I2C_SendByte	0	static
+lpc17xx_i2c.c:254:6:I2C_Init	24	static
+lpc17xx_i2c.c:302:6:I2C_DeInit	8	static
+lpc17xx_i2c.c:335:6:I2C_Cmd	16	static
+lpc17xx_i2c.c:362:6:I2C_IntCmd	0	static
+lpc17xx_i2c.c:406:6:I2C_MasterHandler	24	static
+lpc17xx_i2c.c:610:6:I2C_SlaveHandler	16	static
+lpc17xx_i2c.c:771:8:I2C_MasterTransferData	32	static
+lpc17xx_i2c.c:983:8:I2C_SlaveTransferData	32	static
+lpc17xx_i2c.c:1174:6:I2C_SetOwnSlaveAddr	16	static
+lpc17xx_i2c.c:1227:6:I2C_MonitorModeConfig	16	static
+lpc17xx_i2c.c:1255:6:I2C_MonitorModeCmd	16	static
+lpc17xx_i2c.c:1290:9:I2C_MonitorGetDatabuffer	8	static
+lpc17xx_i2c.c:1311:8:I2C_MonitorHandler	8	static
+lpc17xx_i2c.c:1335:10:I2C_MasterTransferComplete	8	static
+lpc17xx_i2c.c:1352:10:I2C_SlaveTransferComplete	8	static

@@ -1,0 +1,6 @@
+lpc17xx_rit.c:53:6:RIT_Init	8	static
+lpc17xx_rit.c:72:6:RIT_DeInit	8	static
+lpc17xx_rit.c:91:6:RIT_TimerConfig	16	static
+lpc17xx_rit.c:122:6:RIT_Cmd	16	static
+lpc17xx_rit.c:146:6:RIT_TimerDebugCmd	16	static
+lpc17xx_rit.c:166:11:RIT_GetIntStatus	8	static

@@ -1,0 +1,11 @@
+debug_frmwrk.c:54:6:UARTPutChar	16	static
+debug_frmwrk.c:79:6:UARTPuts	16	static
+debug_frmwrk.c:96:6:UARTPuts_	8	static
+debug_frmwrk.c:109:6:UARTPutDec	24	static
+debug_frmwrk.c:125:6:UARTPutDec16	24	static
+debug_frmwrk.c:145:6:UARTPutDec32	24	static
+debug_frmwrk.c:194:6:UARTPutHex16	16	static
+debug_frmwrk.c:212:6:UARTPutHex32	16	static
+debug_frmwrk.c:65:9:UARTGetChar	16	static
+debug_frmwrk.c:175:6:UARTPutHex	16	static
+debug_frmwrk.c:247:6:debug_frmwrk_init	24	static

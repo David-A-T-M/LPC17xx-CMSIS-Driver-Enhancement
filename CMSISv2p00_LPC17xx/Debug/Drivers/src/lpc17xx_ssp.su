@@ -1,0 +1,17 @@
+lpc17xx_ssp.c:119:6:SSP_Init	16	static
+lpc17xx_ssp.c:160:6:SSP_DeInit	0	static
+lpc17xx_ssp.c:184:9:SSP_GetDataSize	8	static
+lpc17xx_ssp.c:202:6:SSP_ConfigStructInit	0	static
+lpc17xx_ssp.c:221:6:SSP_Cmd	16	static
+lpc17xx_ssp.c:246:6:SSP_LoopBackCmd	16	static
+lpc17xx_ssp.c:274:6:SSP_SlaveOutputCmd	16	static
+lpc17xx_ssp.c:300:6:SSP_SendData	16	static
+lpc17xx_ssp.c:316:10:SSP_ReceiveData	8	static
+lpc17xx_ssp.c:339:9:SSP_ReadWrite	40	static
+lpc17xx_ssp.c:524:12:SSP_GetStatus	16	static
+lpc17xx_ssp.c:548:6:SSP_IntConfig	16	static
+lpc17xx_ssp.c:577:11:SSP_GetRawIntStatus	16	static
+lpc17xx_ssp.c:592:10:SSP_GetRawIntStatusReg	8	static
+lpc17xx_ssp.c:613:11:SSP_GetIntStatus	16	static
+lpc17xx_ssp.c:633:6:SSP_ClearIntPending	16	static
+lpc17xx_ssp.c:655:6:SSP_DMACmd	16	static

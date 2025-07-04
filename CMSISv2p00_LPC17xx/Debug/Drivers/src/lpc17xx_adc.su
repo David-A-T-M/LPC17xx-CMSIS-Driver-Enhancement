@@ -1,0 +1,13 @@
+lpc17xx_adc.c:56:6:ADC_Init	16	static
+lpc17xx_adc.c:90:6:ADC_DeInit	8	static
+lpc17xx_adc.c:106:10:ADC_GetData	0	static
+lpc17xx_adc.c:131:6:ADC_StartCmd	16	static
+lpc17xx_adc.c:149:6:ADC_BurstCmd	16	static
+lpc17xx_adc.c:167:6:ADC_PowerdownCmd	16	static
+lpc17xx_adc.c:185:6:ADC_EdgeStartConfig	16	static
+lpc17xx_adc.c:210:6:ADC_IntConfig	16	static
+lpc17xx_adc.c:229:6:ADC_ChannelCmd	16	static
+lpc17xx_adc.c:247:10:ADC_ChannelGetData	16	static
+lpc17xx_adc.c:267:12:ADC_ChannelGetStatus	16	static
+lpc17xx_adc.c:294:10:ADC_GlobalGetData	8	static
+lpc17xx_adc.c:309:15:ADC_GlobalGetStatus	16	static

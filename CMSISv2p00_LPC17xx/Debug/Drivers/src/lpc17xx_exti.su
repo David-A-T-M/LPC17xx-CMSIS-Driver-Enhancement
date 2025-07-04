@@ -1,0 +1,6 @@
+lpc17xx_exti.c:52:6:EXTI_Init	0	static
+lpc17xx_exti.c:65:6:EXTI_DeInit	0	static
+lpc17xx_exti.c:97:6:EXTI_SetMode	0	static
+lpc17xx_exti.c:121:6:EXTI_SetPolarity	0	static
+lpc17xx_exti.c:78:6:EXTI_Config	8	static
+lpc17xx_exti.c:142:6:EXTI_ClearEXTIFlag	0	static

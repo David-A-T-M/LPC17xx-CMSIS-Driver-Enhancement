@@ -1,0 +1,8 @@
+lpc17xx_clkpwr.c:74:6:CLKPWR_SetPCLKDiv	8	static
+lpc17xx_clkpwr.c:135:10:CLKPWR_GetPCLKSEL	0	static
+lpc17xx_clkpwr.c:190:10:CLKPWR_GetPCLK	8	static
+lpc17xx_clkpwr.c:260:6:CLKPWR_ConfigPPWR	0	static
+lpc17xx_clkpwr.c:278:6:CLKPWR_Sleep	0	static
+lpc17xx_clkpwr.c:291:6:CLKPWR_DeepSleep	0	static
+lpc17xx_clkpwr.c:306:6:CLKPWR_PowerDown	0	static
+lpc17xx_clkpwr.c:321:6:CLKPWR_DeepPowerDown	0	static
