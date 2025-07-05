@@ -1,10 +1,10 @@
-/***********************************************************************//**
+/***********************************************************************/ /**
  * @file        lpc17xx_pinsel.c
- * @brief        Contains all functions support for Pin connect block firmware
- *                 library on LPC17xx
- * @version        2.0
+ * @brief       Contains all functions support for Pin connect block firmware
+ *              library on LPC17xx
+ * @version     2.0
  * @date        21. May. 2010
- * @author        NXP MCU SW Application Team
+ * @author      NXP MCU SW Application Team
  **************************************************************************
  * Software that is described herein is for illustrative purposes only
  * which provides customers with programming information regarding the
@@ -26,273 +26,173 @@
 /* Includes ------------------------------------------------------------------- */
 #include "lpc17xx_pinsel.h"
 
-/* Public Functions ----------------------------------------------------------- */
+/* Private Functions ----------------------------------------------------------- */
 
-static void set_PinFunc ( uint8_t portnum, uint8_t pinnum, uint8_t funcnum);
-static void set_ResistorMode ( uint8_t portnum, uint8_t pinnum, uint8_t modenum);
-static void set_OpenDrainMode( uint8_t portnum, uint8_t pinnum, uint8_t modenum);
+static void set_PinFunc(uint8_t portNum, uint8_t pinNum, uint8_t funcNum);
+static void set_ResistorMode(uint8_t portNum, uint8_t pinNum, uint8_t pinMode);
+static void set_OpenDrainMode(uint8_t portNum, uint8_t pinNum, uint8_t openDrain);
 
-/*********************************************************************//**
- * @brief         Setup the pin selection function
- * @param[in]    portnum PORT number,
- *                 should be one of the following:
- *                 - PINSEL_PORT_0    : Port 0
- *                 - PINSEL_PORT_1    : Port 1
- *                 - PINSEL_PORT_2    : Port 2
- *                 - PINSEL_PORT_3    : Port 3
+/*********************************************************************/ /**
+ * @brief       Sets up the pin selection function.
  *
- * @param[in]    pinnum    Pin number,
- *                 should be one of the following:
-                - PINSEL_PIN_0 : Pin 0
-                - PINSEL_PIN_1 : Pin 1
-                - PINSEL_PIN_2 : Pin 2
-                - PINSEL_PIN_3 : Pin 3
-                - PINSEL_PIN_4 : Pin 4
-                - PINSEL_PIN_5 : Pin 5
-                - PINSEL_PIN_6 : Pin 6
-                - PINSEL_PIN_7 : Pin 7
-                - PINSEL_PIN_8 : Pin 8
-                - PINSEL_PIN_9 : Pin 9
-                - PINSEL_PIN_10 : Pin 10
-                - PINSEL_PIN_11 : Pin 11
-                - PINSEL_PIN_12 : Pin 12
-                - PINSEL_PIN_13 : Pin 13
-                - PINSEL_PIN_14 : Pin 14
-                - PINSEL_PIN_15 : Pin 15
-                - PINSEL_PIN_16 : Pin 16
-                - PINSEL_PIN_17 : Pin 17
-                - PINSEL_PIN_18 : Pin 18
-                - PINSEL_PIN_19 : Pin 19
-                - PINSEL_PIN_20 : Pin 20
-                - PINSEL_PIN_21 : Pin 21
-                - PINSEL_PIN_22 : Pin 22
-                - PINSEL_PIN_23 : Pin 23
-                - PINSEL_PIN_24 : Pin 24
-                - PINSEL_PIN_25 : Pin 25
-                - PINSEL_PIN_26 : Pin 26
-                - PINSEL_PIN_27 : Pin 27
-                - PINSEL_PIN_28 : Pin 28
-                - PINSEL_PIN_29 : Pin 29
-                - PINSEL_PIN_30 : Pin 30
-                - PINSEL_PIN_31 : Pin 31
-
- * @param[in]     funcnum Function number,
- *                 should be one of the following:
- *                - PINSEL_FUNC_0 : default function
- *                - PINSEL_FUNC_1 : first alternate function
- *                - PINSEL_FUNC_2 : second alternate function
- *                - PINSEL_FUNC_3 : third alternate function
+ * @param[in]   portNum  PINSEL_PORT_x, where x is in the range [0,3].
+ * @param[in]   pinNum   PINSEL_PIN_x, where x is in the range [0,31].
+ * @param[in]   funcNum  PINSEL_FUNC_x, where x is in the range [0,3].
  *
- * @return         None
+ * @return      None
  **********************************************************************/
-static void set_PinFunc ( uint8_t portnum, uint8_t pinnum, uint8_t funcnum)
-{
-    uint32_t pinnum_t = pinnum;
-    uint32_t pinselreg_idx = 2 * portnum;
-    uint32_t *pPinCon = (uint32_t *)&LPC_PINCON->PINSEL0;
+static void set_PinFunc(uint8_t portNum, uint8_t pinNum, uint8_t funcNum) {
+    uint32_t pinNum_t = pinNum;
+    uint32_t pinselReg_idx = 2 * portNum;
+    uint32_t* pPinCon = (uint32_t*)&LPC_PINCON->PINSEL0;
 
-    if (pinnum_t >= 16) {
-        pinnum_t -= 16;
-        pinselreg_idx++;
+    if (pinNum_t >= 16) {
+        pinNum_t -= 16;
+        pinselReg_idx++;
     }
-    *(uint32_t *)(pPinCon + pinselreg_idx) &= ~(0x03UL << (pinnum_t * 2));
-    *(uint32_t *)(pPinCon + pinselreg_idx) |= ((uint32_t)funcnum) << (pinnum_t * 2);
+    *(uint32_t*)(pPinCon + pinselReg_idx) &= ~(PINSEL_FUNC_MASK << (pinNum_t * 2));
+    *(uint32_t*)(pPinCon + pinselReg_idx) |= ((uint32_t)funcNum) << (pinNum_t * 2);
 }
 
-/*********************************************************************//**
- * @brief         Setup resistor mode for each pin
- * @param[in]    portnum PORT number,
- *                 should be one of the following:
- *                 - PINSEL_PORT_0    : Port 0
- *                 - PINSEL_PORT_1    : Port 1
- *                 - PINSEL_PORT_2    : Port 2
- *                 - PINSEL_PORT_3    : Port 3
- * @param[in]    pinnum    Pin number,
- *                 should be one of the following:
-                - PINSEL_PIN_0 : Pin 0
-                - PINSEL_PIN_1 : Pin 1
-                - PINSEL_PIN_2 : Pin 2
-                - PINSEL_PIN_3 : Pin 3
-                - PINSEL_PIN_4 : Pin 4
-                - PINSEL_PIN_5 : Pin 5
-                - PINSEL_PIN_6 : Pin 6
-                - PINSEL_PIN_7 : Pin 7
-                - PINSEL_PIN_8 : Pin 8
-                - PINSEL_PIN_9 : Pin 9
-                - PINSEL_PIN_10 : Pin 10
-                - PINSEL_PIN_11 : Pin 11
-                - PINSEL_PIN_12 : Pin 12
-                - PINSEL_PIN_13 : Pin 13
-                - PINSEL_PIN_14 : Pin 14
-                - PINSEL_PIN_15 : Pin 15
-                - PINSEL_PIN_16 : Pin 16
-                - PINSEL_PIN_17 : Pin 17
-                - PINSEL_PIN_18 : Pin 18
-                - PINSEL_PIN_19 : Pin 19
-                - PINSEL_PIN_20 : Pin 20
-                - PINSEL_PIN_21 : Pin 21
-                - PINSEL_PIN_22 : Pin 22
-                - PINSEL_PIN_23 : Pin 23
-                - PINSEL_PIN_24 : Pin 24
-                - PINSEL_PIN_25 : Pin 25
-                - PINSEL_PIN_26 : Pin 26
-                - PINSEL_PIN_27 : Pin 27
-                - PINSEL_PIN_28 : Pin 28
-                - PINSEL_PIN_29 : Pin 29
-                - PINSEL_PIN_30 : Pin 30
-                - PINSEL_PIN_31 : Pin 31
-
- * @param[in]     modenum: Mode number,
- *                 should be one of the following:
-                - PINSEL_PINMODE_PULLUP    : Internal pull-up resistor
-                - PINSEL_PINMODE_TRISTATE : Tri-state
-                - PINSEL_PINMODE_PULLDOWN : Internal pull-down resistor
-
- * @return         None
+/*********************************************************************/ /**
+ * @brief       Configures the resistor mode for a pin.
+ *
+ * @param[in]   portNum  PINSEL_PORT_x, where x is in the range [0,3].
+ * @param[in]   pinNum   PINSEL_PIN_x, where x is in the range [0,31].
+ * @param[in]   pinMode: Must be one of:
+ *                       - PINSEL_PINMODE_PULLUP    : Internal pull-up resistor.
+ *                       - PINSEL_PINMODE_REPEATER  : Repeater mode.
+ *                       - PINSEL_PINMODE_TRISTATE  : Tri-state.
+ *                       - PINSEL_PINMODE_PULLDOWN  : Internal pull-down resistor.
+ *
+ * @return      None
  **********************************************************************/
-void set_ResistorMode ( uint8_t portnum, uint8_t pinnum, uint8_t modenum)
-{
-    uint32_t pinnum_t = pinnum;
-    uint32_t pinmodereg_idx = 2 * portnum;
-    uint32_t *pPinCon = (uint32_t *)&LPC_PINCON->PINMODE0;
+static void set_ResistorMode(uint8_t portNum, uint8_t pinNum, uint8_t pinMode) {
+    uint32_t pinNum_t = pinNum;
+    uint32_t pinmodeReg_idx = 2 * portNum;
+    uint32_t* pPinCon = (uint32_t*)&LPC_PINCON->PINMODE0;
 
-    if (pinnum_t >= 16) {
-        pinnum_t -= 16;
-        pinmodereg_idx++ ;
+    if (pinNum_t >= 16) {
+        pinNum_t -= 16;
+        pinmodeReg_idx++;
     }
 
-    *(uint32_t *)(pPinCon + pinmodereg_idx) &= ~(0x03UL << (pinnum_t * 2));
-    *(uint32_t *)(pPinCon + pinmodereg_idx) |= ((uint32_t)modenum) << (pinnum_t * 2);
+    *(uint32_t*)(pPinCon + pinmodeReg_idx) &= ~(PINSEL_FUNC_MASK << (pinNum_t * 2));
+    *(uint32_t*)(pPinCon + pinmodeReg_idx) |= ((uint32_t)pinMode) << (pinNum_t * 2);
 }
 
-/*********************************************************************//**
- * @brief         Setup Open drain mode for each pin
- * @param[in]    portnum PORT number,
- *                 should be one of the following:
- *                 - PINSEL_PORT_0    : Port 0
- *                 - PINSEL_PORT_1    : Port 1
- *                 - PINSEL_PORT_2    : Port 2
- *                 - PINSEL_PORT_3    : Port 3
+/*********************************************************************/ /**
+ * @brief       Configures the open-drain mode for a pin.
  *
- * @param[in]    pinnum    Pin number,
- *                 should be one of the following:
-                - PINSEL_PIN_0 : Pin 0
-                - PINSEL_PIN_1 : Pin 1
-                - PINSEL_PIN_2 : Pin 2
-                - PINSEL_PIN_3 : Pin 3
-                - PINSEL_PIN_4 : Pin 4
-                - PINSEL_PIN_5 : Pin 5
-                - PINSEL_PIN_6 : Pin 6
-                - PINSEL_PIN_7 : Pin 7
-                - PINSEL_PIN_8 : Pin 8
-                - PINSEL_PIN_9 : Pin 9
-                - PINSEL_PIN_10 : Pin 10
-                - PINSEL_PIN_11 : Pin 11
-                - PINSEL_PIN_12 : Pin 12
-                - PINSEL_PIN_13 : Pin 13
-                - PINSEL_PIN_14 : Pin 14
-                - PINSEL_PIN_15 : Pin 15
-                - PINSEL_PIN_16 : Pin 16
-                - PINSEL_PIN_17 : Pin 17
-                - PINSEL_PIN_18 : Pin 18
-                - PINSEL_PIN_19 : Pin 19
-                - PINSEL_PIN_20 : Pin 20
-                - PINSEL_PIN_21 : Pin 21
-                - PINSEL_PIN_22 : Pin 22
-                - PINSEL_PIN_23 : Pin 23
-                - PINSEL_PIN_24 : Pin 24
-                - PINSEL_PIN_25 : Pin 25
-                - PINSEL_PIN_26 : Pin 26
-                - PINSEL_PIN_27 : Pin 27
-                - PINSEL_PIN_28 : Pin 28
-                - PINSEL_PIN_29 : Pin 29
-                - PINSEL_PIN_30 : Pin 30
-                - PINSEL_PIN_31 : Pin 31
-
- * @param[in]    modenum  Open drain mode number,
- *                 should be one of the following:
- *                 - PINSEL_PINMODE_NORMAL : Pin is in the normal (not open drain) mode
- *                 - PINSEL_PINMODE_OPENDRAIN : Pin is in the open drain mode
+ * @param[in]   portNum   PINSEL_PORT_x, where x is in the range [0,3].
+ * @param[in]   pinNum    PINSEL_PIN_x, where x is in the range [0,31].
+ * @param[in]   openDrain Must be one of:
+ *                        - PINSEL_OD_MODE_NORMAL     : Normal mode (not open-drain).
+ *                        - PINSEL_OD_MODE_OPENDRAIN  : Open-drain mode.
  *
- * @return         None
+ * @return      None
  **********************************************************************/
-void set_OpenDrainMode( uint8_t portnum, uint8_t pinnum, uint8_t modenum)
-{
-    uint32_t *pPinCon = (uint32_t *)&LPC_PINCON->PINMODE_OD0;
+static void set_OpenDrainMode(uint8_t portNum, uint8_t pinNum, uint8_t openDrain) {
+    uint32_t* pPinCon = (uint32_t*)&LPC_PINCON->PINMODE_OD0;
 
-    if (modenum == PINSEL_PINMODE_OPENDRAIN){
-        *(uint32_t *)(pPinCon + portnum) |= (0x01UL << pinnum);
+    if (openDrain == PINSEL_OD_MODE_OPENDRAIN) {
+        *(uint32_t*)(pPinCon + portNum) |= (PINSEL_PIN_MASK << pinNum);
     } else {
-        *(uint32_t *)(pPinCon + portnum) &= ~(0x01UL << pinnum);
+        *(uint32_t*)(pPinCon + portNum) &= ~(PINSEL_PIN_MASK << pinNum);
     }
 }
 
-/* End of Public Functions ---------------------------------------------------- */
+/* End of Private Functions --------------------------------------------------- */
 
 /* Public Functions ----------------------------------------------------------- */
 /** @addtogroup PINSEL_Public_Functions
  * @{
  */
-/*********************************************************************//**
- * @brief         Configure trace function
- * @param[in]     NewState State of the Trace function configuration,
- *                 should be one of the following:
- *                 - ENABLE : Enable Trace Function
- *                 - DISABLE : Disable Trace Function
+
+/*********************************************************************/ /**
+ * @brief       Configures the pin according to the parameters in PinCfg.
  *
- * @return         None
+ * @param[in]   PinCfg  Pointer to a `PINSEL_CFG_Type` structure that contains
+ *                      the configuration information for the specified pin.
+ * @return      None
  **********************************************************************/
-void PINSEL_ConfigTraceFunc(FunctionalState NewState)
-{
-    if (NewState == ENABLE) {
-        LPC_PINCON->PINSEL10 |= (0x01UL << 3);
-    } else if (NewState == DISABLE) {
-        LPC_PINCON->PINSEL10 &= ~(0x01UL << 3);
+void PINSEL_ConfigPin(const PINSEL_CFG_Type* PinCfg) {
+    set_PinFunc(PinCfg->portNum, PinCfg->pinNum, PinCfg->funcNum);
+    set_ResistorMode(PinCfg->portNum, PinCfg->pinNum, PinCfg->pinMode);
+    set_OpenDrainMode(PinCfg->portNum, PinCfg->pinNum, PinCfg->openDrain);
+}
+
+/*********************************************************************/ /**
+ * @brief       Configures multiple pins according to the parameters in
+ *              PinCfg and the bitValue mask.
+ *
+ * @param[in]   PinCfg    Pointer to a `PINSEL_CFG_Type` structure containing
+ *                        the base configuration for the pins.
+ * @param[in]   bitValue  32-bit value where each bit set to 1 indicates that
+ *                        the corresponding pin (0-31) will be configured.
+ *
+ * @note        For each bit set in bitValue, the corresponding pin is configured
+ *              using the parameters from PinCfg, except that the pinNum field in
+ *              the original PinCfg is ignored and set automatically for each pin.
+ *
+ * @return      None
+ **********************************************************************/
+void PINSEL_ConfigMultiplePins(const PINSEL_CFG_Type* PinCfg, uint32_t bitValue) {
+    PINSEL_CFG_Type tempCfg = *PinCfg;
+    for (uint8_t pin = 0; pin < 32; pin++) {
+        if (bitValue & (1U << pin)) {
+            tempCfg.pinNum = pin;
+            PINSEL_ConfigPin(&tempCfg);
+        }
     }
 }
 
-/*********************************************************************//**
- * @brief         Setup I2C0 pins
- * @param[in]    i2cPinMode I2C pin mode,
- *                 should be one of the following:
- *                 - PINSEL_I2C_Normal_Mode : The standard drive mode
- *                 - PINSEL_I2C_Fast_Mode : Fast Mode Plus drive mode
+/*********************************************************************/ /**
+ * @brief       Configures the trace function.
  *
- * @param[in]    filterSlewRateEnable  should be:
- *                 - ENABLE: Enable filter and slew rate.
- *                 - DISABLE: Disable filter and slew rate.
+ * @param[in]   NewState Must be:
+ *                       - ENABLE : Enable Trace Function.
+ *                       - DISABLE : Disable Trace Function.
  *
- * @return         None
+ * @return      None
  **********************************************************************/
-void PINSEL_SetI2C0Pins(uint8_t i2cPinMode, FunctionalState filterSlewRateEnable)
-{
+void PINSEL_ConfigTraceFunc(FunctionalState NewState) {
+    if (NewState == ENABLE) {
+        LPC_PINCON->PINSEL10 |= (PINSEL_PIN_MASK << 3);
+    } else if (NewState == DISABLE) {
+        LPC_PINCON->PINSEL10 &= ~(PINSEL_PIN_MASK << 3);
+    }
+}
+
+/*********************************************************************/ /**
+ * @brief       Configures the I2C pins according to the specified parameters.
+ *
+ * @param[in]   driveMode Should be one of the following:
+ *                        - PINSEL_I2C_NORMAL : Standard drive mode.
+ *                        - PINSEL_I2C_FAST   : Fast Mode Plus drive mode.
+ *
+ * @param[in]   filterSlewRate Should be:
+ *                             - ENABLE  : Enables filter and slew rate control.
+ *                             - DISABLE : Disables filter and slew rate control.
+ *
+ * @note        If `filterSlewRate` is DISABLE, the `driveMode` parameter
+ *              is ignored and both pins are configured as standard drive mode
+ *              (`PINSEL_I2C_NORMAL`) with filter and slew rate control disabled.
+ *
+ * @return      None
+ **********************************************************************/
+void PINSEL_SetI2CPins(uint8_t driveMode, FunctionalState filterSlewRate) {
     uint32_t regVal = 0;
 
-    if (i2cPinMode == PINSEL_I2C_Fast_Mode){
+    if (driveMode == PINSEL_I2C_FAST) {
         regVal = PINSEL_I2CPADCFG_SCLDRV0 | PINSEL_I2CPADCFG_SDADRV0;
     }
 
-    if (filterSlewRateEnable == DISABLE){
+    if (filterSlewRate == DISABLE) {
         regVal = PINSEL_I2CPADCFG_SCLI2C0 | PINSEL_I2CPADCFG_SDAI2C0;
     }
-    
+
     LPC_PINCON->I2CPADCFG = regVal;
-}
-
-
-/*********************************************************************//**
- * @brief         Configure Pin corresponding to specified parameters passed
- *                 in the PinCfg
- * @param[in]    PinCfg    Pointer to a PINSEL_CFG_Type structure
- *                    that contains the configuration information for the
- *                    specified pin.
- * @return         None
- **********************************************************************/
-void PINSEL_ConfigPin(PINSEL_CFG_Type *PinCfg)
-{
-    set_PinFunc(PinCfg->Portnum, PinCfg->Pinnum, PinCfg->Funcnum);
-    set_ResistorMode(PinCfg->Portnum, PinCfg->Pinnum, PinCfg->Pinmode);
-    set_OpenDrainMode(PinCfg->Portnum, PinCfg->Pinnum, PinCfg->OpenDrain);
 }
 
 

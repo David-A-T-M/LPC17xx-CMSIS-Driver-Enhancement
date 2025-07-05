@@ -1,2 +1,3 @@
 Release
-CMakeLists.txt
+../CMakeLists.txt
+../.clang-format
