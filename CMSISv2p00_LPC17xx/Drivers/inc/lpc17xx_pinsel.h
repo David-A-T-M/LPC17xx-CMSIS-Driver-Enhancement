@@ -114,7 +114,7 @@ extern "C" {
 #define PINSEL_I2C_FAST             ((1))   /**< Fast Mode Plus drive mode.*/
 
 /***********************************************************************
- * Macros define for I2C mode.
+ * Macros define for masks.
  ***********************************************************************/
 #define PINSEL_FUNC_MASK            ((0x03UL))  /**< Function selection mask.*/
 #define PINSEL_PIN_MASK             ((0x01UL))  /** Pin selection mask.*/
