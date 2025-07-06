@@ -169,6 +169,7 @@ uint32_t FIO_ReadValue(uint8_t portNum);
 void FIO_TogglePins(uint8_t portNum, uint32_t bitValue);
 void FIO_SetMask(uint8_t portNum, uint32_t bitValue, FunctionalState newState);
 void FIO_IntCmd(uint8_t portNum, uint32_t newValue, uint8_t edgeState);
+FunctionalState FIO_GetPortIntStatus(uint8_t portNum);
 FunctionalState FIO_GetIntStatus(uint8_t portNum, uint32_t pinNum, uint8_t edgeState);
 void FIO_ClearInt(uint8_t portNum, uint32_t pinNum);
 
