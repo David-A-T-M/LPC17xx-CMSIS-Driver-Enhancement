@@ -35,7 +35,7 @@ static void set_OpenDrainMode(uint8_t portNum, uint8_t pinNum, uint8_t openDrain
 /*********************************************************************/ /**
  * @brief       Sets up the pin selection function.
  *
- * @param[in]   portNum  PINSEL_PORT_x, where x is in the range [0,3].
+ * @param[in]   portNum  PINSEL_PORT_x, where x is in the range [0,4].
  * @param[in]   pinNum   PINSEL_PIN_x, where x is in the range [0,31].
  * @param[in]   funcNum  PINSEL_FUNC_x, where x is in the range [0,3].
  *
@@ -57,7 +57,7 @@ static void set_PinFunc(uint8_t portNum, uint8_t pinNum, uint8_t funcNum) {
 /*********************************************************************/ /**
  * @brief       Configures the resistor mode for a pin.
  *
- * @param[in]   portNum  PINSEL_PORT_x, where x is in the range [0,3].
+ * @param[in]   portNum  PINSEL_PORT_x, where x is in the range [0,4].
  * @param[in]   pinNum   PINSEL_PIN_x, where x is in the range [0,31].
  * @param[in]   pinMode: Must be one of:
  *                       - PINSEL_PINMODE_PULLUP    : Internal pull-up resistor.
@@ -84,7 +84,7 @@ static void set_ResistorMode(uint8_t portNum, uint8_t pinNum, uint8_t pinMode) {
 /*********************************************************************/ /**
  * @brief       Configures the open-drain mode for a pin.
  *
- * @param[in]   portNum   PINSEL_PORT_x, where x is in the range [0,3].
+ * @param[in]   portNum   PINSEL_PORT_x, where x is in the range [0,4].
  * @param[in]   pinNum    PINSEL_PIN_x, where x is in the range [0,31].
  * @param[in]   openDrain Must be one of:
  *                        - PINSEL_OD_MODE_NORMAL     : Normal mode (not open-drain).
