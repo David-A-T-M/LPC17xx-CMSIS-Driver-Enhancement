@@ -1,4 +1,4 @@
-/***********************************************************************//**
+/***********************************************************************/ /**
  * @file		lpc17xx_exti.h
  * @brief		Contains all macro definitions and function prototypes
  * 				support for External interrupt firmware library on LPC17xx
@@ -31,24 +31,19 @@
 #include "LPC17xx.h"
 #include "lpc_types.h"
 
-
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
-
 
 /* Private Macros ------------------------------------------------------------- */
 /** @defgroup EXTI_Private_Macros EXTI Private Macros
  * @{
  */
-/*********************************************************************//**
- * Macro defines for EXTI  control register
+
+/*********************************************************************/ /**
+ * Macro defines for EXTI masks.
  **********************************************************************/
-#define EXTI_EINT0_BIT_MARK 	0x01
-#define EXTI_EINT1_BIT_MARK 	0x02
-#define EXTI_EINT2_BIT_MARK 	0x04
-#define EXTI_EINT3_BIT_MARK 	0x08
+#define EINT_ALL_MASK ((0xF))
 
 /**
  * @}
@@ -60,55 +55,49 @@ extern "C"
  */
 
 /**
- * @brief EXTI external interrupt line option
+ * @brief EXTI external interrupt line option.
  */
-typedef enum
-{
-	EXTI_EINT0, /*!<  External interrupt 0, P2.10 */
-	EXTI_EINT1, /*!<  External interrupt 0, P2.11 */
-	EXTI_EINT2, /*!<  External interrupt 0, P2.12 */
-	EXTI_EINT3 	/*!<  External interrupt 0, P2.13 */
+typedef enum {
+    EXTI_EINT0, /*!<  External interrupt 0, P2.10.*/
+    EXTI_EINT1, /*!<  External interrupt 0, P2.11.*/
+    EXTI_EINT2, /*!<  External interrupt 0, P2.12.*/
+    EXTI_EINT3  /*!<  External interrupt 0, P2.13.*/
 } EXTI_LINE_ENUM;
 
 /**
- * @brief EXTI mode option
+ * @brief EXTI mode option.
  */
-typedef enum
-{
-	EXTI_MODE_LEVEL_SENSITIVE, 	/*!< Level sensitivity is selected */
-	EXTI_MODE_EDGE_SENSITIVE  	/*!< Edge sensitivity is selected */
+typedef enum {
+    EXTI_MODE_LEVEL_SENSITIVE, /*!< Level sensitivity is selected.*/
+    EXTI_MODE_EDGE_SENSITIVE   /*!< Edge sensitivity is selected.*/
 } EXTI_MODE_ENUM;
 
 /**
- * @brief EXTI polarity option
+ * @brief EXTI polarity option.
  */
-typedef enum
-{
-	EXTI_POLARITY_LOW_ACTIVE_OR_FALLING_EDGE,	/*!< Low active or falling edge sensitive
-												depending on pin mode */
-	EXTI_POLARITY_HIGH_ACTIVE_OR_RISING_EDGE	/*!< High active or rising edge sensitive
-												depending on pin mode */
+typedef enum {
+    EXTI_POLARITY_LOW_ACTIVE = 0,   /*!< Low active sensitive.*/
+    EXTI_POLARITY_FALLING_EDGE = 0, /*!< Falling edge sensitive.*/
+    EXTI_POLARITY_HIGH_ACTIVE = 1,  /*!< High active sensitive.*/
+    EXTI_POLARITY_RISING_EDGE = 1   /*!< Rising edge sensitive.*/
 } EXTI_POLARITY_ENUM;
 
 /**
- * @brief EXTI Initialize structure
+ * @brief EXTI Initialize structure.
  */
-typedef struct
-{
-	EXTI_LINE_ENUM EXTI_Line; /*!<Select external interrupt pin (EINT0, EINT1, EINT 2, EINT3) */
+typedef struct {
+    EXTI_LINE_ENUM EXTI_Line;           /*!<Select external interrupt pin (EINTx) */
 
-	EXTI_MODE_ENUM EXTI_Mode; /*!< Choose between Level-sensitivity or Edge sensitivity */
+    EXTI_MODE_ENUM EXTI_Mode;           /*!< Choose between Level or Edge sensitivity */
 
-	EXTI_POLARITY_ENUM EXTI_polarity; /*!< 	If EXTI mode is level-sensitive: this element use to select low or high active level
-											if EXTI mode is polarity-sensitive: this element use to select falling or rising edge */
+    EXTI_POLARITY_ENUM EXTI_Polarity;   /*!< Selects the active level (low/high) if EXTI_Mode is level-sensitive,
+                                             or the edge (falling/rising) if EXTI_Mode is edge-sensitive. */
 
-}EXTI_InitTypeDef;
-
+} EXTI_InitTypeDef;
 
 /**
  * @}
  */
-
 
 /* Public Functions ----------------------------------------------------------- */
 /** @defgroup EXTI_Public_Functions EXTI Public Functions
@@ -116,23 +105,48 @@ typedef struct
  */
 
 void EXTI_Init(void);
-void EXTI_DeInit(void);
 
-void EXTI_Config(EXTI_InitTypeDef *EXTICfg);
+void EXTI_Config(EXTI_InitTypeDef* EXTICfg);
+void EXTI_ConfigEnable(EXTI_InitTypeDef* EXTICfg);
 void EXTI_SetMode(EXTI_LINE_ENUM EXTILine, EXTI_MODE_ENUM mode);
 void EXTI_SetPolarity(EXTI_LINE_ENUM EXTILine, EXTI_POLARITY_ENUM polarity);
-void EXTI_ClearEXTIFlag(EXTI_LINE_ENUM EXTILine);
 
+/*********************************************************************/ /**
+ * @brief       Clears the external interrupt flag for the specified EXTI line.
+ * @param[in]   EXTILine  External interrupt line, must be:
+ *                        - EXTI_EINTx, where x is in the range [0,3].
+ *********************************************************************/
+static __INLINE void EXTI_ClearFlag(EXTI_LINE_ENUM EXTILine) {
+    LPC_SC->EXTINT |= (1 << EXTILine);
+}
+
+/*********************************************************************/ /**
+ * @brief       Gets the status of the external interrupt flag for the specified EXTI line.
+ * @param[in]   EXTILine  External interrupt line, must be:
+ *                        - EXTI_EINTx, where x is in the range [0,3].
+ * @return      1 if the interrupt flag is set, 0 otherwise.
+ *********************************************************************/
+static __INLINE uint8_t EXTI_GetFlag(EXTI_LINE_ENUM EXTILine) {
+    return (LPC_SC->EXTINT & (1 << EXTILine)) ? 1 : 0;
+}
+
+/*********************************************************************/ /**
+ * @brief       Clears the interrupt flag and enables the IRQ for the specified EXTI line.
+ * @param[in]   EXTILine  External interrupt line, must be:
+ *                        - EXTI_EINTx, where x is in the range [0,3].
+ *********************************************************************/
+static __INLINE void EXTI_EnableIRQ(EXTI_LINE_ENUM EXTILine) {
+    EXTI_ClearFlag(EXTILine);
+    NVIC_EnableIRQ((IRQn_Type)(EINT0_IRQn + EXTILine));
+}
 
 /**
  * @}
  */
 
-
 #ifdef __cplusplus
 }
 #endif
-
 
 #endif /* LPC17XX_EXTI_H_ */
 
