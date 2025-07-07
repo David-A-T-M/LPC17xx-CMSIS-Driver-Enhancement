@@ -104,11 +104,66 @@ typedef struct {
  * @{
  */
 
+/*********************************************************************/ /**
+ * @brief       Initializes the External Interrupt (EXTI) controller.
+ *
+ * This function disables all external IRQs (EINT0 to EINT3) in the NVIC and sets the EXTMODE
+ * and EXTPOLAR registers to their default values (level-sensitive mode, low polarity).
+ *
+ * @note        It is safe to call this function during system initialization or before configuring
+ *              individual external interrupt lines. To clear pending flags, use EXTI_ClearEXTIFlag
+ *              or EINT_EnableIRQ as appropriate.
+ *********************************************************************/
 void EXTI_Init(void);
 
+/*********************************************************************/ /**
+ * @brief       Configures a specific External Interrupt (EXTI) line.
+ *
+ * This function disables the corresponding external IRQ in the NVIC before making any changes,
+ * sets the mode and polarity for the selected EXTI line.
+ *
+ * @param[in]   EXTICfg  Pointer to an EXTI_InitTypeDef structure containing the configuration
+ *                       information for the specified external interrupt line.
+ *********************************************************************/
 void EXTI_Config(EXTI_InitTypeDef* EXTICfg);
+
+/*********************************************************************/ /**
+ * @brief       Configures and enables a specific External Interrupt (EXTI) line.
+ *
+ * This function disables the corresponding external IRQ in the NVIC before making any changes,
+ * sets the mode and polarity for the selected EXTI line, clears the interrupt flag for that line,
+ * and finally enables the IRQ in the NVIC.
+ *
+ * This sequence ensures safe configuration and activation of the external interrupt, preventing
+ * spurious interrupts and guaranteeing that the interrupt flag is cleared before enabling.
+ *
+ * @param[in]   EXTICfg  Pointer to an EXTI_InitTypeDef structure containing the configuration
+ *                       information for the specified external interrupt line.
+ *********************************************************************/
 void EXTI_ConfigEnable(EXTI_InitTypeDef* EXTICfg);
+
+/*********************************************************************/ /**
+ * @brief       Sets the mode (level or edge sensitivity) for a specific EXTI line.
+ *
+ * @param[in]   EXTILine  External interrupt line, must be:
+ *                        - EXTI_EINTx, where x is in the range [0,3].
+ * @param[in]   mode      Mode selection, must be:
+ *                        - EXTI_MODE_LEVEL_SENSITIVE
+ *                        - EXTI_MODE_EDGE_SENSITIVE
+ * @note        If the mode value is invalid, the function does nothing.
+*********************************************************************/
 void EXTI_SetMode(EXTI_LINE_ENUM EXTILine, EXTI_MODE_ENUM mode);
+
+/*********************************************************************/ /**
+ * @brief       Sets the polarity (active level or edge) for a specific EXTI line.
+ *
+ * @param[in]   EXTILine  External interrupt line, must be:
+ *                        - EXTI_EINTx, where x is in the range [0,3].
+ * @param[in]   polarity  Polarity selection, should be:
+ *                        - EXTI_POLARITY_LOW_ACTIVE or EXTI_POLARITY_FALLING_EDGE (equivalent)
+ *                        - EXTI_POLARITY_HIGH_ACTIVE or EXTI_POLARITY_RISING_EDGE (equivalent)
+ * @note        If the polarity value is invalid, the function does nothing.
+*********************************************************************/
 void EXTI_SetPolarity(EXTI_LINE_ENUM EXTILine, EXTI_POLARITY_ENUM polarity);
 
 /*********************************************************************/ /**

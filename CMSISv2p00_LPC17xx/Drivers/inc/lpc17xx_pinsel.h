@@ -171,12 +171,53 @@ typedef struct {
  * @{
  */
 
+/*********************************************************************/ /**
+ * @brief       Configures the pin according to the parameters in PinCfg.
+ *
+ * @param[in]   PinCfg  Pointer to a `PINSEL_CFG_Type` structure that contains
+ *                      the configuration information for the specified pin.
+ **********************************************************************/
 void PINSEL_ConfigPin(const PINSEL_CFG_Type* PinCfg);
 
+/*********************************************************************/ /**
+ * @brief       Configures multiple pins according to the parameters in
+ *              PinCfg and the bitValue mask.
+ *
+ * @param[in]   PinCfg    Pointer to a `PINSEL_CFG_Type` structure containing
+ *                        the base configuration for the pins.
+ * @param[in]   numPins   32-bit value where each bit set to 1 indicates that
+ *                        the corresponding pin (0-31) will be configured.
+ *
+ * @note        For each bit set in bitValue, the corresponding pin is configured
+ *              using the parameters from PinCfg, except that the pinNum field in
+ *              the original PinCfg is ignored and set automatically for each pin.
+ **********************************************************************/
 void PINSEL_ConfigMultiplePins(const PINSEL_CFG_Type* PinCfg, uint32_t numPins);
 
+/*********************************************************************/ /**
+ * @brief       Configures the trace function.
+ *
+ * @param[in]   NewState Must be:
+ *                       - ENABLE : Enable Trace Function.
+ *                       - DISABLE : Disable Trace Function.
+ **********************************************************************/
 void PINSEL_ConfigTraceFunc(FunctionalState NewState);
 
+/*********************************************************************/ /**
+ * @brief       Configures the I2C pins according to the specified parameters.
+ *
+ * @param[in]   driveMode Should be one of the following:
+ *                        - PINSEL_I2C_NORMAL : Standard drive mode.
+ *                        - PINSEL_I2C_FAST   : Fast Mode Plus drive mode.
+ *
+ * @param[in]   filterSlewRate Should be:
+ *                             - ENABLE  : Enables filter and slew rate control.
+ *                             - DISABLE : Disables filter and slew rate control.
+ *
+ * @note        If `filterSlewRate` is DISABLE, the `driveMode` parameter
+ *              is ignored and both pins are configured as standard drive mode
+ *              (`PINSEL_I2C_NORMAL`) with filter and slew rate control disabled.
+ **********************************************************************/
 void PINSEL_SetI2CPins(uint8_t driveMode, FunctionalState filterSlewRate);
 
 /**

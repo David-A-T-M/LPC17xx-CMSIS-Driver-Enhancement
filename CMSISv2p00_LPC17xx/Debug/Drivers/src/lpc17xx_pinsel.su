@@ -1,3 +1,0 @@
-lpc17xx_pinsel.c:245:6:PINSEL_ConfigTraceFunc	0	static
-lpc17xx_pinsel.c:267:6:PINSEL_SetI2C0Pins	0	static
-lpc17xx_pinsel.c:291:6:PINSEL_ConfigPin	20	static
