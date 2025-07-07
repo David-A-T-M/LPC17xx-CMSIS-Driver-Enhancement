@@ -253,13 +253,13 @@ void debug_frmwrk_init(void)
     /*
      * Initialize UART0 pin connect
      */
-    PinCfg.Funcnum = 1;
-    PinCfg.OpenDrain = 0;
-    PinCfg.Pinmode = 0;
-    PinCfg.Pinnum = 2;
-    PinCfg.Portnum = 0;
+    PinCfg.funcNum = 1;
+    PinCfg.openDrain = 0;
+    PinCfg.pinMode = 0;
+    PinCfg.pinNum = 2;
+    PinCfg.portNum = 0;
     PINSEL_ConfigPin(&PinCfg);
-    PinCfg.Pinnum = 3;
+    PinCfg.pinNum = 3;
     PINSEL_ConfigPin(&PinCfg);
 #elif (USED_UART_DEBUG_PORT==1)
     /*
