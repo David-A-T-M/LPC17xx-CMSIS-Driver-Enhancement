@@ -36,136 +36,51 @@
 #include "lpc17xx_libcfg_default.h"
 #endif /* __BUILD_WITH_EXAMPLE__ */
 
-
 #ifdef _SYSTICK
 
 /* Public Functions ----------------------------------------------------------- */
 /** @addtogroup SYSTICK_Public_Functions
  * @{
  */
-/*********************************************************************//**
- * @brief 		Initial System Tick with using internal CPU clock source
- * @param[in]	time	time interval(ms)
- * @return 		None
- **********************************************************************/
+
 void SYSTICK_InternalInit(uint32_t time)
 {
-	uint32_t cclk;
-	float maxtime;
-
-	cclk = SystemCoreClock;
-	/* With internal CPU clock frequency for LPC17xx is 'SystemCoreClock'
-	 * And limit 24 bit for LOAD value
-	 * So the maximum time can be set:
-	 * 1/SystemCoreClock * (2^24) * 1000 (ms)
-	 */
-	//check time value is available or not
-	maxtime = (1<<24)/(SystemCoreClock / 1000) ;
-	if(time > maxtime)
-		//Error loop
-		while(1);
-	else
-	{
-		//Select CPU clock is System Tick clock source
-		SysTick->CTRL |= ST_CTRL_CLKSOURCE;
-		/* Set RELOAD value
-		 * RELOAD = (SystemCoreClock/1000) * time - 1
-		 * with time base is millisecond
-		 */
-		SysTick->LOAD = (cclk/1000)*time - 1;
-	}
+    SYSTICK_ExternalInit(SystemCoreClock, time);
+    SysTick->CTRL |= ST_CTRL_CLKSOURCE;
 }
 
-/*********************************************************************//**
- * @brief 		Initial System Tick with using external clock source
- * @param[in]	freq	external clock frequency(Hz)
- * @param[in]	time	time interval(ms)
- * @return 		None
- **********************************************************************/
-void SYSTICK_ExternalInit(uint32_t freq, uint32_t time)
+void SYSTICK_ExternalInit(uint32_t extFreq, uint32_t time)
 {
-	float maxtime;
+    const float maxtime = (float)(ST_MAX_LOAD) * 1000 / (float)extFreq;
 
-	/* With external clock frequency for LPC17xx is 'freq'
-	 * And limit 24 bit for RELOAD value
-	 * So the maximum time can be set:
-	 * 1/freq * (2^24) * 1000 (ms)
-	 */
-	//check time value is available or not
-	maxtime = (1<<24)/(freq / 1000) ;
-	if (time>maxtime)
-		//Error Loop
-		while(1);
+	SysTick->CTRL &= ~ ST_CTRL_CLKSOURCE;
+
+	if ((float)time > maxtime)
+	    SysTick->LOAD = ST_MAX_LOAD;
 	else
-	{
-		//Select external clock is System Tick clock source
-		SysTick->CTRL &= ~ ST_CTRL_CLKSOURCE;
-		/* Set RELOAD value
-		 * RELOAD = (freq/1000) * time - 1
-		 * with time base is millisecond
-		 */
-		maxtime = (freq/1000)*time - 1;
-		SysTick->LOAD = (freq/1000)*time - 1;
-	}
+		SysTick->LOAD = (extFreq/1000)*time - 1;
 }
 
-/*********************************************************************//**
- * @brief 		Enable/disable System Tick counter
- * @param[in]	NewState	System Tick counter status, should be:
- * 					- ENABLE
- * 					- DISABLE
- * @return 		None
- **********************************************************************/
 void SYSTICK_Cmd(FunctionalState NewState)
 {
 	CHECK_PARAM(PARAM_FUNCTIONALSTATE(NewState));
 
 	if(NewState == ENABLE)
-		//Enable System Tick counter
 		SysTick->CTRL |= ST_CTRL_ENABLE;
 	else
-		//Disable System Tick counter
 		SysTick->CTRL &= ~ST_CTRL_ENABLE;
 }
 
-/*********************************************************************//**
- * @brief 		Enable/disable System Tick interrupt
- * @param[in]	NewState	System Tick interrupt status, should be:
- * 					- ENABLE
- * 					- DISABLE
- * @return 		None
- **********************************************************************/
 void SYSTICK_IntCmd(FunctionalState NewState)
 {
 	CHECK_PARAM(PARAM_FUNCTIONALSTATE(NewState));
 
 	if(NewState == ENABLE)
-		//Enable System Tick counter
 		SysTick->CTRL |= ST_CTRL_TICKINT;
 	else
-		//Disable System Tick counter
 		SysTick->CTRL &= ~ST_CTRL_TICKINT;
 }
 
-/*********************************************************************//**
- * @brief 		Get current value of System Tick counter
- * @param[in]	None
- * @return 		current value of System Tick counter
- **********************************************************************/
-uint32_t SYSTICK_GetCurrentValue(void)
-{
-	return (SysTick->VAL);
-}
-
-/*********************************************************************//**
- * @brief 		Clear Counter flag
- * @param[in]	None
- * @return 		None
- **********************************************************************/
-void SYSTICK_ClearCounterFlag(void)
-{
-	SysTick->CTRL &= ~ST_CTRL_COUNTFLAG;
-}
 /**
  * @}
  */
