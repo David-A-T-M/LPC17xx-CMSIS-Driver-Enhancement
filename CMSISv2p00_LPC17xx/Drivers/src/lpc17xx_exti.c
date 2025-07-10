@@ -52,14 +52,14 @@ void EXTI_Init(void) {
     LPC_SC->EXTPOLAR = 0x0;
 }
 
-void EXTI_Config(EXTI_InitTypeDef* EXTICfg) {
+void EXTI_Config(const EXTI_CFG_Type* EXTICfg) {
     NVIC_DisableIRQ((IRQn_Type)(EINT0_IRQn + EXTICfg->EXTI_Line));
 
     EXTI_SetMode(EXTICfg->EXTI_Line, EXTICfg->EXTI_Mode);
     EXTI_SetPolarity(EXTICfg->EXTI_Line, EXTICfg->EXTI_Polarity);
 }
 
-void EXTI_ConfigEnable(EXTI_InitTypeDef* EXTICfg) {
+void EXTI_ConfigEnable(const EXTI_CFG_Type* EXTICfg) {
     EXTI_Config(EXTICfg);
     EXTI_EnableIRQ(EXTICfg->EXTI_Line);
 }

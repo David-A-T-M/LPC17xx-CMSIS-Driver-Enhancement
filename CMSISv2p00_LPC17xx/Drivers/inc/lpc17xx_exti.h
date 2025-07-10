@@ -93,7 +93,7 @@ typedef struct {
     EXTI_POLARITY_ENUM EXTI_Polarity;   /*!< Selects the active level (low/high) if EXTI_Mode is level-sensitive,
                                              or the edge (falling/rising) if EXTI_Mode is edge-sensitive. */
 
-} EXTI_InitTypeDef;
+} EXTI_CFG_Type;
 
 /**
  * @}
@@ -122,10 +122,10 @@ void EXTI_Init(void);
  * This function disables the corresponding external IRQ in the NVIC before making any changes,
  * sets the mode and polarity for the selected EXTI line.
  *
- * @param[in]   EXTICfg  Pointer to an EXTI_InitTypeDef structure containing the configuration
+ * @param[in]   EXTICfg  Pointer to an EXTI_CFG_Type structure containing the configuration
  *                       information for the specified external interrupt line.
  *********************************************************************/
-void EXTI_Config(EXTI_InitTypeDef* EXTICfg);
+void EXTI_Config(const EXTI_CFG_Type* EXTICfg);
 
 /*********************************************************************/ /**
  * @brief       Configures and enables a specific External Interrupt (EXTI) line.
@@ -137,10 +137,10 @@ void EXTI_Config(EXTI_InitTypeDef* EXTICfg);
  * This sequence ensures safe configuration and activation of the external interrupt, preventing
  * spurious interrupts and guaranteeing that the interrupt flag is cleared before enabling.
  *
- * @param[in]   EXTICfg  Pointer to an EXTI_InitTypeDef structure containing the configuration
+ * @param[in]   EXTICfg  Pointer to an EXTI_CFG_Type structure containing the configuration
  *                       information for the specified external interrupt line.
  *********************************************************************/
-void EXTI_ConfigEnable(EXTI_InitTypeDef* EXTICfg);
+void EXTI_ConfigEnable(const EXTI_CFG_Type* EXTICfg);
 
 /*********************************************************************/ /**
  * @brief       Sets the mode (level or edge sensitivity) for a specific EXTI line.
