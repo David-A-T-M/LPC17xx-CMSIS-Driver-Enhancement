@@ -181,7 +181,8 @@ void GPIO_WriteValue(uint8_t portNum, uint32_t newValue)
     LPC_GPIO_TypeDef *pGPIO = GPIO_GetPointer(portNum);
 
     if (pGPIO != NULL) {
-        pGPIO->FIOPIN = newValue;
+        pGPIO->FIOCLR = ~newValue;
+        pGPIO->FIOSET = newValue;
     }
 }
 
@@ -201,7 +202,11 @@ void GPIO_TogglePins(uint8_t portNum, uint32_t bitValue)
     LPC_GPIO_TypeDef *pGPIO = GPIO_GetPointer(portNum);
 
     if (pGPIO != NULL) {
-        pGPIO->FIOPIN ^= bitValue;
+        const uint32_t current = pGPIO->FIOPIN;
+        const uint32_t toSet = (~current) & bitValue;
+        const uint32_t toClear = current & bitValue;
+        pGPIO->FIOSET = toSet;
+        pGPIO->FIOCLR = toClear;
     }
 }
 
@@ -373,10 +378,12 @@ void FIO_HalfWordWriteValue(uint8_t portNum, uint8_t halfwordNum, uint16_t newVa
     GPIO_HalfWord_TypeDef *pFIO = FIO_HalfWordGetPointer(portNum);
     if (pFIO != NULL) {
         if (halfwordNum == HIGH_HALFWORD) {
-            pFIO->FIOPINU = newValue;
+            pFIO->FIOCLRU = ~newValue;
+            pFIO->FIOSETU = newValue;
         }
         else if (halfwordNum == LOW_HALFWORD) {
-            pFIO->FIOPINL = newValue;
+            pFIO->FIOCLRL = ~newValue;
+            pFIO->FIOSETL = newValue;
         }
     }
 }
@@ -400,10 +407,18 @@ void FIO_HalfWordTogglePins(uint8_t portNum, uint8_t halfwordNum, uint16_t bitVa
     GPIO_HalfWord_TypeDef *pFIO = FIO_HalfWordGetPointer(portNum);
     if (pFIO != NULL) {
         if (halfwordNum == HIGH_HALFWORD) {
-            pFIO->FIOPINU ^= bitValue;
+            const uint16_t current = pFIO->FIOPINU;
+            const uint16_t toSet = (~current) & bitValue;
+            const uint16_t toClear = current & bitValue;
+            pFIO->FIOSETU = toSet;
+            pFIO->FIOCLRU = toClear;
         }
         else if (halfwordNum == LOW_HALFWORD) {
-            pFIO->FIOPINL ^= bitValue;
+            const uint16_t current = pFIO->FIOPINL;
+            const uint16_t toSet = (~current) & bitValue;
+            const uint16_t toClear = current & bitValue;
+            pFIO->FIOSETL = toSet;
+            pFIO->FIOCLRL = toClear;
         }
     }
 }
@@ -474,10 +489,9 @@ void FIO_ByteClearValue(uint8_t portNum, uint8_t byteNum, uint8_t bitValue)
 void FIO_ByteWriteValue(uint8_t portNum, uint8_t byteNum, uint8_t newValue)
 {
     GPIO_Byte_TypeDef *pFIO = FIO_ByteGetPointer(portNum);
-    if (pFIO != NULL) {
-        if (byteNum <= 3){
-            pFIO->FIOPIN[byteNum] = newValue;
-        }
+    if (pFIO != NULL && byteNum <= 3) {
+        pFIO->FIOCLR[byteNum] = ~newValue;
+        pFIO->FIOSET[byteNum] = newValue;
     }
 }
 
@@ -495,10 +509,12 @@ uint8_t FIO_ByteReadValue(uint8_t portNum, uint8_t byteNum)
 void FIO_ByteTogglePins(uint8_t portNum, uint8_t byteNum, uint8_t bitValue)
 {
     GPIO_Byte_TypeDef *pFIO = FIO_ByteGetPointer(portNum);
-    if (pFIO != NULL) {
-        if (byteNum <= 3){
-            pFIO->FIOPIN[byteNum] ^= bitValue;
-        }
+    if (pFIO != NULL && byteNum <= 3) {
+        uint8_t current = pFIO->FIOPIN[byteNum];
+        uint8_t toSet = (~current) & bitValue;
+        uint8_t toClear = current & bitValue;
+        pFIO->FIOSET[byteNum] = toSet;
+        pFIO->FIOCLR[byteNum] = toClear;
     }
 }
 
