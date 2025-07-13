@@ -49,4 +49,13 @@
 #define PROPAGATION_DELAY() \
 do { for (volatile unsigned int _d = 0; _d < 50; ++_d) {}} while(0)
 
+#define EDGE_INT_P0_LOW(n)  do{ LPC_PINCON->PINMODE0 |=  (0x3 << ((n) * 2)); \
+								for (volatile int _d = 0; _d < 50; ++_d) {} \
+                                LPC_PINCON->PINMODE0 &= ~(0x3 << ((n) * 2)); \
+								for (volatile int _d = 0; _d < 50; ++_d) {}} while(0)
+#define EDGE_INT_P0_HIGH(n) do{ LPC_PINCON->PINMODE1 |=  (0x3 << (((n) - 16) * 2)); \
+								for (volatile int _d = 0; _d < 50; ++_d) {} \
+                                LPC_PINCON->PINMODE1 &= ~(0x3 << (((n) - 16) * 2)); \
+								for (volatile int _d = 0; _d < 50; ++_d) {}} while(0)
+
 #endif //TEST_UTILS_H

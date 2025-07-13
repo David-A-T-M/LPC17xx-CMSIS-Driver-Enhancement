@@ -1,0 +1,533 @@
+/**
+ * @file     lpc17xx_gpio_tests.c
+ * @brief    Tests for the LPC17xx GPIO driver.
+ * @version  V1.0
+ * @date     11 July 2025
+ */
+#include "lpc17xx_gpio_tests.h"
+#include "test_utils.h"
+
+uint8_t GPIO_SetDirTest(void);
+uint8_t GPIO_SetValueTest(void);
+uint8_t GPIO_ClearValueTest(void);
+uint8_t GPIO_WriteValueTest(void);
+uint8_t GPIO_ReadValueTest(void);
+uint8_t GPIO_TogglePinsTest(void);
+uint8_t GPIO_SetMaskTest(void);
+uint8_t GPIO_IntCmdTest(void);
+uint8_t GPIO_GetPortIntStatusTest(void);
+uint8_t GPIO_GetPinIntStatusTest(void);
+uint8_t GPIO_ClearIntTest(void);
+uint8_t FIO_HalfWordSetDirTest(void);
+uint8_t FIO_HalfWordSetValueTest(void);
+uint8_t FIO_HalfWordClearValueTest(void);
+uint8_t FIO_HalfWordWriteValueTest(void);
+uint8_t FIO_HalfWordReadValueTest(void);
+uint8_t FIO_HalfWordTogglePinsTest(void);
+uint8_t FIO_HalfWordSetMaskTest(void);
+uint8_t FIO_ByteSetDirTest(void);
+uint8_t FIO_ByteSetValueTest(void);
+uint8_t FIO_ByteClearValueTest(void);
+uint8_t FIO_ByteWriteValueTest(void);
+uint8_t FIO_ByteReadValueTest(void);
+uint8_t FIO_ByteTogglePinsTest(void);
+uint8_t FIO_ByteSetMaskTest(void);
+
+/**
+ * @brief Guarantees port0 as output low.
+ */
+void GPIO_Setup(void) {
+    LPC_GPIO0->FIODIR = 0xFFFFFFFF;
+    LPC_GPIO0->FIOCLR = 0xFFFFFFFF;
+    LPC_GPIO0->FIOMASK = 0x00000000;
+    LPC_GPIOINT->IO0IntClr = 0xFFFFFFFF;
+}
+
+void GPIO_TearDown(void) {
+    LPC_GPIOINT->IO0IntClr = 0xFFFFFFFF;
+    LPC_GPIOINT->IO2IntClr = 0xFFFFFFFF;
+    LPC_GPIOINT->IO0IntEnF = 0x00000000;
+    LPC_GPIOINT->IO0IntEnR = 0x00000000;
+    LPC_GPIOINT->IO2IntEnF = 0x00000000;
+    LPC_GPIOINT->IO2IntEnR = 0x00000000;
+}
+
+void GPIO_RunTests(void) {
+    RUN_TESTS_INIT();
+
+    RUN_TEST(GPIO_SetDirTest);
+    RUN_TEST(GPIO_SetValueTest);
+    RUN_TEST(GPIO_ClearValueTest);
+    RUN_TEST(GPIO_WriteValueTest);
+    RUN_TEST(GPIO_ReadValueTest);
+    RUN_TEST(GPIO_TogglePinsTest);
+    RUN_TEST(GPIO_SetMaskTest);
+    RUN_TEST(GPIO_IntCmdTest);
+    RUN_TEST(GPIO_GetPortIntStatusTest);
+    RUN_TEST(GPIO_GetPinIntStatusTest);
+    RUN_TEST(GPIO_ClearIntTest);
+    RUN_TEST(FIO_HalfWordSetDirTest)
+    RUN_TEST(FIO_HalfWordSetValueTest)
+    RUN_TEST(FIO_HalfWordClearValueTest)
+    RUN_TEST(FIO_HalfWordWriteValueTest)
+    RUN_TEST(FIO_HalfWordReadValueTest)
+    RUN_TEST(FIO_HalfWordTogglePinsTest)
+    RUN_TEST(FIO_HalfWordSetMaskTest)
+    RUN_TEST(FIO_ByteSetDirTest)
+    RUN_TEST(FIO_ByteSetValueTest)
+    RUN_TEST(FIO_ByteClearValueTest)
+    RUN_TEST(FIO_ByteWriteValueTest)
+    RUN_TEST(FIO_ByteReadValueTest)
+    RUN_TEST(FIO_ByteTogglePinsTest)
+    RUN_TEST(FIO_ByteSetMaskTest)
+
+    GPIO_Setup();
+
+    RUN_TESTS_END("GPIO");
+}
+
+uint8_t GPIO_SetDirTest(void) {
+    GPIO_Setup();
+    TEST_INIT();
+
+    GPIO_SetDir(GPIO_PORT_0, 0xFF, INPUT);
+    EXPECT_EQUAL((LPC_GPIO0->FIODIR & PORT_0_MASK), (0xFFFFFF00 & PORT_0_MASK));
+
+    GPIO_SetDir(GPIO_PORT_0, 0xCF, OUTPUT);
+    EXPECT_EQUAL((LPC_GPIO0->FIODIR & PORT_0_MASK), (0xFFFFFFCF & PORT_0_MASK));
+
+    ASSERT_TEST();
+}
+
+uint8_t GPIO_SetValueTest(void) {
+    GPIO_Setup();
+    TEST_INIT();
+
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0x0 & PORT_0_MASK));
+
+    GPIO_SetValue(GPIO_PORT_0, 0x0F0F);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0x00000F0F & PORT_0_MASK));
+
+    GPIO_SetValue(GPIO_PORT_0, 0x0FF0);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0x00000FFF & PORT_0_MASK));
+
+    ASSERT_TEST();
+}
+
+uint8_t GPIO_ClearValueTest(void) {
+    GPIO_Setup();
+    TEST_INIT();
+
+    GPIO_SetValue(GPIO_PORT_0, 0xFFFFFFFF);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0xFFFFFFFF & PORT_0_MASK));
+
+    GPIO_ClearValue(GPIO_PORT_0, 0x0F0F);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0xFFFFF0F0 & PORT_0_MASK));
+
+    GPIO_ClearValue(GPIO_PORT_0, 0x0FF0);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0xFFFFF000 & PORT_0_MASK));
+
+    ASSERT_TEST();
+}
+
+uint8_t GPIO_WriteValueTest(void) {
+    GPIO_Setup();
+    TEST_INIT();
+
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0x0 & PORT_0_MASK));
+
+    GPIO_WriteValue(GPIO_PORT_0, 0xFF000F0F);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0xFF000F0F & PORT_0_MASK));
+
+    GPIO_WriteValue(GPIO_PORT_0, 0x00FFFF00);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0x00FFFF00 & PORT_0_MASK));
+
+    GPIO_WriteValue(GPIO_PORT_0, 0x0F);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0x0000000F & PORT_0_MASK));
+
+    ASSERT_TEST();
+}
+
+uint8_t GPIO_ReadValueTest(void) {
+    GPIO_Setup();
+    TEST_INIT();
+
+    LPC_GPIO0->FIOSET = 0x55;
+    EXPECT_EQUAL((GPIO_ReadValue(GPIO_PORT_0) & PORT_0_MASK), (0x55 & PORT_0_MASK));
+
+    ASSERT_TEST();
+}
+
+uint8_t GPIO_TogglePinsTest(void) {
+    GPIO_Setup();
+    TEST_INIT();
+
+    GPIO_TogglePins(GPIO_PORT_0, 0xF00F);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0x0000F00F & PORT_0_MASK));
+
+    GPIO_TogglePins(GPIO_PORT_0, 0xFFFF);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0x00000FF0 & PORT_0_MASK));
+
+    GPIO_TogglePins(GPIO_PORT_0, 0xFFFFFFFF);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0xFFFFF00F & PORT_0_MASK));
+
+    ASSERT_TEST();
+}
+
+uint8_t GPIO_SetMaskTest(void) {
+    GPIO_Setup();
+    TEST_INIT();
+
+    GPIO_SetMask(GPIO_PORT_0, 0xF00F, ENABLE);
+    EXPECT_EQUAL((LPC_GPIO0->FIOMASK & PORT_0_MASK), (0xF00F & PORT_0_MASK));
+
+    GPIO_SetMask(GPIO_PORT_0, 0xFF, DISABLE);
+    EXPECT_EQUAL((LPC_GPIO0->FIOMASK & PORT_0_MASK), (0xF000 & PORT_0_MASK));
+
+    GPIO_SetMask(GPIO_PORT_0, 0xFF0, ENABLE);
+    EXPECT_EQUAL((LPC_GPIO0->FIOMASK & PORT_0_MASK), (0xFFF0 & PORT_0_MASK));
+
+    ASSERT_TEST();
+}
+
+uint8_t GPIO_IntCmdTest(void) {
+    GPIO_Setup();
+    TEST_INIT();
+
+    GPIO_IntCmd(GPIO_PORT_0, 0xF00F, GPIO_INT_RISING);
+    GPIO_IntCmd(GPIO_PORT_0, 0x00FF, GPIO_INT_FALLING);
+    EXPECT_EQUAL((LPC_GPIOINT->IO0IntEnR & PORT_0_MASK), (0xF00F & PORT_0_MASK));
+    EXPECT_EQUAL((LPC_GPIOINT->IO0IntEnF & PORT_0_MASK), (0x00FF & PORT_0_MASK));
+
+    GPIO_IntCmd(GPIO_PORT_0, 0x0FF0, GPIO_INT_RISING);
+    GPIO_IntCmd(GPIO_PORT_0, 0xFF00, GPIO_INT_FALLING);
+    EXPECT_EQUAL((LPC_GPIOINT->IO0IntEnR & PORT_0_MASK), (0x0FF0 & PORT_0_MASK));
+    EXPECT_EQUAL((LPC_GPIOINT->IO0IntEnF & PORT_0_MASK), (0xFF00 & PORT_0_MASK));
+
+    GPIO_TearDown();
+    ASSERT_TEST();
+}
+
+uint8_t GPIO_GetPortIntStatusTest(void) {
+    GPIO_Setup();
+    TEST_INIT();
+
+    LPC_GPIO0->FIODIR = 0xFFFFFFF0;
+
+    EXPECT_EQUAL((LPC_GPIOINT->IntStatus & 0x1), 0x0);
+
+    GPIO_IntCmd(GPIO_PORT_0, 0x1, GPIO_INT_RISING);
+    EDGE_INT_P0_LOW(0);
+    EXPECT_EQUAL((LPC_GPIOINT->IntStatus & 0x1), 0x1);
+
+    LPC_GPIOINT->IO0IntClr = 0x1;
+
+    GPIO_IntCmd(GPIO_PORT_0, 0x0, GPIO_INT_RISING);
+    EDGE_INT_P0_LOW(0);
+    EXPECT_EQUAL((LPC_GPIOINT->IntStatus & 0x1), 0x0);
+
+    LPC_GPIOINT->IO0IntClr = 0x1;
+
+    GPIO_IntCmd(GPIO_PORT_0, 0x1, GPIO_INT_FALLING);
+    EDGE_INT_P0_LOW(0);
+    EXPECT_EQUAL((LPC_GPIOINT->IntStatus & 0x1), 0x1);
+
+    LPC_GPIOINT->IO0IntClr = 0x1;
+
+    GPIO_IntCmd(GPIO_PORT_0, 0x0, GPIO_INT_FALLING);
+    EDGE_INT_P0_LOW(0);
+    EXPECT_EQUAL((LPC_GPIOINT->IntStatus & 0x1), 0x0);
+
+    GPIO_TearDown();
+    ASSERT_TEST();
+}
+
+uint8_t GPIO_GetPinIntStatusTest(void) {
+    GPIO_Setup();
+    TEST_INIT();
+
+    LPC_GPIO0->FIODIR = 0xFFFFFFF0;
+
+    EXPECT_EQUAL((LPC_GPIOINT->IntStatus & 0x1), 0x0);
+
+    GPIO_IntCmd(GPIO_PORT_0, 0x2, GPIO_INT_RISING);
+    EDGE_INT_P0_LOW(1);
+    EXPECT_EQUAL(GPIO_GetPinIntStatus(GPIO_PORT_0, 1, GPIO_INT_RISING), ENABLE);
+
+    LPC_GPIOINT->IO0IntClr = 0xF;
+
+    GPIO_IntCmd(GPIO_PORT_0, 0x0, GPIO_INT_RISING);
+    EDGE_INT_P0_LOW(1);
+    EXPECT_EQUAL(GPIO_GetPinIntStatus(GPIO_PORT_0, 1, GPIO_INT_RISING), DISABLE);
+
+    LPC_GPIOINT->IO0IntClr = 0xF;
+
+    GPIO_IntCmd(GPIO_PORT_0, 0x4, GPIO_INT_FALLING);
+    EDGE_INT_P0_LOW(2);
+    EXPECT_EQUAL(GPIO_GetPinIntStatus(GPIO_PORT_0, 2, GPIO_INT_FALLING), ENABLE);
+
+    LPC_GPIOINT->IO0IntClr = 0xF;
+
+    GPIO_IntCmd(GPIO_PORT_0, 0x0, GPIO_INT_FALLING);
+    EDGE_INT_P0_LOW(2);
+    EXPECT_EQUAL(GPIO_GetPinIntStatus(GPIO_PORT_0, 2, GPIO_INT_FALLING), DISABLE);
+
+    GPIO_TearDown();
+    ASSERT_TEST();
+}
+
+uint8_t GPIO_ClearIntTest(void) {
+    GPIO_Setup();
+    TEST_INIT();
+
+    LPC_GPIO0->FIODIR = 0xFFFFFFF0;
+
+    EXPECT_EQUAL((LPC_GPIOINT->IntStatus & 0x1), 0x0);
+
+    GPIO_IntCmd(GPIO_PORT_0, 0x1, GPIO_INT_RISING);
+    EDGE_INT_P0_LOW(0);
+
+    GPIO_ClearInt(GPIO_PORT_0, 0x1);
+    EXPECT_EQUAL((LPC_GPIOINT->IntStatus & 0x1), 0x0);
+
+    GPIO_TearDown();
+    ASSERT_TEST();
+}
+
+uint8_t FIO_HalfWordSetDirTest(void) {
+    GPIO_Setup();
+    TEST_INIT();
+
+    FIO_HalfWordSetDir(GPIO_PORT_0, LOW_HALFWORD, 0xFF, INPUT);
+    EXPECT_EQUAL((LPC_GPIO0->FIODIR & PORT_0_MASK), (0xFFFFFF00 & PORT_0_MASK));
+
+    FIO_HalfWordSetDir(GPIO_PORT_0, HIGH_HALFWORD, 0xFF, INPUT);
+    EXPECT_EQUAL((LPC_GPIO0->FIODIR & PORT_0_MASK), (0xFF00FF00 & PORT_0_MASK));
+
+    FIO_HalfWordSetDir(GPIO_PORT_0, LOW_HALFWORD, 0xFF, OUTPUT);
+    EXPECT_EQUAL((LPC_GPIO0->FIODIR & PORT_0_MASK), (0xFF00FFFF & PORT_0_MASK));
+
+    FIO_HalfWordSetDir(GPIO_PORT_0, HIGH_HALFWORD, 0xF0, OUTPUT);
+    EXPECT_EQUAL((LPC_GPIO0->FIODIR & PORT_0_MASK), (0xFFF0FFFF & PORT_0_MASK));
+
+    ASSERT_TEST();
+}
+
+uint8_t FIO_HalfWordSetValueTest(void) {
+    GPIO_Setup();
+    TEST_INIT();
+
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0x00000000 & PORT_0_MASK));
+
+    FIO_HalfWordSetValue(GPIO_PORT_0, LOW_HALFWORD, 0x0F0F);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0x00000F0F & PORT_0_MASK));
+
+    FIO_HalfWordSetValue(GPIO_PORT_0, HIGH_HALFWORD, 0x0FF0);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0x0FF00F0F & PORT_0_MASK));
+
+    FIO_HalfWordSetValue(GPIO_PORT_0, HIGH_HALFWORD, 0xF0F0);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0xFFF00F0F & PORT_0_MASK));
+
+    ASSERT_TEST();
+}
+
+uint8_t FIO_HalfWordClearValueTest(void) {
+    GPIO_Setup();
+    TEST_INIT();
+
+    GPIO_SetValue(GPIO_PORT_0, 0xFFFFFFFF);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0xFFFFFFFF & PORT_0_MASK));
+
+    FIO_HalfWordClearValue(GPIO_PORT_0, LOW_HALFWORD, 0x0F0F);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0xFFFFF0F0 & PORT_0_MASK));
+
+    FIO_HalfWordClearValue(GPIO_PORT_0, LOW_HALFWORD, 0x0FF0);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0xFFFFF000 & PORT_0_MASK));
+
+    FIO_HalfWordClearValue(GPIO_PORT_0, HIGH_HALFWORD, 0x0FF0);
+    REG_PROPAGATION_DELAY();
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0xF00FF000 & PORT_0_MASK));
+
+    ASSERT_TEST();
+}
+
+uint8_t FIO_HalfWordWriteValueTest(void) {
+    GPIO_Setup();
+    TEST_INIT();
+
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0x00000000 & PORT_0_MASK));
+
+    FIO_HalfWordWriteValue(GPIO_PORT_0, LOW_HALFWORD, 0x0F0F);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0x00000F0F & PORT_0_MASK));
+
+    FIO_HalfWordWriteValue(GPIO_PORT_0, LOW_HALFWORD, 0xFF00);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0x0000FF00 & PORT_0_MASK));
+
+    FIO_HalfWordWriteValue(GPIO_PORT_0, HIGH_HALFWORD, 0x000F);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0x000FFF00 & PORT_0_MASK));
+
+    ASSERT_TEST();
+}
+
+uint8_t FIO_HalfWordReadValueTest(void) {
+    GPIO_Setup();
+    TEST_INIT();
+
+    LPC_GPIO0->FIOSET = 0x660055;
+    EXPECT_EQUAL((FIO_HalfWordReadValue(GPIO_PORT_0, LOW_HALFWORD) & PORT_0_HW_MASK_LOW), (0x55 & PORT_0_HW_MASK_LOW));
+    EXPECT_EQUAL((FIO_HalfWordReadValue(GPIO_PORT_0, HIGH_HALFWORD) & PORT_0_HW_MASK_HIGH), (0x66 & PORT_0_HW_MASK_HIGH));
+
+    ASSERT_TEST();
+}
+
+uint8_t FIO_HalfWordTogglePinsTest(void) {
+    GPIO_Setup();
+    TEST_INIT();
+
+    FIO_HalfWordTogglePins(GPIO_PORT_0, LOW_HALFWORD, 0xF00F);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0x0000F00F & PORT_0_MASK));
+
+    FIO_HalfWordTogglePins(GPIO_PORT_0, LOW_HALFWORD, 0xFFFF);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0x00000FF0 & PORT_0_MASK));
+
+    FIO_HalfWordTogglePins(GPIO_PORT_0, HIGH_HALFWORD, 0xF0F0);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0xF0F00FF0 & PORT_0_MASK));
+
+    ASSERT_TEST();
+}
+
+uint8_t FIO_HalfWordSetMaskTest(void) {
+    GPIO_Setup();
+    TEST_INIT();
+
+    FIO_HalfWordSetMask(GPIO_PORT_0, LOW_HALFWORD, 0xF00F, ENABLE);
+    EXPECT_EQUAL((LPC_GPIO0->FIOMASK & PORT_0_MASK), (0x0000F00F & PORT_0_MASK));
+
+    FIO_HalfWordSetMask(GPIO_PORT_0, LOW_HALFWORD, 0x00FF, DISABLE);
+    EXPECT_EQUAL((LPC_GPIO0->FIOMASK & PORT_0_MASK), (0x0000F000 & PORT_0_MASK));
+
+    FIO_HalfWordSetMask(GPIO_PORT_0, HIGH_HALFWORD, 0x0FF0, ENABLE);
+    EXPECT_EQUAL((LPC_GPIO0->FIOMASK & PORT_0_MASK), (0x0FF0F000 & PORT_0_MASK));
+
+    ASSERT_TEST();
+}
+
+uint8_t FIO_ByteSetDirTest(void) {
+    GPIO_Setup();
+    TEST_INIT();
+
+    FIO_ByteSetDir(GPIO_PORT_0, BYTE0, 0xFF, INPUT);
+    EXPECT_EQUAL((LPC_GPIO0->FIODIR & PORT_0_MASK), (0xFFFFFF00 & PORT_0_MASK));
+
+    FIO_ByteSetDir(GPIO_PORT_0, BYTE0, 0xFF, OUTPUT);
+    EXPECT_EQUAL((LPC_GPIO0->FIODIR & PORT_0_MASK), (0xFFFFFFFF & PORT_0_MASK));
+
+    FIO_ByteSetDir(GPIO_PORT_0, BYTE3, 0xFF, INPUT);
+    EXPECT_EQUAL((LPC_GPIO0->FIODIR & PORT_0_MASK), (0x00FFFFFF & PORT_0_MASK));
+
+    FIO_ByteSetDir(GPIO_PORT_0, BYTE3, 0xF0, OUTPUT);
+    EXPECT_EQUAL((LPC_GPIO0->FIODIR & PORT_0_MASK), (0xF0FFFFFF & PORT_0_MASK));
+
+    ASSERT_TEST();
+}
+
+uint8_t FIO_ByteSetValueTest(void) {
+    GPIO_Setup();
+    TEST_INIT();
+
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0x00000000 & PORT_0_MASK));
+
+    FIO_ByteSetValue(GPIO_PORT_0, BYTE0, 0x0F);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0x0000000F & PORT_0_MASK));
+
+    FIO_ByteSetValue(GPIO_PORT_0, BYTE0, 0x00);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0x0000000F & PORT_0_MASK));
+
+    FIO_ByteSetValue(GPIO_PORT_0, BYTE3, 0xF0);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0xF000000F & PORT_0_MASK));
+
+    ASSERT_TEST();
+}
+
+uint8_t FIO_ByteClearValueTest(void) {
+    GPIO_Setup();
+    TEST_INIT();
+
+    GPIO_SetValue(GPIO_PORT_0, 0xFFFFFFFF);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0xFFFFFFFF & PORT_0_MASK));
+
+    FIO_ByteClearValue(GPIO_PORT_0, BYTE0, 0x0F);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0xFFFFFFF0 & PORT_0_MASK));
+
+    FIO_ByteClearValue(GPIO_PORT_0, BYTE0, 0x00);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0xFFFFFFF0 & PORT_0_MASK));
+
+    FIO_ByteClearValue(GPIO_PORT_0, BYTE3, 0xF0);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0x0FFFFFF0 & PORT_0_MASK));
+
+    ASSERT_TEST();
+}
+
+uint8_t FIO_ByteWriteValueTest(void) {
+    GPIO_Setup();
+    TEST_INIT();
+
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0x00000000 & PORT_0_MASK));
+
+    FIO_ByteWriteValue(GPIO_PORT_0, BYTE0, 0x0F);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0x0000000F & PORT_0_MASK));
+
+    FIO_ByteWriteValue(GPIO_PORT_0, BYTE0, 0x00);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0x00000000 & PORT_0_MASK));
+
+    FIO_ByteWriteValue(GPIO_PORT_0, BYTE3, 0x0F);
+    REG_PROPAGATION_DELAY();
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0x0F000000 & PORT_0_MASK));
+
+    ASSERT_TEST();
+}
+
+uint8_t FIO_ByteReadValueTest(void) {
+    GPIO_Setup();
+    TEST_INIT();
+
+    LPC_GPIO0->FIOSET = 0x12664355;
+    EXPECT_EQUAL((FIO_ByteReadValue(GPIO_PORT_0, BYTE0) & PORT_0_B0_MASK), (0x55 & PORT_0_B0_MASK));
+    EXPECT_EQUAL((FIO_ByteReadValue(GPIO_PORT_0, BYTE1) & PORT_0_B1_MASK), (0x43 & PORT_0_B1_MASK));
+    EXPECT_EQUAL((FIO_ByteReadValue(GPIO_PORT_0, BYTE2) & PORT_0_B2_MASK), (0x66 & PORT_0_B2_MASK));
+    EXPECT_EQUAL((FIO_ByteReadValue(GPIO_PORT_0, BYTE3) & PORT_0_B3_MASK), (0x12 & PORT_0_B3_MASK));
+
+    ASSERT_TEST();
+}
+
+uint8_t FIO_ByteTogglePinsTest(void) {
+    GPIO_Setup();
+    TEST_INIT();
+
+    FIO_ByteTogglePins(GPIO_PORT_0, BYTE0, 0x0F);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0x0000000F & PORT_0_MASK));
+
+    FIO_ByteTogglePins(GPIO_PORT_0, BYTE0, 0x00);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0x0000000F & PORT_0_MASK));
+
+    FIO_ByteTogglePins(GPIO_PORT_0, BYTE3, 0xFF);
+    EXPECT_EQUAL((LPC_GPIO0->FIOPIN & PORT_0_MASK), (0xFF00000F & PORT_0_MASK));
+
+    ASSERT_TEST();
+}
+
+uint8_t FIO_ByteSetMaskTest(void) {
+    GPIO_Setup();
+    TEST_INIT();
+
+    FIO_ByteSetMask(GPIO_PORT_0, BYTE0, 0xF0, ENABLE);
+    EXPECT_EQUAL((LPC_GPIO0->FIOMASK & PORT_0_MASK), (0x000000F0 & PORT_0_MASK));
+
+    FIO_ByteSetMask(GPIO_PORT_0, BYTE0, 0x0F, DISABLE);
+    EXPECT_EQUAL((LPC_GPIO0->FIOMASK & PORT_0_MASK), (0x000000F0 & PORT_0_MASK));
+
+    FIO_ByteSetMask(GPIO_PORT_0, BYTE3, 0xFF, ENABLE);
+    EXPECT_EQUAL((LPC_GPIO0->FIOMASK & PORT_0_MASK), (0xFF0000F0 & PORT_0_MASK));
+
+    ASSERT_TEST();
+}
