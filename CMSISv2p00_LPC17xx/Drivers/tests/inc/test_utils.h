@@ -44,7 +44,7 @@
 
 #define RUN_TESTS_INIT()    uint8_t total = 0; uint8_t passed = 0
 #define RUN_TEST(fn)        total++; passed += fn();
-#define RUN_TESTS_END(name) printf("Passed %d/%d %s tests\n", passed, total, name)
+#define RUN_TESTS_END(name) printf("Passed %d/%d %s tests\n\n", passed, total, name)
 
 #define PROPAGATION_DELAY() \
 do { for (volatile unsigned int _d = 0; _d < 50; ++_d) {}} while(0)
