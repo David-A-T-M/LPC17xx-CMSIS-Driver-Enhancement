@@ -37,6 +37,51 @@
 
 #ifdef _EXTI
 
+/* Private Functions ----------------------------------------------------------- */
+/** @addtogroup EXTI_Private_Functions
+ * @{
+ */
+
+/*********************************************************************/ /**
+ * @brief       Sets the mode (level or edge sensitivity) for a specific EXTI line.
+ *
+ * @param[in]   EXTILine  External interrupt line, must be:
+ *                        - EXTI_EINTx, where x is in the range [0,3].
+ * @param[in]   mode      Mode selection, must be:
+ *                        - EXTI_MODE_LEVEL_SENSITIVE
+ *                        - EXTI_MODE_EDGE_SENSITIVE
+ * @note        If the mode value is invalid, the function does nothing.
+*********************************************************************/
+static void EXTI_SetMode(EXTI_LINE_ENUM EXTILine, EXTI_MODE_ENUM mode) {
+    if (mode == EXTI_MODE_EDGE_SENSITIVE) {
+        LPC_SC->EXTMODE |= (1 << EXTILine);
+    } else if (mode == EXTI_MODE_LEVEL_SENSITIVE) {
+        LPC_SC->EXTMODE &= ~(1 << EXTILine);
+    }
+}
+
+/*********************************************************************/ /**
+ * @brief       Sets the polarity (active level or edge) for a specific EXTI line.
+ *
+ * @param[in]   EXTILine  External interrupt line, must be:
+ *                        - EXTI_EINTx, where x is in the range [0,3].
+ * @param[in]   polarity  Polarity selection, should be:
+ *                        - EXTI_POLARITY_LOW_ACTIVE or EXTI_POLARITY_FALLING_EDGE (equivalent)
+ *                        - EXTI_POLARITY_HIGH_ACTIVE or EXTI_POLARITY_RISING_EDGE (equivalent)
+ * @note        If the polarity value is invalid, the function does nothing.
+*********************************************************************/
+static void EXTI_SetPolarity(EXTI_LINE_ENUM EXTILine, EXTI_POLARITY_ENUM polarity) {
+    if (polarity == EXTI_POLARITY_HIGH_ACTIVE) {
+        LPC_SC->EXTPOLAR |= (1 << EXTILine);
+    } else if (polarity == EXTI_POLARITY_LOW_ACTIVE) {
+        LPC_SC->EXTPOLAR &= ~(1 << EXTILine);
+    }
+}
+
+/**
+ * @}
+ */
+
 /* Public Functions ----------------------------------------------------------- */
 /** @addtogroup EXTI_Public_Functions
  * @{
@@ -62,22 +107,6 @@ void EXTI_Config(const EXTI_CFG_Type* EXTICfg) {
 void EXTI_ConfigEnable(const EXTI_CFG_Type* EXTICfg) {
     EXTI_Config(EXTICfg);
     EXTI_EnableIRQ(EXTICfg->EXTI_Line);
-}
-
-void EXTI_SetMode(EXTI_LINE_ENUM EXTILine, EXTI_MODE_ENUM mode) {
-    if (mode == EXTI_MODE_EDGE_SENSITIVE) {
-        LPC_SC->EXTMODE |= (1 << EXTILine);
-    } else if (mode == EXTI_MODE_LEVEL_SENSITIVE) {
-        LPC_SC->EXTMODE &= ~(1 << EXTILine);
-    }
-}
-
-void EXTI_SetPolarity(EXTI_LINE_ENUM EXTILine, EXTI_POLARITY_ENUM polarity) {
-    if (polarity == EXTI_POLARITY_HIGH_ACTIVE) {
-        LPC_SC->EXTPOLAR |= (1 << EXTILine);
-    } else if (polarity == EXTI_POLARITY_LOW_ACTIVE) {
-        LPC_SC->EXTPOLAR &= ~(1 << EXTILine);
-    }
 }
 
 /**
