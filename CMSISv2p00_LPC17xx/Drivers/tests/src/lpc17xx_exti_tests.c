@@ -10,8 +10,6 @@
 uint8_t EXTI_InitTest(void);
 uint8_t EXTI_ConfigTest(void);
 uint8_t EXTI_ConfigEnableTest(void);
-uint8_t EXTI_SetModeTest(void);
-uint8_t EXTI_SetPolarityTest(void);
 uint8_t EXTI_ClearFlagTest(void);
 uint8_t EXTI_GetFlagTest(void);
 uint8_t EXTI_EnableIRQTest(void);
