@@ -143,30 +143,6 @@ void EXTI_Config(const EXTI_CFG_Type* EXTICfg);
 void EXTI_ConfigEnable(const EXTI_CFG_Type* EXTICfg);
 
 /*********************************************************************/ /**
- * @brief       Sets the mode (level or edge sensitivity) for a specific EXTI line.
- *
- * @param[in]   EXTILine  External interrupt line, must be:
- *                        - EXTI_EINTx, where x is in the range [0,3].
- * @param[in]   mode      Mode selection, must be:
- *                        - EXTI_MODE_LEVEL_SENSITIVE
- *                        - EXTI_MODE_EDGE_SENSITIVE
- * @note        If the mode value is invalid, the function does nothing.
-*********************************************************************/
-void EXTI_SetMode(EXTI_LINE_ENUM EXTILine, EXTI_MODE_ENUM mode);
-
-/*********************************************************************/ /**
- * @brief       Sets the polarity (active level or edge) for a specific EXTI line.
- *
- * @param[in]   EXTILine  External interrupt line, must be:
- *                        - EXTI_EINTx, where x is in the range [0,3].
- * @param[in]   polarity  Polarity selection, should be:
- *                        - EXTI_POLARITY_LOW_ACTIVE or EXTI_POLARITY_FALLING_EDGE (equivalent)
- *                        - EXTI_POLARITY_HIGH_ACTIVE or EXTI_POLARITY_RISING_EDGE (equivalent)
- * @note        If the polarity value is invalid, the function does nothing.
-*********************************************************************/
-void EXTI_SetPolarity(EXTI_LINE_ENUM EXTILine, EXTI_POLARITY_ENUM polarity);
-
-/*********************************************************************/ /**
  * @brief       Clears the external interrupt flag for the specified EXTI line.
  * @param[in]   EXTILine  External interrupt line, must be:
  *                        - EXTI_EINTx, where x is in the range [0,3].
@@ -192,6 +168,7 @@ static __INLINE uint8_t EXTI_GetFlag(EXTI_LINE_ENUM EXTILine) {
  *********************************************************************/
 static __INLINE void EXTI_EnableIRQ(EXTI_LINE_ENUM EXTILine) {
     EXTI_ClearFlag(EXTILine);
+    NVIC_ClearPendingIRQ((IRQn_Type)(EINT0_IRQn + EXTILine));
     NVIC_EnableIRQ((IRQn_Type)(EINT0_IRQn + EXTILine));
 }
 
