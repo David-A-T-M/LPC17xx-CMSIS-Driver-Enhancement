@@ -34,8 +34,9 @@ Initially built for educational purposes in the course _Digital Electronics 3_ a
 |-----------|:-------------:|:------------:|:--------------:|
 | `PINSEL`  |  ✅ Complete   |  ✅ Complete  |   ✅ Complete   |
 | `GPIO`    |  ✅ Complete   |  ✅ Complete  |   ✅ Complete   |
-| `systick` |  ✅ Complete   |  ✅ Complete  |   🔲 Planned   |
-| `eint`    |  ✅ Complete   |  ✅ Complete  |   🔲 Planned   |
+| `eint`    |  ✅ Complete   |  ✅ Complete  |   ✅ Complete   |
+| `systick` |  ✅ Complete   |  ✅ Complete  |   ✅ Complete   |
+| `timer`   |  ✅ Complete   |  ✅ Complete  |   🔲 Planned   |
 | `adc`     |  🔲 Planned   |  🔲 Planned  |   🔲 Planned   |
 | `dac`     |  🔲 Planned   |  🔲 Planned  |   🔲 Planned   |
 | `gpdma`   |  🔲 Planned   |  🔲 Planned  |   🔲 Planned   |
