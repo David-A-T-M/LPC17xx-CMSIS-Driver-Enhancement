@@ -5,4 +5,5 @@ void run_all_tests(void) {
     GPIO_RunTests();
     SYSTICK_RunTests();
     EXTI_RunTests();
+    TIMER_RunTests();
 }
