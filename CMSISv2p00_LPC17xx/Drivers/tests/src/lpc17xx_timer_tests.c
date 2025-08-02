@@ -107,7 +107,7 @@ uint8_t TIM_DeInitTest(void) {
     TIM_Init(LPC_TIM0, TIM_TIMER_MODE, &cfg);
     LPC_TIM0->TCR |= TIM_ENABLE;
     TIM_DeInit(LPC_TIM0);
-    EXPECT_EQUAL(LPC_SC->PCONP & 0x2 >> 1, 0x00);
+    EXPECT_EQUAL((LPC_SC->PCONP & 0x2) >> 1, 0x00);
     LPC_SC->PCONP |= 0x2;
 
     ASSERT_TEST();
