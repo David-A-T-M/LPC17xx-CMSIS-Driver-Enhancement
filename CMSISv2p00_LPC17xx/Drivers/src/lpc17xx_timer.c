@@ -198,7 +198,7 @@ void TIM_ConfigStructInit(TIM_MODE_OPT TimerCounterMode, void *TIM_ConfigStruct)
     if (TimerCounterMode == TIM_TIMER_MODE) {
         TIM_TIMERCFG_Type * pTimeCfg = (TIM_TIMERCFG_Type *)TIM_ConfigStruct;
         pTimeCfg->PrescaleOption = TIM_PRESCALE_USVAL;
-        pTimeCfg->PrescaleValue = 0;
+        pTimeCfg->PrescaleValue = 1;
     }
     else {
         TIM_COUNTERCFG_Type * pCounterCfg = (TIM_COUNTERCFG_Type *)TIM_ConfigStruct;
