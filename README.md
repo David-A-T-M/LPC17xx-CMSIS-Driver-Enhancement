@@ -36,7 +36,7 @@ Initially built for educational purposes in the course _Digital Electronics 3_ a
 | `GPIO`    |  ✅ Complete   |  ✅ Complete  |   ✅ Complete   |
 | `eint`    |  ✅ Complete   |  ✅ Complete  |   ✅ Complete   |
 | `systick` |  ✅ Complete   |  ✅ Complete  |   ✅ Complete   |
-| `timer`   |  ✅ Complete   |  ✅ Complete  |   🔲 Planned   |
+| `timer`   |  ✅ Complete   |  ✅ Complete  |   ✅ Complete   |
 | `adc`     |  🔲 Planned   |  🔲 Planned  |   🔲 Planned   |
 | `dac`     |  🔲 Planned   |  🔲 Planned  |   🔲 Planned   |
 | `gpdma`   |  🔲 Planned   |  🔲 Planned  |   🔲 Planned   |

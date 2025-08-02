@@ -5,6 +5,7 @@
 #include "lpc17xx_gpio_tests.h"
 #include "lpc17xx_systick_tests.h"
 #include "lpc17xx_exti_tests.h"
+#include "lpc17xx_timer_tests.h"
 
 void run_all_tests(void);
 
