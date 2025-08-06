@@ -1,3 +1,5 @@
+#ifdef UNIT_TESTING_ENABLED
+
 #include "run_tests.h"
 
 void run_all_tests(void) {
@@ -7,3 +9,5 @@ void run_all_tests(void) {
     EXTI_RunTests();
     TIMER_RunTests();
 }
+
+#endif //UNIT_TESTING_ENABLED

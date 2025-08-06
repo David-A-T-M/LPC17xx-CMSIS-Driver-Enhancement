@@ -4,6 +4,8 @@
  * @version  V1.0
  * @date     01 August 2025
  */
+#ifdef UNIT_TESTING_ENABLED
+
 #include "lpc17xx_timer_tests.h"
 
 uint8_t TIM_InitTimerTest(void);
@@ -285,3 +287,5 @@ uint8_t TIM_ResetCounterTest(void) {
 
     ASSERT_TEST();
 }
+
+#endif //UNIT_TESTING_ENABLED

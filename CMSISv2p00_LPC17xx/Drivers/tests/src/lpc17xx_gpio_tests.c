@@ -4,6 +4,8 @@
  * @version  V1.0
  * @date     11 July 2025
  */
+#ifdef UNIT_TESTING_ENABLED
+
 #include "lpc17xx_gpio_tests.h"
 #include "test_utils.h"
 
@@ -566,3 +568,5 @@ uint8_t FIO_ByteSetMaskTest(void) {
 
     ASSERT_TEST();
 }
+
+#endif // UNIT_TESTING_ENABLED
