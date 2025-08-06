@@ -4,6 +4,8 @@
  * @version  V1.0
  * @date     16 July 2025
  */
+#ifdef UNIT_TESTING_ENABLED
+
 #include "lpc17xx_systick_tests.h"
 
 uint8_t SYSTICK_InternalInitTest();
@@ -209,3 +211,5 @@ uint8_t SYSTICK_HasFiredTest() {
 
     ASSERT_TEST();
 }
+
+#endif // UNIT_TESTING_ENABLED

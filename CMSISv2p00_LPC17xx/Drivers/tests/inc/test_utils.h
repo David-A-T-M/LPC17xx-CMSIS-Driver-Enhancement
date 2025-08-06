@@ -1,6 +1,8 @@
 #ifndef TEST_UTILS_H
 #define TEST_UTILS_H
 
+#ifdef UNIT_TESTING_ENABLED
+
 //==========================================================================
 // Defines for available pins in each port (double register per port).
 //==========================================================================
@@ -74,4 +76,5 @@ do { for (volatile unsigned int _d = 0; _d < 50; ++_d) {}} while(0)
                                 LPC_PINCON->PINMODE5 &= ~(0x3 << (((n) - 16) * 2)); \
                                 for (volatile int _d = 0; _d < 50; ++_d) {}} while(0)
 
+#endif // UNIT_TESTING_ENABLED
 #endif //TEST_UTILS_H

@@ -1,6 +1,8 @@
 #ifndef TEST_ASSERTS_H
 #define TEST_ASSERTS_H
 
+#ifdef UNIT_TESTING_ENABLED
+
 #include <stdio.h>
 #include <stdbool.h>
 
@@ -40,4 +42,5 @@
         return __test_passed; \
     } while(0)
 
+#endif // UNIT_TESTING_ENABLED
 #endif //TEST_ASSERTS_H

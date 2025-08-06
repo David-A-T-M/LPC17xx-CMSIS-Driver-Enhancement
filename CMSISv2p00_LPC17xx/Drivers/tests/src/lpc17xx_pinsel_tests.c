@@ -4,6 +4,8 @@
  * @version  V1.0
  * @date     11 July 2025
  */
+#ifdef UNIT_TESTING_ENABLED
+
 #include "lpc17xx_pinsel_tests.h"
 
 static PINSEL_CFG_Type pinCfg = {0};
@@ -133,3 +135,5 @@ uint8_t PINSEL_ConfigMultiplePinsTest(void) {
 
     ASSERT_TEST();
 }
+
+#endif // UNIT_TESTING_ENABLED
