@@ -57,7 +57,7 @@ void ADC_Init(uint32_t rate) {
     LPC_ADC->ADCR = adc_ctrl;
 }
 
-void ADC_DeInit() {
+void ADC_DeInit(void) {
     LPC_ADC->ADCR &= ~ADC_CR_PDN;
 
     CLKPWR_ConfigPPWR (CLKPWR_PCONP_PCAD, DISABLE);
