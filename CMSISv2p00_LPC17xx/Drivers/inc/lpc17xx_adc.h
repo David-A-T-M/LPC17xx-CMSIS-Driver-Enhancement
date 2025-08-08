@@ -146,10 +146,10 @@ extern "C"
 #define PARAM_ADC_RATE(rate)    ((rate > 0) && (rate <= 200000))
 
 /** Check ADC channel selection parameter */
-#define PARAM_ADC_CHANNEL_SELECTION(SEL)    ( (SEL == ADC_CHANNEL_0) || (ADC_CHANNEL_1) \
-                                           || (SEL == ADC_CHANNEL_2) || (ADC_CHANNEL_3) \
-                                           || (SEL == ADC_CHANNEL_4) || (ADC_CHANNEL_5) \
-                                           || (SEL == ADC_CHANNEL_6) || (ADC_CHANNEL_7) )
+#define PARAM_ADC_CHANNEL_SELECTION(SEL)    ( (SEL == ADC_CHANNEL_0) || (SEL == ADC_CHANNEL_1) \
+                                           || (SEL == ADC_CHANNEL_2) || (SEL == ADC_CHANNEL_3) \
+                                           || (SEL == ADC_CHANNEL_4) || (SEL == ADC_CHANNEL_5) \
+                                           || (SEL == ADC_CHANNEL_6) || (SEL == ADC_CHANNEL_7) )
 
 /** Check ADC start option parameter */
 #define PARAM_ADC_START_OPT(OPT)    ( (OPT == ADC_START_CONTINUOUS) ||  (OPT == ADC_START_NOW) \
@@ -353,7 +353,7 @@ void ADC_EdgeStartConfig(ADC_START_ON_EDGE_OPT EdgeOption);
  *
  * @param[in]  Channel   ADC interrupt type:
  *                       - ADC_ADINTENx [0...7]
-                         - ADC_ADGINTEN
+ *                       - ADC_ADGINTEN
  * @param[in]  NewState  Functional state:
  *                       - ENABLE  : Enable interrupt.
  *                       - DISABLE : Disable interrupt.

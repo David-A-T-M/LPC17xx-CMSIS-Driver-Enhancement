@@ -117,6 +117,7 @@ void ADC_IntConfig(ADC_CHN_INT_OPT Channel, FunctionalState NewState) {
 
     if (NewState) {
         LPC_ADC->ADINTEN |= ADC_INTEN_CH(Channel);
+        return;
     }
     LPC_ADC->ADINTEN &= ~ADC_INTEN_CH(Channel);
 }
