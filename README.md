@@ -37,7 +37,7 @@ Initially built for educational purposes in the course _Digital Electronics 3_ a
 | `eint`    |  ✅ Complete   |  ✅ Complete  |   ✅ Complete   |
 | `systick` |  ✅ Complete   |  ✅ Complete  |   ✅ Complete   |
 | `timer`   |  ✅ Complete   |  ✅ Complete  |   ✅ Complete   |
-| `adc`     |  🔲 Planned   |  🔲 Planned  |   🔲 Planned   |
+| `adc`     |  ✅ Complete   |  ✅ Complete  |   🔲 Planned   |
 | `dac`     |  🔲 Planned   |  🔲 Planned  |   🔲 Planned   |
 | `gpdma`   |  🔲 Planned   |  🔲 Planned  |   🔲 Planned   |
 | `usart`   |  🔲 Planned   |  🔲 Planned  |   🔲 Planned   |
