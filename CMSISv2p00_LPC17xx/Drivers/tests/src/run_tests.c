@@ -8,6 +8,7 @@ void run_all_tests(void) {
     SYSTICK_RunTests();
     EXTI_RunTests();
     TIMER_RunTests();
+    ADC_RunTests();
 }
 
 #endif //UNIT_TESTING_ENABLED
