@@ -34,15 +34,15 @@ Initially built for educational purposes in the course _Digital Electronics 3_ a
 |-----------|:-------------:|:------------:|:--------------:|
 | `PINSEL`  |  ✅ Complete   |  ✅ Complete  |   ✅ Complete   |
 | `GPIO`    |  ✅ Complete   |  ✅ Complete  |   ✅ Complete   |
-| `eint`    |  ✅ Complete   |  ✅ Complete  |   ✅ Complete   |
-| `systick` |  ✅ Complete   |  ✅ Complete  |   ✅ Complete   |
-| `timer`   |  ✅ Complete   |  ✅ Complete  |   ✅ Complete   |
-| `adc`     |  ✅ Complete   |  ✅ Complete  |   🔲 Planned   |
-| `dac`     |  🔲 Planned   |  🔲 Planned  |   🔲 Planned   |
-| `gpdma`   |  🔲 Planned   |  🔲 Planned  |   🔲 Planned   |
-| `usart`   |  🔲 Planned   |  🔲 Planned  |   🔲 Planned   |
-| `nvic`    |  🔲 Planned   |  🔲 Planned  |   🔲 Planned   |
-| `pwm`     |  🔲 Planned   |  🔲 Planned  |   🔲 Planned   |
+| `EINT`    |  ✅ Complete   |  ✅ Complete  |   ✅ Complete   |
+| `SysTick` |  ✅ Complete   |  ✅ Complete  |   ✅ Complete   |
+| `Timer`   |  ✅ Complete   |  ✅ Complete  |   ✅ Complete   |
+| `ADC`     |  ✅ Complete   |  ✅ Complete  |   ✅ Complete   |
+| `DAC`     |  🔲 Planned   |  🔲 Planned  |   🔲 Planned   |
+| `GPDMA`   |  🔲 Planned   |  🔲 Planned  |   🔲 Planned   |
+| `USART`   |  🔲 Planned   |  🔲 Planned  |   🔲 Planned   |
+| `NVIC`    |  🔲 Planned   |  🔲 Planned  |   🔲 Planned   |
+| `PWM`     |  🔲 Planned   |  🔲 Planned  |   🔲 Planned   |
 
 _This table is continuously updated as development progresses._
 
