@@ -38,10 +38,9 @@ Initially built for educational purposes in the course _Digital Electronics 3_ a
 | `SysTick` |  ✅ Complete   |  ✅ Complete  |   ✅ Complete   |
 | `Timer`   |  ✅ Complete   |  ✅ Complete  |   ✅ Complete   |
 | `ADC`     |  ✅ Complete   |  ✅ Complete  |   ✅ Complete   |
-| `DAC`     |  🔲 Planned   |  🔲 Planned  |   🔲 Planned   |
+| `DAC`     |  ✅ Complete   |  ✅ Complete  |   🔲 Planned   |
 | `GPDMA`   |  🔲 Planned   |  🔲 Planned  |   🔲 Planned   |
 | `USART`   |  🔲 Planned   |  🔲 Planned  |   🔲 Planned   |
-| `NVIC`    |  🔲 Planned   |  🔲 Planned  |   🔲 Planned   |
 | `PWM`     |  🔲 Planned   |  🔲 Planned  |   🔲 Planned   |
 
 _This table is continuously updated as development progresses._
