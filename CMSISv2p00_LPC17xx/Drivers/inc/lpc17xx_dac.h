@@ -176,6 +176,7 @@ void DAC_ConfigDAConverterControl(DAC_CONVERTER_CFG_Type *cfgStruct);
  *
  * @note:
  * - Use this function to configure DMA or interrupt timing.
+ * - If time_out is more than 16 bits, only the lower 16 bits are used.
  * - Only the counter value is updated.
  */
 void DAC_SetDMATimeOut(uint32_t time_out);
