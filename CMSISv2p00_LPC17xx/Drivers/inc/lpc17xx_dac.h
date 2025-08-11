@@ -150,7 +150,7 @@ void DAC_UpdateValue(uint32_t newValue);
  */
 void DAC_SetBias(DAC_CURRENT_OPT bias);
 
-/***********************************************************************
+/**
  * @brief      Configures the DAC converter control features.
  *
  * This function enables or disables double buffering, timeout counter,
@@ -167,7 +167,7 @@ void DAC_SetBias(DAC_CURRENT_OPT bias);
  */
 void DAC_ConfigDAConverterControl(DAC_CONVERTER_CFG_Type *cfgStruct);
 
-/***********************************************************************
+/**
  * @brief      Sets the reload value for the DAC interrupt/DMA counter.
  *
  * This function sets the timeout value for the DAC DMA or interrupt counter.
