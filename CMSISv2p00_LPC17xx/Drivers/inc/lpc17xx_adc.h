@@ -1,11 +1,11 @@
-/***********************************************************************//**
+/**
  * @file        lpc17xx_adc.h
  * @brief        Contains all macro definitions and function prototypes
  *                 support for ADC firmware library on LPC17xx
  * @version        3.0
  * @date        18. June. 2010
  * @author        NXP MCU SW Application Team
- **************************************************************************
+ *
  * Software that is described herein is for illustrative purposes only
  * which provides customers with programming information regarding the
  * products. This software is supplied "AS IS" without any warranties.
@@ -16,7 +16,7 @@
  * notification. NXP Semiconductors also make no representation or
  * warranty that such application will be suitable for the specified
  * use without further testing or modification.
- **************************************************************************/
+ */
 
 /* Peripheral group ----------------------------------------------------------- */
 /** @defgroup ADC ADC
@@ -43,13 +43,9 @@ extern "C"
  */
 
 /* -------------------------- BIT DEFINITIONS ----------------------------------- */
-/*********************************************************************//**
- * Macro defines for ADC  control register
- **********************************************************************/
 /**  Selects which of the AD0.0:7 pins is (are) to be sampled and converted */
 #define ADC_CR_CH_SEL(n)            ((1UL << n))
-/**  The APB clock (PCLK) is divided by (this value plus one)
-* to produce the clock for the A/D */
+/**  The APB clock (PCLK) is divided by (this value plus one) to produce the clock for the A/D */
 #define ADC_CR_CLKDIV(n)            ((n<<8))
 /**  Repeated conversions A/D enable bit */
 #define ADC_CR_BURST                ((1UL<<16))
@@ -76,33 +72,26 @@ extern "C"
 /**  Start conversion on a falling edge on the selected CAP/MAT signal */
 #define ADC_CR_EDGE                 ((1UL<<27))
 
-/*********************************************************************//**
- * Macro defines for ADC Global Data register
- **********************************************************************/
+/* ----------------------- ADGDR REGISTER DEFINITIONS ------------------------- */
 /** When DONE is 1, this field contains result value of ADC conversion */
 #define ADC_GDR_RESULT(n)           (((n>>4)&0xFFF))
 /** These bits contain the channel from which the LS bits were converted */
 #define ADC_GDR_CH(n)               (((n>>24)&0x7))
-/** This bit is 1 in burst mode if the results of one or
- * more conversions was (were) lost */
+/** This bit is 1 in burst mode if the results of one or more conversions was (were) lost */
 #define ADC_GDR_OVERRUN_FLAG        ((1UL<<30))
 /** This bit is set to 1 when an A/D conversion completes */
 #define ADC_GDR_DONE_FLAG           ((1UL<<31))
 
 /** This bits is used to mask for Channel */
 #define ADC_GDR_CH_MASK             ((7UL<<24))
-/*********************************************************************//**
- * Macro defines for ADC Interrupt register
- **********************************************************************/
-/** These bits allow control over which A/D channels generate
- * interrupts for conversion completion */
+
+/* --------------------- ADINTEN REGISTER DEFINITIONS -------------------------- */
+/** These bits allow control over which A/D channels generate interrupts for conversion completion */
 #define ADC_INTEN_CH(n)             ((1UL<<n))
 /** When 1, enables the global DONE flag in ADDR to generate an interrupt */
 #define ADC_INTEN_GLOBAL            ((1UL<<8))
 
-/*********************************************************************//**
- * Macro defines for ADC Data register
- **********************************************************************/
+/* --------------------- ADDRx REGISTER DEFINITIONS -------------------------- */
 /** When DONE is 1, this field contains result value of ADC conversion */
 #define ADC_DR_RESULT(n)            (((n>>4)&0xFFF))
 /** These bits mirror the OVERRRUN status flags that appear in the
@@ -112,9 +101,7 @@ extern "C"
  * when this register is read */
 #define ADC_DR_DONE_FLAG            ((1UL<<31))
 
-/*********************************************************************//**
- * Macro defines for ADC Status register
-**********************************************************************/
+/* --------------------- ADSTAT REGISTER DEFINITIONS ------------------------- */
 /** These bits mirror the DONE status flags that appear in the result
  * register for each A/D channel */
 #define ADC_STAT_CH_DONE_FLAG(n)    ((n&0xFF))
@@ -124,9 +111,7 @@ extern "C"
 /** This bit is the A/D interrupt flag */
 #define ADC_STAT_INT_FLAG           ((1UL<<16))
 
-/*********************************************************************//**
- * Macro defines for ADC Trim register
-**********************************************************************/
+/* --------------------- ADTRM REGISTER DEFINITIONS -------------------------- */
 /** Offset trim bits for ADC operation */
 #define ADC_ADCOFFS(n)              (((n&0xF)<<4))
 /** Written to boot code*/
@@ -136,33 +121,9 @@ extern "C"
 /** Check ADC parameter */
 #define PARAM_ADCx(n)    (((uint32_t *)n)==((uint32_t *)LPC_ADC))
 
-/** Check ADC state parameter */
-#define PARAM_ADC_START_ON_EDGE_OPT(OPT)    ((OPT == ADC_START_ON_RISING)||(OPT == ADC_START_ON_FALLING))
-
-/** Check ADC state parameter */
-#define PARAM_ADC_DATA_STATUS(OPT)    ((OPT== ADC_DATA_BURST)||(OPT== ADC_DATA_DONE))
-
 /** Check ADC rate parameter */
 #define PARAM_ADC_RATE(rate)    ((rate > 0) && (rate <= 200000))
 
-/** Check ADC channel selection parameter */
-#define PARAM_ADC_CHANNEL_SELECTION(SEL)    ( (SEL == ADC_CHANNEL_0) || (SEL == ADC_CHANNEL_1) \
-                                           || (SEL == ADC_CHANNEL_2) || (SEL == ADC_CHANNEL_3) \
-                                           || (SEL == ADC_CHANNEL_4) || (SEL == ADC_CHANNEL_5) \
-                                           || (SEL == ADC_CHANNEL_6) || (SEL == ADC_CHANNEL_7) )
-
-/** Check ADC start option parameter */
-#define PARAM_ADC_START_OPT(OPT)    ( (OPT == ADC_START_CONTINUOUS) ||  (OPT == ADC_START_NOW) \
-                                   || (OPT == ADC_START_ON_EINT0)   ||  (OPT == ADC_START_ON_CAP01) \
-                                   || (OPT == ADC_START_ON_MAT01)   ||  (OPT == ADC_START_ON_MAT03) \
-                                   || (OPT == ADC_START_ON_MAT10)   ||  (OPT == ADC_START_ON_MAT11) )
-
-/** Check ADC interrupt type parameter */
-#define PARAM_ADC_CHN_INT_OPT(OPT)    ( (OPT == ADC_ADINTEN0) || (OPT == ADC_ADINTEN1) \
-                                      || (OPT == ADC_ADINTEN2) || (OPT == ADC_ADINTEN3) \
-                                      || (OPT == ADC_ADINTEN4) || (OPT == ADC_ADINTEN5) \
-                                      || (OPT == ADC_ADINTEN6) || (OPT == ADC_ADINTEN7) \
-                                      || (OPT == ADC_ADGINTEN) )
 /**
  * @}
  */
@@ -172,68 +133,71 @@ extern "C"
  * @{
  */
 
-/*********************************************************************//**
- * @brief ADC enumeration
- **********************************************************************/
 /**
  * @brief ADC channel selection.
  */
 typedef enum {
-    ADC_CHANNEL_0 = 0,    /*!< Channel 0 */
-    ADC_CHANNEL_1,        /*!< Channel 1 */
-    ADC_CHANNEL_2,        /*!< Channel 2 */
-    ADC_CHANNEL_3,        /*!< Channel 3 */
-    ADC_CHANNEL_4,        /*!< Channel 4 */
-    ADC_CHANNEL_5,        /*!< Channel 5 */
-    ADC_CHANNEL_6,        /*!< Channel 6 */
-    ADC_CHANNEL_7         /*!< Channel 7 */
+    ADC_CHANNEL_0 = 0,
+    ADC_CHANNEL_1,
+    ADC_CHANNEL_2,
+    ADC_CHANNEL_3,
+    ADC_CHANNEL_4,
+    ADC_CHANNEL_5,
+    ADC_CHANNEL_6,
+    ADC_CHANNEL_7
 } ADC_CHANNEL_SELECTION;
+/** Check ADC channel selection parameter. */
+#define PARAM_ADC_CHANNEL_SELECTION(SEL)    ((SEL) >= ADC_CHANNEL_0 && (SEL) <= ADC_CHANNEL_7)
 
 /**
  * @brief ADC start option.
  */
 typedef enum {
-    ADC_START_CONTINUOUS = 0, /*!< Continuous mode */
-    ADC_START_NOW,            /*!< Start conversion now */
-    ADC_START_ON_EINT0,       /*!< Start conversion on P2.10/EINT0 edge */
-    ADC_START_ON_CAP01,       /*!< Start conversion on P1.27/CAP0.1 edge */
-    ADC_START_ON_MAT01,       /*!< Start conversion on MAT0.1 edge */
-    ADC_START_ON_MAT03,       /*!< Start conversion on MAT0.3 edge */
-    ADC_START_ON_MAT10,       /*!< Start conversion on MAT1.0 edge */
-    ADC_START_ON_MAT11        /*!< Start conversion on MAT1.1 edge */
+    ADC_START_CONTINUOUS = 0,
+    ADC_START_NOW,
+    ADC_START_ON_EINT0,
+    ADC_START_ON_CAP01,
+    ADC_START_ON_MAT01,
+    ADC_START_ON_MAT03
 } ADC_START_OPT;
-
+/** Check ADC start option parameter. */
+#define PARAM_ADC_START_OPT(OPT)            ((OPT) >= ADC_START_CONTINUOUS && (OPT) <= ADC_START_ON_MAT03)
 
 /**
  * @brief ADC edge selection for start conversion.
  */
 typedef enum {
-    ADC_START_ON_RISING = 0, /*!< Start conversion on rising edge */
-    ADC_START_ON_FALLING     /*!< Start conversion on falling edge */
+    ADC_START_ON_RISING = 0,
+    ADC_START_ON_FALLING
 } ADC_START_ON_EDGE_OPT;
+/** Check ADC state parameter */
+#define PARAM_ADC_START_ON_EDGE_OPT(OPT)    ((OPT == ADC_START_ON_RISING)||(OPT == ADC_START_ON_FALLING))
 
 /**
  * @brief ADC interrupt type.
  */
 typedef enum {
-    ADC_ADINTEN0 = 0,    /*!< Interrupt for channel 0 */
-    ADC_ADINTEN1,        /*!< Interrupt for channel 1 */
-    ADC_ADINTEN2,        /*!< Interrupt for channel 2 */
-    ADC_ADINTEN3,        /*!< Interrupt for channel 3 */
-    ADC_ADINTEN4,        /*!< Interrupt for channel 4 */
-    ADC_ADINTEN5,        /*!< Interrupt for channel 5 */
-    ADC_ADINTEN6,        /*!< Interrupt for channel 6 */
-    ADC_ADINTEN7,        /*!< Interrupt for channel 7 */
-    ADC_ADGINTEN         /*!< Global DONE flag interrupt */
+    ADC_ADINTEN0 = 0,
+    ADC_ADINTEN1,
+    ADC_ADINTEN2,
+    ADC_ADINTEN3,
+    ADC_ADINTEN4,
+    ADC_ADINTEN5,
+    ADC_ADINTEN6,
+    ADC_ADINTEN7
 } ADC_CHN_INT_OPT;
+/** Check ADC interrupt type parameter. */
+#define PARAM_ADC_CHN_INT_OPT(OPT) ((OPT) >= ADC_ADINTEN0 && (OPT) <= ADC_ADINTEN7)
 
 /**
  * @brief ADC data status.
  */
 typedef enum {
-    ADC_DATA_BURST = 0,  /*!< Burst mode status */
-    ADC_DATA_DONE        /*!< Done status */
+    ADC_DATA_BURST = 0,
+    ADC_DATA_DONE
 } ADC_DATA_STATUS;
+/** Check ADC state parameter */
+#define PARAM_ADC_DATA_STATUS(OPT)    ((OPT== ADC_DATA_BURST)||(OPT== ADC_DATA_DONE))
 
 /**
  * @}
@@ -276,7 +240,7 @@ void ADC_DeInit(void);
  *
  * This function sets or clears the burst mode bit in the ADC control register.
  *
- * @param[in]  NewState  Functional state:
+ * @param[in]  newState  Functional state:
  *                       - ENABLE  : Enable burst mode.
  *                       - DISABLE : Disable burst mode.
  * @note:
@@ -284,14 +248,14 @@ void ADC_DeInit(void);
  * - Enabling burst mode starts conversions immediately.
  * - Disabling burst mode stops conversions.
  */
-void ADC_BurstCmd(FunctionalState NewState);
+void ADC_BurstCmd(FunctionalState newState);
 
 /**
  * @brief      Powers up or powers down the ADC.
  *
  * This function sets or clears the power-down bit in the ADC control register.
  *
- * @param[in]  NewState  Functional state:
+ * @param[in]  newState  Functional state:
  *                       - ENABLE  : Power up ADC.
  *                       - DISABLE : Power down ADC.
  * @note:
@@ -300,7 +264,7 @@ void ADC_BurstCmd(FunctionalState NewState);
  * - Enable after enabling the ADC clock.
  * - Disable before disabling the ADC clock.
  */
-void ADC_PowerdownCmd(FunctionalState NewState);
+void ADC_PowerdownCmd(FunctionalState newState);
 
 /**
  * @brief      Starts ADC conversion in the specified mode.
@@ -324,13 +288,13 @@ void ADC_StartCmd(ADC_START_OPT startMode);
  *
  * This function sets or clears the channel select bit in the ADC control register.
  *
- * @param[in]  Channel    ADC channel to configure:
+ * @param[in]  channel    ADC channel to configure:
  *                        - ADC_CHANNEL_x [0...7]
- * @param[in]  NewState   Functional state:
+ * @param[in]  newState   Functional state:
  *                        - ENABLE  : Enable channel.
  *                        - DISABLE : Disable channel.
  */
-void ADC_ChannelCmd(ADC_CHANNEL_SELECTION Channel, FunctionalState NewState);
+void ADC_ChannelCmd(ADC_CHANNEL_SELECTION channel, FunctionalState newState);
 
 /* Configure ADC functions -------------------*/
 /**
@@ -338,30 +302,30 @@ void ADC_ChannelCmd(ADC_CHANNEL_SELECTION Channel, FunctionalState NewState);
  *
  * This function sets the edge select bit in the ADC control register.
  *
- * @param[in]  EdgeOption  ADC edge selection:
+ * @param[in]  edgeOption  ADC edge selection:
  *                         - ADC_START_ON_RISING
  *                         - ADC_START_ON_FALLING
  * @note:
  * - This option is only effective when the start bits are set to [010...111]
  */
-void ADC_EdgeStartConfig(ADC_START_ON_EDGE_OPT EdgeOption);
+void ADC_EdgeStartConfig(ADC_START_ON_EDGE_OPT edgeOption);
 
 /**
  * @brief      Enables or disables ADC interrupt for the specified type.
  *
  * This function sets or clears the interrupt enable bit for the given channel or global interrupt.
  *
- * @param[in]  Channel   ADC interrupt type:
+ * @param[in]  channel   ADC interrupt type:
  *                       - ADC_ADINTENx [0...7]
  *                       - ADC_ADGINTEN
- * @param[in]  NewState  Functional state:
+ * @param[in]  newState  Functional state:
  *                       - ENABLE  : Enable interrupt.
  *                       - DISABLE : Disable interrupt.
  * @note:
  * - If ADC_ADGINTEN is selected, only the global DONE flag is enabled to generate an interrupt.
  * - ADC_ADGINTEN must be disabled for burst mode operation.
  */
-void ADC_IntConfig(ADC_CHN_INT_OPT Channel, FunctionalState NewState);
+void ADC_IntConfig(ADC_CHN_INT_OPT channel, FunctionalState newState);
 
 /* Get ADC information functions -------------------*/
 /**
@@ -369,7 +333,7 @@ void ADC_IntConfig(ADC_CHN_INT_OPT Channel, FunctionalState NewState);
  *
  * This function checks the global ADC status register for DONE or OVERRUN flags.
  *
- * @param[in]  StatusType  ADC data status:
+ * @param[in]  statusType  ADC data status:
  *                         - ADC_DATA_BURST
  *                         - ADC_DATA_DONE
  *
@@ -377,7 +341,7 @@ void ADC_IntConfig(ADC_CHN_INT_OPT Channel, FunctionalState NewState);
  *             - SET   : Status flag is set.
  *             - RESET : Status flag is not set.
  */
-FlagStatus ADC_GlobalGetStatus(ADC_DATA_STATUS StatusType);
+FlagStatus ADC_GlobalGetStatus(ADC_DATA_STATUS statusType);
 
 /**
  * @brief      Gets the status flag for the specified ADC channel.
@@ -386,7 +350,7 @@ FlagStatus ADC_GlobalGetStatus(ADC_DATA_STATUS StatusType);
  *
  * @param[in]  channel     ADC channel to check:
  *                         - ADC_CHANNEL_x [0...7]
- * @param[in]  StatusType  ADC data status:
+ * @param[in]  statusType  ADC data status:
  *                         - ADC_DATA_BURST
  *                         - ADC_DATA_DONE
  *
@@ -394,7 +358,7 @@ FlagStatus ADC_GlobalGetStatus(ADC_DATA_STATUS StatusType);
  *             - SET   : Status flag is set.
  *             - RESET : Status flag is not set.
  */
-FlagStatus ADC_ChannelGetStatus(ADC_CHANNEL_SELECTION channel, ADC_DATA_STATUS StatusType);
+FlagStatus ADC_ChannelGetStatus(ADC_CHANNEL_SELECTION channel, ADC_DATA_STATUS statusType);
 
 /**
  * @brief      Gets the global ADC conversion result.
@@ -421,11 +385,9 @@ uint32_t ADC_GlobalGetData(void);
  */
 uint16_t ADC_ChannelGetData(ADC_CHANNEL_SELECTION channel);
 
-
 /**
  * @}
  */
-
 
 #ifdef __cplusplus
 }

@@ -4,7 +4,7 @@
  * @version     3.0
  * @date        18. June. 2010
  * @author      NXP MCU SW Application Team
- **************************************************************************
+ *
  * Software that is described herein is for illustrative purposes only
  * which provides customers with programming information regarding the
  * products. This software is supplied "AS IS" without any warranties.
@@ -15,7 +15,7 @@
  * notification. NXP Semiconductors also make no representation or
  * warranty that such application will be suitable for the specified
  * use without further testing or modification.
- **********************************************************************/
+ */
 
 /* Peripheral group ----------------------------------------------------------- */
 /** @addtogroup EXTI
@@ -45,17 +45,16 @@
 /*********************************************************************/ /**
  * @brief       Sets the mode (level or edge sensitivity) for a specific EXTI line.
  *
- * @param[in]   EXTILine  External interrupt line, must be:
- *                        - EXTI_EINTx, where x is in the range [0,3].
+ * @param[in]   EXTILine  EXTI_EINTx [0...3].
  * @param[in]   mode      Mode selection, must be:
- *                        - EXTI_MODE_LEVEL_SENSITIVE
- *                        - EXTI_MODE_EDGE_SENSITIVE
+ *                        - EXTI_LEVEL_SENSITIVE
+ *                        - EXTI_EDGE_SENSITIVE
  * @note        If the mode value is invalid, the function does nothing.
 *********************************************************************/
-static void EXTI_SetMode(EXTI_LINE_ENUM EXTILine, EXTI_MODE_ENUM mode) {
-    if (mode == EXTI_MODE_EDGE_SENSITIVE) {
+static void EXTI_SetMode(EXTI_LINE_OPT EXTILine, EXTI_MODE_OPT mode) {
+    if (mode == EXTI_EDGE_SENSITIVE) {
         LPC_SC->EXTMODE |= (1 << EXTILine);
-    } else if (mode == EXTI_MODE_LEVEL_SENSITIVE) {
+    } else if (mode == EXTI_LEVEL_SENSITIVE) {
         LPC_SC->EXTMODE &= ~(1 << EXTILine);
     }
 }
@@ -63,17 +62,16 @@ static void EXTI_SetMode(EXTI_LINE_ENUM EXTILine, EXTI_MODE_ENUM mode) {
 /*********************************************************************/ /**
  * @brief       Sets the polarity (active level or edge) for a specific EXTI line.
  *
- * @param[in]   EXTILine  External interrupt line, must be:
- *                        - EXTI_EINTx, where x is in the range [0,3].
+ * @param[in]   EXTILine  EXTI_EINTx [0...3].
  * @param[in]   polarity  Polarity selection, should be:
- *                        - EXTI_POLARITY_LOW_ACTIVE or EXTI_POLARITY_FALLING_EDGE (equivalent)
- *                        - EXTI_POLARITY_HIGH_ACTIVE or EXTI_POLARITY_RISING_EDGE (equivalent)
+ *                        - EXTI_LOW_ACTIVE or EXTI_FALLING_EDGE (equivalent)
+ *                        - EXTI_HIGH_ACTIVE or EXTI_RISING_EDGE (equivalent)
  * @note        If the polarity value is invalid, the function does nothing.
 *********************************************************************/
-static void EXTI_SetPolarity(EXTI_LINE_ENUM EXTILine, EXTI_POLARITY_ENUM polarity) {
-    if (polarity == EXTI_POLARITY_HIGH_ACTIVE) {
+static void EXTI_SetPolarity(EXTI_LINE_OPT EXTILine, EXTI_POLARITY_ENUM polarity) {
+    if (polarity == EXTI_HIGH_ACTIVE) {
         LPC_SC->EXTPOLAR |= (1 << EXTILine);
-    } else if (polarity == EXTI_POLARITY_LOW_ACTIVE) {
+    } else if (polarity == EXTI_LOW_ACTIVE) {
         LPC_SC->EXTPOLAR &= ~(1 << EXTILine);
     }
 }
@@ -98,15 +96,43 @@ void EXTI_Init(void) {
 }
 
 void EXTI_Config(const EXTI_CFG_Type* EXTICfg) {
-    NVIC_DisableIRQ((IRQn_Type)(EINT0_IRQn + EXTICfg->EXTI_Line));
+    CHECK_PARAM(PARAM_EXTI_LINE(EXTICfg->line));
+    CHECK_PARAM(PARAM_EXTI_MODE(EXTICfg->mode));
+    CHECK_PARAM(PARAM_EXTI_POLARITY(EXTICfg->polarity));
 
-    EXTI_SetMode(EXTICfg->EXTI_Line, EXTICfg->EXTI_Mode);
-    EXTI_SetPolarity(EXTICfg->EXTI_Line, EXTICfg->EXTI_Polarity);
+    NVIC_DisableIRQ((IRQn_Type)(EINT0_IRQn + EXTICfg->line));
+
+    EXTI_SetMode(EXTICfg->line, EXTICfg->mode);
+    EXTI_SetPolarity(EXTICfg->line, EXTICfg->polarity);
 }
 
 void EXTI_ConfigEnable(const EXTI_CFG_Type* EXTICfg) {
+    CHECK_PARAM(PARAM_EXTI_LINE(EXTICfg->line));
+    CHECK_PARAM(PARAM_EXTI_MODE(EXTICfg->mode));
+    CHECK_PARAM(PARAM_EXTI_POLARITY(EXTICfg->polarity));
+
     EXTI_Config(EXTICfg);
-    EXTI_EnableIRQ(EXTICfg->EXTI_Line);
+    EXTI_EnableIRQ(EXTICfg->line);
+}
+
+void EXTI_ClearFlag(EXTI_LINE_OPT EXTILine) {
+    CHECK_PARAM(PARAM_EXTI_LINE(EXTILine));
+
+    LPC_SC->EXTINT |= (1 << EXTILine);
+}
+
+FlagStatus EXTI_GetFlag(EXTI_LINE_OPT EXTILine) {
+    CHECK_PARAM(PARAM_EXTI_LINE(EXTILine));
+
+    return (LPC_SC->EXTINT & (1 << EXTILine)) ? SET : RESET;
+}
+
+void EXTI_EnableIRQ(EXTI_LINE_OPT EXTILine) {
+    CHECK_PARAM(PARAM_EXTI_LINE(EXTILine));
+
+    EXTI_ClearFlag(EXTILine);
+    NVIC_ClearPendingIRQ((IRQn_Type)(EINT0_IRQn + EXTILine));
+    NVIC_EnableIRQ((IRQn_Type)(EINT0_IRQn + EXTILine));
 }
 
 /**

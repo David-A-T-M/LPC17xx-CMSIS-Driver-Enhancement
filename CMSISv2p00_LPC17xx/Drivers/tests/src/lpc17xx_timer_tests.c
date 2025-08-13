@@ -68,13 +68,13 @@ uint8_t TIM_InitTimerTest(void) {
     TEST_INIT();
 
     TIM_TIMERCFG_Type cfg = {0};
-    cfg.PrescaleOption = TIM_PRESCALE_USVAL;
-    cfg.PrescaleValue = 1000;
+    cfg.prescaleOption = TIM_USVAL;
+    cfg.prescaleValue = 1000;
 
     TIM_Init(LPC_TIM0, TIM_TIMER_MODE, &cfg);
     EXPECT_EQUAL(LPC_TIM0->CTCR & TIM_CTCR_MODE_MASK, TIM_TIMER_MODE);
     EXPECT_EQUAL(LPC_TIM0->CTCR & TIM_CTCR_INPUT_MASK, 0x00);
-    EXPECT_EQUAL(LPC_TIM0->PR, SystemCoreClock / 4 / 1000000 * cfg.PrescaleValue - 1);
+    EXPECT_EQUAL(LPC_TIM0->PR, SystemCoreClock / 4 / 1000000 * cfg.prescaleValue - 1);
     EXPECT_EQUAL(LPC_TIM0->IR & 0x3F, 0x0);
     EXPECT_EQUAL(LPC_TIM0->TCR & TIM_ENABLE, 0x00);
 
@@ -86,11 +86,11 @@ uint8_t TIM_InitCounterTest(void) {
     TEST_INIT();
 
     TIM_COUNTERCFG_Type cfg = {0};
-    cfg.CountInputSelect = TIM_COUNTER_INCAP1;
+    cfg.countInputSelect = TIM_CAPTURE_CHANNEL_1;
 
     TIM_Init(LPC_TIM0, TIM_COUNTER_FALLING_MODE, &cfg);
     EXPECT_EQUAL(LPC_TIM0->CTCR & TIM_CTCR_MODE_MASK, TIM_COUNTER_FALLING_MODE);
-    EXPECT_EQUAL(LPC_TIM0->CTCR & TIM_CTCR_INPUT_MASK, TIM_COUNTER_INCAP1 << 2);
+    EXPECT_EQUAL(LPC_TIM0->CTCR & TIM_CTCR_INPUT_MASK, TIM_CAPTURE_CHANNEL_1 << 2);
     EXPECT_EQUAL(LPC_TIM0->PR, 0);
     EXPECT_EQUAL(LPC_TIM0->IR & 0x3F, 0x0);
     EXPECT_EQUAL(LPC_TIM0->TCR & TIM_ENABLE, 0x00);
@@ -103,8 +103,8 @@ uint8_t TIM_DeInitTest(void) {
     TEST_INIT();
 
     TIM_TIMERCFG_Type cfg = {0};
-    cfg.PrescaleOption = TIM_PRESCALE_TICKVAL;
-    cfg.PrescaleValue = 1;
+    cfg.prescaleOption = TIM_TICKVAL;
+    cfg.prescaleValue = 1;
 
     TIM_Init(LPC_TIM0, TIM_TIMER_MODE, &cfg);
     LPC_TIM0->TCR |= TIM_ENABLE;
@@ -120,8 +120,8 @@ uint8_t TIM_ClearIntPendingTest(void) {
     TEST_INIT();
 
     TIM_TIMERCFG_Type cfg = {0};
-    cfg.PrescaleOption = TIM_PRESCALE_TICKVAL;
-    cfg.PrescaleValue = 1;
+    cfg.prescaleOption = TIM_TICKVAL;
+    cfg.prescaleValue = 1;
 
     TIM_Init(LPC_TIM0, TIM_TIMER_MODE, &cfg);
     LPC_TIM0->MR0 = 0x10;
@@ -144,8 +144,8 @@ uint8_t TIM_GetIntStatusTest(void) {
     TEST_INIT();
 
     TIM_TIMERCFG_Type cfg = {0};
-    cfg.PrescaleOption = TIM_PRESCALE_TICKVAL;
-    cfg.PrescaleValue = 1;
+    cfg.prescaleOption = TIM_TICKVAL;
+    cfg.prescaleValue = 1;
 
     TIM_Init(LPC_TIM0, TIM_TIMER_MODE, &cfg);
     LPC_TIM0->MR0 = 0x10;
@@ -168,8 +168,8 @@ uint8_t TIM_ConfigStructInitTimerTest(void) {
     TIM_TIMERCFG_Type cfg;
 
     TIM_ConfigStructInit(TIM_TIMER_MODE, &cfg);
-    EXPECT_EQUAL(cfg.PrescaleOption, TIM_PRESCALE_USVAL);
-    EXPECT_EQUAL(cfg.PrescaleValue, 1);
+    EXPECT_EQUAL(cfg.prescaleOption, TIM_USVAL);
+    EXPECT_EQUAL(cfg.prescaleValue, 1);
 
     ASSERT_TEST();
 }
@@ -181,7 +181,7 @@ uint8_t TIM_ConfigStructInitCounterTest(void) {
     TIM_COUNTERCFG_Type cfg;
 
     TIM_ConfigStructInit(TIM_COUNTER_ANY_MODE, &cfg);
-    EXPECT_EQUAL(cfg.CountInputSelect, TIM_COUNTER_INCAP0);
+    EXPECT_EQUAL(cfg.countInputSelect, TIM_CAPTURE_CHANNEL_0);
 
     ASSERT_TEST();
 }
@@ -191,17 +191,17 @@ uint8_t TIM_ConfigMatchTest(void) {
     TEST_INIT();
 
     TIM_MATCHCFG_Type matchCfg = {0};
-    matchCfg.MatchChannel = 0;
-    matchCfg.IntOnMatch = ENABLE;
-    matchCfg.ResetOnMatch = DISABLE;
-    matchCfg.StopOnMatch = ENABLE;
-    matchCfg.ExtMatchOutputType = TIM_EXTMATCH_TOGGLE;
-    matchCfg.MatchValue = 0xFF;
+    matchCfg.matchChannel = 0;
+    matchCfg.intOnMatch = ENABLE;
+    matchCfg.resetOnMatch = DISABLE;
+    matchCfg.stopOnMatch = ENABLE;
+    matchCfg.extMatchOutputType = TIM_TOGGLE;
+    matchCfg.matchValue = 0xFF;
     TIM_ConfigMatch(LPC_TIM0, &matchCfg);
 
     EXPECT_EQUAL(LPC_TIM0->MR0, 0xFF);
     EXPECT_EQUAL(LPC_TIM0->MCR & TIM_MCR_CHANNEL_MASKBIT(0), TIM_INT_ON_MATCH(0) | TIM_STOP_ON_MATCH(0));
-    EXPECT_EQUAL(LPC_TIM0->EMR & TIM_EM_MASK(0), TIM_EM_SET(0, TIM_EXTMATCH_TOGGLE));
+    EXPECT_EQUAL(LPC_TIM0->EMR & TIM_EMR_MASK(0), TIM_EM_SET(0, TIM_TOGGLE));
 
     ASSERT_TEST();
 }
@@ -220,8 +220,8 @@ uint8_t TIM_SetMatchExtTest(void) {
     TIMER_Setup();
     TEST_INIT();
 
-    TIM_SetMatchExt(LPC_TIM0, 1, TIM_EXTMATCH_TOGGLE);
-    EXPECT_EQUAL(LPC_TIM0->EMR & TIM_EM_MASK(1), TIM_EM_SET(1, TIM_EXTMATCH_TOGGLE));
+    TIM_SetMatchExt(LPC_TIM0, 1, TIM_TOGGLE);
+    EXPECT_EQUAL(LPC_TIM0->EMR & TIM_EMR_MASK(1), TIM_EM_SET(1, TIM_TOGGLE));
 
     ASSERT_TEST();
 }

@@ -67,15 +67,15 @@ uint8_t EXTI_ConfigTest(void) {
     TEST_INIT();
 
     const EXTI_CFG_Type cfg = {
-        .EXTI_Line = EXTI_EINT1,
-        .EXTI_Mode = EXTI_MODE_EDGE_SENSITIVE,
-        .EXTI_Polarity = EXTI_POLARITY_RISING_EDGE
+        .line = EXTI_EINT1,
+        .mode = EXTI_EDGE_SENSITIVE,
+        .polarity = EXTI_RISING_EDGE
     };
 
     EXTI_Config(&cfg);
 
-    EXPECT_TRUE(LPC_SC->EXTMODE & (1 << cfg.EXTI_Line));
-    EXPECT_TRUE(LPC_SC->EXTPOLAR & (1 << cfg.EXTI_Line));
+    EXPECT_TRUE(LPC_SC->EXTMODE & (1 << cfg.line));
+    EXPECT_TRUE(LPC_SC->EXTPOLAR & (1 << cfg.line));
 
     ASSERT_TEST();
 }
@@ -85,15 +85,15 @@ uint8_t EXTI_ConfigEnableTest(void) {
     TEST_INIT();
 
     const EXTI_CFG_Type cfg = {
-        .EXTI_Line = EXTI_EINT3,
-        .EXTI_Mode = EXTI_MODE_EDGE_SENSITIVE,
-        .EXTI_Polarity = EXTI_POLARITY_RISING_EDGE
+        .line = EXTI_EINT3,
+        .mode = EXTI_EDGE_SENSITIVE,
+        .polarity = EXTI_RISING_EDGE
     };
 
     EXTI_Config(&cfg);
 
-    EXPECT_TRUE(LPC_SC->EXTMODE & (1 << cfg.EXTI_Line));
-    EXPECT_TRUE(LPC_SC->EXTPOLAR & (1 << cfg.EXTI_Line));
+    EXPECT_TRUE(LPC_SC->EXTMODE & (1 << cfg.line));
+    EXPECT_TRUE(LPC_SC->EXTPOLAR & (1 << cfg.line));
 
     ASSERT_TEST();
 }
@@ -103,17 +103,17 @@ uint8_t EXTI_ClearFlagTest(void) {
     TEST_INIT();
 
     const EXTI_CFG_Type cfg = {
-        .EXTI_Line = EXTI_EINT3,
-        .EXTI_Mode = EXTI_MODE_EDGE_SENSITIVE,
-        .EXTI_Polarity = EXTI_POLARITY_RISING_EDGE
+        .line = EXTI_EINT3,
+        .mode = EXTI_EDGE_SENSITIVE,
+        .polarity = EXTI_RISING_EDGE
     };
     EXTI_Config(&cfg);
 
     EDGE_INT_P2_LOW(13);
-    EXPECT_TRUE(LPC_SC->EXTINT & (1 << cfg.EXTI_Line));
+    EXPECT_TRUE(LPC_SC->EXTINT & (1 << cfg.line));
 
     EXTI_ClearFlag(EXTI_EINT3);
-    EXPECT_FALSE(LPC_SC->EXTINT & (1 << cfg.EXTI_Line));
+    EXPECT_FALSE(LPC_SC->EXTINT & (1 << cfg.line));
 
     ASSERT_TEST();
 }
@@ -123,9 +123,9 @@ uint8_t EXTI_GetFlagTest(void) {
     TEST_INIT();
 
     const EXTI_CFG_Type cfg = {
-        .EXTI_Line = EXTI_EINT3,
-        .EXTI_Mode = EXTI_MODE_EDGE_SENSITIVE,
-        .EXTI_Polarity = EXTI_POLARITY_RISING_EDGE
+        .line = EXTI_EINT3,
+        .mode = EXTI_EDGE_SENSITIVE,
+        .polarity = EXTI_RISING_EDGE
     };
     EXTI_Config(&cfg);
     EXTI_ClearFlag(EXTI_EINT1);

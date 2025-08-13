@@ -69,18 +69,22 @@ void DAC_SetBias(DAC_CURRENT_OPT bias) {
 }
 
 void DAC_ConfigDAConverterControl(DAC_CONVERTER_CFG_Type *cfgStruct) {
+    CHECK_PARAM(PARAM_FUNCTIONALSTATE(cfgStruct->doubleBufferEnable));
+    CHECK_PARAM(PARAM_FUNCTIONALSTATE(cfgStruct->counterEnable));
+    CHECK_PARAM(PARAM_FUNCTIONALSTATE(cfgStruct->dmaEnable));
+
     LPC_DAC->DACCTRL &= ~DAC_DACCTRL_MASK;
 
-    if (cfgStruct->DBLBUF_ENA)
+    if (cfgStruct->doubleBufferEnable)
         LPC_DAC->DACCTRL |= DAC_DBLBUF_ENA;
-    if (cfgStruct->CNT_ENA)
+    if (cfgStruct->counterEnable)
         LPC_DAC->DACCTRL |= DAC_CNT_ENA;
-    if (cfgStruct->DMA_ENA)
+    if (cfgStruct->dmaEnable)
         LPC_DAC->DACCTRL |= DAC_DMA_ENA;
 }
 
-void DAC_SetDMATimeOut(uint32_t time_out) {
-    LPC_DAC->DACCNTVAL = DAC_CCNT_VALUE(time_out);
+void DAC_SetDMATimeOut(uint32_t timeOut) {
+    LPC_DAC->DACCNTVAL = DAC_CCNT_VALUE(timeOut);
 }
 
 /**

@@ -1,11 +1,11 @@
-/***********************************************************************//**
+/**
  * @file        lpc17xx_dac.h
  * @brief       Contains all macro definitions and function prototypes
  *              support for DAC firmware library on LPC17xx
  * @version     3.0
  * @date        18. June. 2010
  * @author      NXP MCU SW Application Team
- **************************************************************************
+ *
  * Software that is described herein is for illustrative purposes only
  * which provides customers with programming information regarding the
  * products. This software is supplied "AS IS" without any warranties.
@@ -16,7 +16,7 @@
  * notification. NXP Semiconductors also make no representation or
  * warranty that such application will be suitable for the specified
  * use without further testing or modification.
- **************************************************************************/
+ */
 
 /* Peripheral group ----------------------------------------------------------- */
 /** @defgroup DAC DAC
@@ -66,12 +66,10 @@ is VALUE/1024 × VREF */
 /** Macro to determine if it is valid DAC peripheral */
 #define PARAM_DACx(n)   (((uint32_t *)n) == ((uint32_t *)LPC_DAC))
 
-/** Macro to check DAC current optional parameter */
-#define PARAM_DAC_CURRENT_OPT(OPTION) ((OPTION == DAC_MAX_CURRENT_700uA)\
-||(OPTION == DAC_MAX_CURRENT_350uA))
 /**
  * @}
  */
+
 /* Public Types --------------------------------------------------------------- */
 /** @defgroup DAC_Public_Types DAC Public Types
  * @{
@@ -86,6 +84,9 @@ typedef enum {
     DAC_MAX_CURRENT_700uA = 0, /**< Settling time: 1 us max, max current: 700 uA */
     DAC_MAX_CURRENT_350uA      /**< Settling time: 2.5 us max, max current: 350 uA */
 } DAC_CURRENT_OPT;
+/** Macro to check DAC current optional parameter */
+#define PARAM_DAC_CURRENT_OPT(OPTION) ((OPTION == DAC_MAX_CURRENT_700uA) || \
+                                       (OPTION == DAC_MAX_CURRENT_350uA))
 
 /**
  * @brief DAC converter control configuration.
@@ -93,10 +94,9 @@ typedef enum {
  * Used to configure double buffering, timeout counter, and DMA access for the DAC.
  */
 typedef struct {
-    uint8_t DBLBUF_ENA; /**< ENABLE or DISABLE DACR double buffering. */
-    uint8_t CNT_ENA;    /**< ENABLE or DISABLE timeout counter. */
-    uint8_t DMA_ENA;    /**< ENABLE or DISABLE DMA burst request. */
-    uint8_t RESERVED;
+    FunctionalState doubleBufferEnable; /**< ENABLE or DISABLE. */
+    FunctionalState counterEnable;      /**< ENABLE or DISABLE. */
+    FunctionalState dmaEnable;          /**< ENABLE or DISABLE. */
 } DAC_CONVERTER_CFG_Type;
 
 /**
@@ -172,14 +172,14 @@ void DAC_ConfigDAConverterControl(DAC_CONVERTER_CFG_Type *cfgStruct);
  *
  * This function sets the timeout value for the DAC DMA or interrupt counter.
  *
- * @param[in]  time_out  Timeout value to reload (16-bit).
+ * @param[in]  timeOut  Timeout value to reload (16-bit).
  *
  * @note:
  * - Use this function to configure DMA or interrupt timing.
- * - If time_out is more than 16 bits, only the lower 16 bits are used.
+ * - If timeOut is more than 16 bits, only the lower 16 bits are used.
  * - Only the counter value is updated.
  */
-void DAC_SetDMATimeOut(uint32_t time_out);
+void DAC_SetDMATimeOut(uint32_t timeOut);
 
 /**
  * @}
