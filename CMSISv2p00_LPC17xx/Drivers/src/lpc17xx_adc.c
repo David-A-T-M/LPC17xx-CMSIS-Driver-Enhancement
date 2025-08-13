@@ -63,20 +63,20 @@ void ADC_DeInit(void) {
     CLKPWR_ConfigPPWR (CLKPWR_PCONP_PCAD, DISABLE);
 }
 
-void ADC_BurstCmd(FunctionalState NewState) {
-    CHECK_PARAM(PARAM_FUNCTIONALSTATE(NewState));
+void ADC_BurstCmd(FunctionalState newState) {
+    CHECK_PARAM(PARAM_FUNCTIONALSTATE(newState));
 
-    if (NewState) {
+    if (newState) {
         LPC_ADC->ADCR |= ADC_CR_BURST;
         return;
     }
     LPC_ADC->ADCR &= ~ADC_CR_BURST;
 }
 
-void ADC_PowerdownCmd(FunctionalState NewState) {
-    CHECK_PARAM(PARAM_FUNCTIONALSTATE(NewState));
+void ADC_PowerdownCmd(FunctionalState newState) {
+    CHECK_PARAM(PARAM_FUNCTIONALSTATE(newState));
 
-    if (NewState) {
+    if (newState) {
         LPC_ADC->ADCR |= ADC_CR_PDN;
         return;
     }
@@ -90,70 +90,66 @@ void ADC_StartCmd(ADC_START_OPT startMode) {
     LPC_ADC->ADCR |= ADC_CR_START_MODE_SEL((uint32_t)startMode);
 }
 
-void ADC_ChannelCmd(ADC_CHANNEL_SELECTION Channel, FunctionalState NewState) {
-    CHECK_PARAM(PARAM_ADC_CHANNEL_SELECTION(Channel));
-    CHECK_PARAM(PARAM_FUNCTIONALSTATE(NewState));
+void ADC_ChannelCmd(ADC_CHANNEL_SELECTION channel, FunctionalState newState) {
+    CHECK_PARAM(PARAM_ADC_CHANNEL_SELECTION(channel));
+    CHECK_PARAM(PARAM_FUNCTIONALSTATE(newState));
 
-    if (NewState) {
-        LPC_ADC->ADCR |= ADC_CR_CH_SEL(Channel);
+    if (newState) {
+        LPC_ADC->ADCR |= ADC_CR_CH_SEL(channel);
         return;
     }
-    LPC_ADC->ADCR &= ~ADC_CR_CH_SEL(Channel);
+    LPC_ADC->ADCR &= ~ADC_CR_CH_SEL(channel);
 }
 
-void ADC_EdgeStartConfig(ADC_START_ON_EDGE_OPT EdgeOption) {
-    CHECK_PARAM(PARAM_ADC_START_ON_EDGE_OPT(EdgeOption));
+void ADC_EdgeStartConfig(ADC_START_ON_EDGE_OPT edgeOption) {
+    CHECK_PARAM(PARAM_ADC_START_ON_EDGE_OPT(edgeOption));
 
-    if (EdgeOption) {
+    if (edgeOption) {
         LPC_ADC->ADCR |= ADC_CR_EDGE;
         return;
     }
     LPC_ADC->ADCR &= ~ADC_CR_EDGE;
 }
 
-void ADC_IntConfig(ADC_CHN_INT_OPT Channel, FunctionalState NewState) {
-    CHECK_PARAM(PARAM_ADC_CHN_INT_OPT(Channel));
-    CHECK_PARAM(PARAM_FUNCTIONALSTATE(NewState));
+void ADC_IntConfig(ADC_CHN_INT_OPT channel, FunctionalState newState) {
+    CHECK_PARAM(PARAM_ADC_CHN_INT_OPT(channel));
+    CHECK_PARAM(PARAM_FUNCTIONALSTATE(newState));
 
-    if (NewState) {
-        LPC_ADC->ADINTEN |= ADC_INTEN_CH(Channel);
+    if (newState) {
+        LPC_ADC->ADINTEN |= ADC_INTEN_CH(channel);
         return;
     }
-    LPC_ADC->ADINTEN &= ~ADC_INTEN_CH(Channel);
+    LPC_ADC->ADINTEN &= ~ADC_INTEN_CH(channel);
 }
 
-FlagStatus ADC_GlobalGetStatus(ADC_DATA_STATUS StatusType) {
-    CHECK_PARAM(PARAM_ADC_DATA_STATUS(StatusType));
+FlagStatus ADC_GlobalGetStatus(ADC_DATA_STATUS statusType) {
+    CHECK_PARAM(PARAM_ADC_DATA_STATUS(statusType));
 
     uint32_t temp = LPC_ADC->ADGDR;
 
-    if (StatusType) {
+    if (statusType)
         temp &= ADC_DR_DONE_FLAG;
-    } else {
+    else
         temp &= ADC_DR_OVERRUN_FLAG;
-    }
 
-    if (temp) {
-        return SET;
-    }
+    if (temp) return SET;
+
     return RESET;
 }
 
-FlagStatus ADC_ChannelGetStatus(ADC_CHANNEL_SELECTION channel, ADC_DATA_STATUS StatusType) {
+FlagStatus ADC_ChannelGetStatus(ADC_CHANNEL_SELECTION channel, ADC_DATA_STATUS statusType) {
     CHECK_PARAM(PARAM_ADC_CHANNEL_SELECTION(channel));
-    CHECK_PARAM(PARAM_ADC_DATA_STATUS(StatusType));
+    CHECK_PARAM(PARAM_ADC_DATA_STATUS(statusType));
 
     uint32_t temp = *(uint32_t*)((&LPC_ADC->ADDR0) + channel);
 
-    if (StatusType) {
+    if (statusType)
         temp &= ADC_DR_DONE_FLAG;
-    } else {
+    else
         temp &= ADC_DR_OVERRUN_FLAG;
-    }
 
-    if (temp) {
-        return SET;
-    }
+    if (temp) return SET;
+
     return RESET;
 }
 
