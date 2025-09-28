@@ -1,28 +1,22 @@
-/**********************************************************************
-* $Id$		lpc17xx_gpdma.c				2010-03-21
-*//**
-* @file		lpc17xx_gpdma.c
-* @brief	Contains all functions support for GPDMA firmware
-* 			library on LPC17xx
-* @version	2.1
-* @date		25. July. 2011
-* @author	NXP MCU SW Application Team
-*
-* Copyright(C) 2010, NXP Semiconductor
-* All rights reserved.
-*
-***********************************************************************
-* Software that is described herein is for illustrative purposes only
-* which provides customers with programming information regarding the
-* products. This software is supplied "AS IS" without any warranties.
-* NXP Semiconductors assumes no responsibility or liability for the
-* use of the software, conveys no license or title under any patent,
-* copyright, or mask work right to the product. NXP Semiconductors
-* reserves the right to make changes in the software without
-* notification. NXP Semiconductors also make no representation or
-* warranty that such application will be suitable for the specified
-* use without further testing or modification.
-**********************************************************************/
+/**
+ * @file    lpc17xx_gpdma.c
+ * @brief   Contains all macro definitions and function prototypes
+ *          support for GPDMA firmware library on LPC17xx
+ * @version 2.0
+ * @date    21. May. 2010
+ * @author  NXP MCU SW Application Team
+ *
+ * Software that is described herein is for illustrative purposes only
+ * which provides customers with programming information regarding the
+ * products. This software is supplied "AS IS" without any warranties.
+ * NXP Semiconductors assumes no responsibility or liability for the
+ * use of the software, conveys no license or title under any patent,
+ * copyright, or mask work right to the product. NXP Semiconductors
+ * reserves the right to make changes in the software without
+ * notification. NXP Semiconductors also make no representation or
+ * warranty that such application will be suitable for the specified
+ * use without further testing or modification.
+ */
 
 /* Peripheral group ----------------------------------------------------------- */
 /** @addtogroup GPDMA
@@ -57,390 +51,367 @@
  */
 #ifdef __IAR_SYSTEMS_ICC__
 volatile const void *GPDMA_LUTPerAddr[] = {
-		(&LPC_SSP0->DR),				// SSP0 Tx
-		(&LPC_SSP0->DR),				// SSP0 Rx
-		(&LPC_SSP1->DR),				// SSP1 Tx
-		(&LPC_SSP1->DR),				// SSP1 Rx
-		(&LPC_ADC->ADGDR),			// ADC
-		(&LPC_I2S->I2STXFIFO), 		// I2S Tx
-		(&LPC_I2S->I2SRXFIFO), 		// I2S Rx
-		(&LPC_DAC->DACR),				// DAC
-		(&LPC_UART0->/*RBTHDLR.*/THR),	// UART0 Tx
-		(&LPC_UART0->/*RBTHDLR.*/RBR),	// UART0 Rx
-		(&LPC_UART1->/*RBTHDLR.*/THR),	// UART1 Tx
-		(&LPC_UART1->/*RBTHDLR.*/RBR),	// UART1 Rx
-		(&LPC_UART2->/*RBTHDLR.*/THR),	// UART2 Tx
-		(&LPC_UART2->/*RBTHDLR.*/RBR),	// UART2 Rx
-		(&LPC_UART3->/*RBTHDLR.*/THR),	// UART3 Tx
-		(&LPC_UART3->/*RBTHDLR.*/RBR),	// UART3 Rx
-		(&LPC_TIM0->MR0),				// MAT0.0
-		(&LPC_TIM0->MR1),				// MAT0.1
-		(&LPC_TIM1->MR0),				// MAT1.0
-		(&LPC_TIM1->MR1),				// MAT1.1
-		(&LPC_TIM2->MR0),				// MAT2.0
-		(&LPC_TIM2->MR1),				// MAT2.1
-		(&LPC_TIM3->MR0),				// MAT3.0
-		(&LPC_TIM3->MR1)				// MAT3.1
+        (&LPC_SSP0->DR),                // SSP0 Tx
+        (&LPC_SSP0->DR),                // SSP0 Rx
+        (&LPC_SSP1->DR),                // SSP1 Tx
+        (&LPC_SSP1->DR),                // SSP1 Rx
+        (&LPC_ADC->ADGDR),          // ADC
+        (&LPC_I2S->I2STXFIFO),      // I2S Tx
+        (&LPC_I2S->I2SRXFIFO),      // I2S Rx
+        (&LPC_DAC->DACR),               // DAC
+        (&LPC_UART0->/*RBTHDLR.*/THR),  // UART0 Tx
+        (&LPC_UART0->/*RBTHDLR.*/RBR),  // UART0 Rx
+        (&LPC_UART1->/*RBTHDLR.*/THR),  // UART1 Tx
+        (&LPC_UART1->/*RBTHDLR.*/RBR),  // UART1 Rx
+        (&LPC_UART2->/*RBTHDLR.*/THR),  // UART2 Tx
+        (&LPC_UART2->/*RBTHDLR.*/RBR),  // UART2 Rx
+        (&LPC_UART3->/*RBTHDLR.*/THR),  // UART3 Tx
+        (&LPC_UART3->/*RBTHDLR.*/RBR),  // UART3 Rx
+        (&LPC_TIM0->MR0),               // MAT0.0
+        (&LPC_TIM0->MR1),               // MAT0.1
+        (&LPC_TIM1->MR0),               // MAT1.0
+        (&LPC_TIM1->MR1),               // MAT1.1
+        (&LPC_TIM2->MR0),               // MAT2.0
+        (&LPC_TIM2->MR1),               // MAT2.1
+        (&LPC_TIM3->MR0),               // MAT3.0
+        (&LPC_TIM3->MR1)                // MAT3.1
 };
 #else
 const uint32_t GPDMA_LUTPerAddr[] = {
-		((uint32_t)&LPC_SSP0->DR),				// SSP0 Tx
-		((uint32_t)&LPC_SSP0->DR),				// SSP0 Rx
-		((uint32_t)&LPC_SSP1->DR),				// SSP1 Tx
-		((uint32_t)&LPC_SSP1->DR),				// SSP1 Rx
-		((uint32_t)&LPC_ADC->ADGDR),			// ADC
-		((uint32_t)&LPC_I2S->I2STXFIFO), 		// I2S Tx
-		((uint32_t)&LPC_I2S->I2SRXFIFO), 		// I2S Rx
-		((uint32_t)&LPC_DAC->DACR),				// DAC
-		((uint32_t)&LPC_UART0->/*RBTHDLR.*/THR),	// UART0 Tx
-		((uint32_t)&LPC_UART0->/*RBTHDLR.*/RBR),	// UART0 Rx
-		((uint32_t)&LPC_UART1->/*RBTHDLR.*/THR),	// UART1 Tx
-		((uint32_t)&LPC_UART1->/*RBTHDLR.*/RBR),	// UART1 Rx
-		((uint32_t)&LPC_UART2->/*RBTHDLR.*/THR),	// UART2 Tx
-		((uint32_t)&LPC_UART2->/*RBTHDLR.*/RBR),	// UART2 Rx
-		((uint32_t)&LPC_UART3->/*RBTHDLR.*/THR),	// UART3 Tx
-		((uint32_t)&LPC_UART3->/*RBTHDLR.*/RBR),	// UART3 Rx
-		((uint32_t)&LPC_TIM0->MR0),				// MAT0.0
-		((uint32_t)&LPC_TIM0->MR1),				// MAT0.1
-		((uint32_t)&LPC_TIM1->MR0),				// MAT1.0
-		((uint32_t)&LPC_TIM1->MR1),				// MAT1.1
-		((uint32_t)&LPC_TIM2->MR0),				// MAT2.0
-		((uint32_t)&LPC_TIM2->MR1),				// MAT2.1
-		((uint32_t)&LPC_TIM3->MR0),				// MAT3.0
-		((uint32_t)&LPC_TIM3->MR1)				// MAT3.1
+        ((uint32_t)(uintptr_t)&LPC_SSP0->DR),          // SSP0 Tx
+        ((uint32_t)(uintptr_t)&LPC_SSP0->DR),          // SSP0 Rx
+        ((uint32_t)(uintptr_t)&LPC_SSP1->DR),          // SSP1 Tx
+        ((uint32_t)(uintptr_t)&LPC_SSP1->DR),          // SSP1 Rx
+        ((uint32_t)(uintptr_t)&LPC_ADC->ADGDR),        // ADC
+        ((uint32_t)(uintptr_t)&LPC_I2S->I2STXFIFO),    // I2S Tx
+        ((uint32_t)(uintptr_t)&LPC_I2S->I2SRXFIFO),    // I2S Rx
+        ((uint32_t)(uintptr_t)&LPC_DAC->DACR),         // DAC
+        ((uint32_t)(uintptr_t)&LPC_UART0->THR),        // UART0 Tx
+        ((uint32_t)(uintptr_t)&LPC_UART0->RBR),        // UART0 Rx
+        ((uint32_t)(uintptr_t)&LPC_UART1->THR),        // UART1 Tx
+        ((uint32_t)(uintptr_t)&LPC_UART1->RBR),        // UART1 Rx
+        ((uint32_t)(uintptr_t)&LPC_UART2->THR),        // UART2 Tx
+        ((uint32_t)(uintptr_t)&LPC_UART2->RBR),        // UART2 Rx
+        ((uint32_t)(uintptr_t)&LPC_UART3->THR),        // UART3 Tx
+        ((uint32_t)(uintptr_t)&LPC_UART3->RBR),        // UART3 Rx
+        ((uint32_t)(uintptr_t)&LPC_TIM0->MR0),         // MAT0.0
+        ((uint32_t)(uintptr_t)&LPC_TIM0->MR1),         // MAT0.1
+        ((uint32_t)(uintptr_t)&LPC_TIM1->MR0),         // MAT1.0
+        ((uint32_t)(uintptr_t)&LPC_TIM1->MR1),         // MAT1.1
+        ((uint32_t)(uintptr_t)&LPC_TIM2->MR0),         // MAT2.0
+        ((uint32_t)(uintptr_t)&LPC_TIM2->MR1),         // MAT2.1
+        ((uint32_t)(uintptr_t)&LPC_TIM3->MR0),         // MAT3.0
+        ((uint32_t)(uintptr_t)&LPC_TIM3->MR1)          // MAT3.1
 };
 #endif
 /**
  * @brief Lookup Table of GPDMA Channel Number matched with
  * GPDMA channel pointer
  */
-const LPC_GPDMACH_TypeDef *pGPDMACh[8] = {
-		LPC_GPDMACH0,	// GPDMA Channel 0
-		LPC_GPDMACH1,	// GPDMA Channel 1
-		LPC_GPDMACH2,	// GPDMA Channel 2
-		LPC_GPDMACH3,	// GPDMA Channel 3
-		LPC_GPDMACH4,	// GPDMA Channel 4
-		LPC_GPDMACH5,	// GPDMA Channel 5
-		LPC_GPDMACH6,	// GPDMA Channel 6
-		LPC_GPDMACH7	// GPDMA Channel 7
+LPC_GPDMACH_TypeDef *pGPDMACh[8] = {
+        LPC_GPDMACH0,       // GPDMA Channel 0
+        LPC_GPDMACH1,       // GPDMA Channel 1
+        LPC_GPDMACH2,       // GPDMA Channel 2
+        LPC_GPDMACH3,       // GPDMA Channel 3
+        LPC_GPDMACH4,       // GPDMA Channel 4
+        LPC_GPDMACH5,       // GPDMA Channel 5
+        LPC_GPDMACH6,       // GPDMA Channel 6
+        LPC_GPDMACH7        // GPDMA Channel 7
 };
 /**
  * @brief Optimized Peripheral Source and Destination burst size
  */
 const uint8_t GPDMA_LUTPerBurst[] = {
-		GPDMA_BSIZE_4,				// SSP0 Tx
-		GPDMA_BSIZE_4,				// SSP0 Rx
-		GPDMA_BSIZE_4,				// SSP1 Tx
-		GPDMA_BSIZE_4,				// SSP1 Rx
-		GPDMA_BSIZE_4,				// ADC
-		GPDMA_BSIZE_32, 			// I2S channel 0
-		GPDMA_BSIZE_32, 			// I2S channel 1
-		GPDMA_BSIZE_1,				// DAC
-		GPDMA_BSIZE_1,				// UART0 Tx
-		GPDMA_BSIZE_1,				// UART0 Rx
-		GPDMA_BSIZE_1,				// UART1 Tx
-		GPDMA_BSIZE_1,				// UART1 Rx
-		GPDMA_BSIZE_1,				// UART2 Tx
-		GPDMA_BSIZE_1,				// UART2 Rx
-		GPDMA_BSIZE_1,				// UART3 Tx
-		GPDMA_BSIZE_1,				// UART3 Rx
-		GPDMA_BSIZE_1,				// MAT0.0
-		GPDMA_BSIZE_1,				// MAT0.1
-		GPDMA_BSIZE_1,				// MAT1.0
-		GPDMA_BSIZE_1,				// MAT1.1
-		GPDMA_BSIZE_1,				// MAT2.0
-		GPDMA_BSIZE_1,				// MAT2.1
-		GPDMA_BSIZE_1,				// MAT3.0
-		GPDMA_BSIZE_1				// MAT3.1
+        GPDMA_BSIZE_4,      // SSP0 Tx
+        GPDMA_BSIZE_4,      // SSP0 Rx
+        GPDMA_BSIZE_4,      // SSP1 Tx
+        GPDMA_BSIZE_4,      // SSP1 Rx
+        GPDMA_BSIZE_4,      // ADC
+        GPDMA_BSIZE_32,     // I2S channel 0
+        GPDMA_BSIZE_32,     // I2S channel 1
+        GPDMA_BSIZE_1,      // DAC
+        GPDMA_BSIZE_1,      // UART0 Tx
+        GPDMA_BSIZE_1,      // UART0 Rx
+        GPDMA_BSIZE_1,      // UART1 Tx
+        GPDMA_BSIZE_1,      // UART1 Rx
+        GPDMA_BSIZE_1,      // UART2 Tx
+        GPDMA_BSIZE_1,      // UART2 Rx
+        GPDMA_BSIZE_1,      // UART3 Tx
+        GPDMA_BSIZE_1,      // UART3 Rx
+        GPDMA_BSIZE_1,      // MAT0.0
+        GPDMA_BSIZE_1,      // MAT0.1
+        GPDMA_BSIZE_1,      // MAT1.0
+        GPDMA_BSIZE_1,      // MAT1.1
+        GPDMA_BSIZE_1,      // MAT2.0
+        GPDMA_BSIZE_1,      // MAT2.1
+        GPDMA_BSIZE_1,      // MAT3.0
+        GPDMA_BSIZE_1       // MAT3.1
 };
 /**
  * @brief Optimized Peripheral Source and Destination transfer width
  */
 const uint8_t GPDMA_LUTPerWid[] = {
-		GPDMA_WIDTH_BYTE,				// SSP0 Tx
-		GPDMA_WIDTH_BYTE,				// SSP0 Rx
-		GPDMA_WIDTH_BYTE,				// SSP1 Tx
-		GPDMA_WIDTH_BYTE,				// SSP1 Rx
-		GPDMA_WIDTH_WORD,				// ADC
-		GPDMA_WIDTH_WORD, 				// I2S channel 0
-		GPDMA_WIDTH_WORD, 				// I2S channel 1
-		GPDMA_WIDTH_BYTE,				// DAC
-		GPDMA_WIDTH_BYTE,				// UART0 Tx
-		GPDMA_WIDTH_BYTE,				// UART0 Rx
-		GPDMA_WIDTH_BYTE,				// UART1 Tx
-		GPDMA_WIDTH_BYTE,				// UART1 Rx
-		GPDMA_WIDTH_BYTE,				// UART2 Tx
-		GPDMA_WIDTH_BYTE,				// UART2 Rx
-		GPDMA_WIDTH_BYTE,				// UART3 Tx
-		GPDMA_WIDTH_BYTE,				// UART3 Rx
-		GPDMA_WIDTH_WORD,				// MAT0.0
-		GPDMA_WIDTH_WORD,				// MAT0.1
-		GPDMA_WIDTH_WORD,				// MAT1.0
-		GPDMA_WIDTH_WORD,				// MAT1.1
-		GPDMA_WIDTH_WORD,				// MAT2.0
-		GPDMA_WIDTH_WORD,				// MAT2.1
-		GPDMA_WIDTH_WORD,				// MAT3.0
-		GPDMA_WIDTH_WORD				// MAT3.1
+        GPDMA_BYTE,         // SSP0 Tx
+        GPDMA_BYTE,         // SSP0 Rx
+        GPDMA_BYTE,         // SSP1 Tx
+        GPDMA_BYTE,         // SSP1 Rx
+        GPDMA_WORD,         // ADC
+        GPDMA_WORD,         // I2S channel 0
+        GPDMA_WORD,         // I2S channel 1
+        GPDMA_BYTE,         // DAC
+        GPDMA_BYTE,         // UART0 Tx
+        GPDMA_BYTE,         // UART0 Rx
+        GPDMA_BYTE,         // UART1 Tx
+        GPDMA_BYTE,         // UART1 Rx
+        GPDMA_BYTE,         // UART2 Tx
+        GPDMA_BYTE,         // UART2 Rx
+        GPDMA_BYTE,         // UART3 Tx
+        GPDMA_BYTE,         // UART3 Rx
+        GPDMA_WORD,         // MAT0.0
+        GPDMA_WORD,         // MAT0.1
+        GPDMA_WORD,         // MAT1.0
+        GPDMA_WORD,         // MAT1.1
+        GPDMA_WORD,         // MAT2.0
+        GPDMA_WORD,         // MAT2.1
+        GPDMA_WORD,         // MAT3.0
+        GPDMA_WORD          // MAT3.1
 };
 
 /**
  * @}
  */
 
-/* Public Functions ----------------------------------------------------------- */
+/* ------------------- Private Function Prototypes ----------------------- */
+/**
+ * @brief Validates if the specified DMA channel is available (not in use).
+ * @param[in] channelNum DMA channel to validate.
+ * @return SUCCESS if available, ERROR if busy.
+ */
+static Status GPDMA_ValidateChannel(GPDMA_CHANNEL channelNum);
+
+/**
+ * @brief Resets the specified DMA channel control and configuration registers,
+ * and clears interrupt flags.
+ * @param[in] ch Pointer to the DMA channel registers.
+ * @param[in] channelNum DMA channel number.
+ */
+static void GPDMA_ResetChannel(LPC_GPDMACH_TypeDef *ch, GPDMA_CHANNEL channelNum);
+
+/**
+ * @brief Configures DMA channel registers according to the configuration structure.
+ * @param[in] ch Pointer to the DMA channel registers.
+ * @param[in] cfg Pointer to the DMA channel configuration structure.
+ */
+static void GPDMA_ConfigChannelRegisters(LPC_GPDMACH_TypeDef *ch, const GPDMA_Channel_CFG_Type *cfg);
+
+/**
+ * @brief Configures the DMAREQSEL register for peripheral connections.
+ * @param[in] cfg Pointer to the DMA channel configuration structure.
+ */
+static void GPDMA_ConfigDMAReqSel(const GPDMA_Channel_CFG_Type *cfg);
+/* ------------------ End of Private Function Prototypes ----------------- */
+
+/* ---------------------- Private Functions ------------------------------ */
+static Status GPDMA_ValidateChannel(GPDMA_CHANNEL channelNum) {
+    if (LPC_GPDMA->DMACEnbldChns & GPDMA_ChannelBit(channelNum))
+        return ERROR;
+    return SUCCESS;
+}
+
+static void GPDMA_ResetChannel(LPC_GPDMACH_TypeDef *ch, GPDMA_CHANNEL channelNum) {
+    LPC_GPDMA->DMACIntTCClear = GPDMA_ChannelBit(channelNum);
+    LPC_GPDMA->DMACIntErrClr = GPDMA_ChannelBit(channelNum);
+    ch->DMACCControl = 0;
+    ch->DMACCConfig = 0;
+}
+
+static void GPDMA_ConfigChannelRegisters(LPC_GPDMACH_TypeDef *ch, const GPDMA_Channel_CFG_Type *cfg) {
+    switch (cfg->transferType) {
+        case GPDMA_M2M:
+            ch->DMACCSrcAddr = cfg->srcMemAddr;
+            ch->DMACCDestAddr = cfg->dstMemAddr;
+            ch->DMACCControl = GPDMA_DMACCxControl_TransferSize(cfg->transferSize)
+                             | GPDMA_DMACCxControl_SBSize(GPDMA_BSIZE_32)
+                             | GPDMA_DMACCxControl_DBSize(GPDMA_BSIZE_32)
+                             | GPDMA_DMACCxControl_SWidth(cfg->transferWidth)
+                             | GPDMA_DMACCxControl_DWidth(cfg->transferWidth)
+                             | GPDMA_DMACCxControl_SI
+                             | GPDMA_DMACCxControl_DI
+                             | GPDMA_DMACCxControl_I;
+            break;
+
+        case GPDMA_M2P:
+            ch->DMACCSrcAddr = cfg->srcMemAddr;
+            ch->DMACCDestAddr = GPDMA_LUTPerAddr[cfg->dstConn];
+            ch->DMACCControl = GPDMA_DMACCxControl_TransferSize(cfg->transferSize)
+                             | GPDMA_DMACCxControl_SBSize(GPDMA_LUTPerBurst[cfg->dstConn])
+                             | GPDMA_DMACCxControl_DBSize(GPDMA_LUTPerBurst[cfg->dstConn])
+                             | GPDMA_DMACCxControl_SWidth(GPDMA_LUTPerWid[cfg->dstConn])
+                             | GPDMA_DMACCxControl_DWidth(GPDMA_LUTPerWid[cfg->dstConn])
+                             | GPDMA_DMACCxControl_SI
+                             | GPDMA_DMACCxControl_I;
+            break;
+
+        case GPDMA_P2M:
+            ch->DMACCSrcAddr = GPDMA_LUTPerAddr[cfg->srcConn];
+            ch->DMACCDestAddr = cfg->dstMemAddr;
+            ch->DMACCControl = GPDMA_DMACCxControl_TransferSize(cfg->transferSize)
+                             | GPDMA_DMACCxControl_SBSize(GPDMA_LUTPerBurst[cfg->srcConn])
+                             | GPDMA_DMACCxControl_DBSize(GPDMA_LUTPerBurst[cfg->srcConn])
+                             | GPDMA_DMACCxControl_SWidth(GPDMA_LUTPerWid[cfg->srcConn])
+                             | GPDMA_DMACCxControl_DWidth(GPDMA_LUTPerWid[cfg->srcConn])
+                             | GPDMA_DMACCxControl_DI
+                             | GPDMA_DMACCxControl_I;
+            break;
+
+        case GPDMA_P2P:
+            ch->DMACCSrcAddr = GPDMA_LUTPerAddr[cfg->srcConn];
+            ch->DMACCDestAddr = GPDMA_LUTPerAddr[cfg->dstConn];
+            ch->DMACCControl = GPDMA_DMACCxControl_TransferSize(cfg->transferSize) \
+                             | GPDMA_DMACCxControl_SBSize(GPDMA_LUTPerBurst[cfg->srcConn]) \
+                             | GPDMA_DMACCxControl_DBSize(GPDMA_LUTPerBurst[cfg->dstConn]) \
+                             | GPDMA_DMACCxControl_SWidth(GPDMA_LUTPerWid[cfg->srcConn]) \
+                             | GPDMA_DMACCxControl_DWidth(GPDMA_LUTPerWid[cfg->dstConn]) \
+                             | GPDMA_DMACCxControl_I;
+            break;
+
+        default:
+            break;
+        }
+}
+
+static void GPDMA_ConfigDMAReqSel(const GPDMA_Channel_CFG_Type *cfg) {
+    if (cfg->srcConn > 15) {
+        LPC_SC->DMAREQSEL |= (1 << (cfg->srcConn - 16));
+    } else {
+        LPC_SC->DMAREQSEL &= ~(1 << (cfg->srcConn - 8));
+    }
+
+    if (cfg->dstConn > 15) {
+        LPC_SC->DMAREQSEL |= (1 << (cfg->dstConn - 16));
+    } else {
+        LPC_SC->DMAREQSEL &= ~(1 << (cfg->dstConn - 8));
+    }
+}
+/* ----------------------- End of Private Functions ---------------------- */
+
+/* --------------------------- Public Functions -------------------------- */
 /** @addtogroup GPDMA_Public_Functions
  * @{
  */
 
-/********************************************************************//**
- * @brief 		Initialize GPDMA controller
- * @param 		None
- * @return 		None
- *********************************************************************/
-void GPDMA_Init(void)
-{
-	/* Enable GPDMA clock */
-	CLKPWR_ConfigPPWR (CLKPWR_PCONP_PCGPDMA, ENABLE);
+void GPDMA_Init(void) {
+    CLKPWR_ConfigPPWR (CLKPWR_PCONP_PCGPDMA, ENABLE);
 
-	// Reset all channel configuration register
-	LPC_GPDMACH0->DMACCConfig = 0;
-	LPC_GPDMACH1->DMACCConfig = 0;
-	LPC_GPDMACH2->DMACCConfig = 0;
-	LPC_GPDMACH3->DMACCConfig = 0;
-	LPC_GPDMACH4->DMACCConfig = 0;
-	LPC_GPDMACH5->DMACCConfig = 0;
-	LPC_GPDMACH6->DMACCConfig = 0;
-	LPC_GPDMACH7->DMACCConfig = 0;
+    for (int i = 0; i < GPDMA_NUM_CHANNELS; i++) {
+        pGPDMACh[i]->DMACCConfig = 0;
+        pGPDMACh[i]->DMACCControl = 0;
+    }
 
-	/* Clear all DMA interrupt and error flag */
-	LPC_GPDMA->DMACIntTCClear = 0xFF;
-	LPC_GPDMA->DMACIntErrClr = 0xFF;
+    LPC_GPDMA->DMACIntTCClear = GPDMA_DMACIntStat_ALL;
+    LPC_GPDMA->DMACIntErrClr = GPDMA_DMACIntStat_ALL;
+
+    LPC_GPDMA->DMACConfig = GPDMA_DMACConfig_E;
+    while (!(LPC_GPDMA->DMACConfig & GPDMA_DMACConfig_E));
 }
 
-/********************************************************************//**
- * @brief 		Setup GPDMA channel peripheral according to the specified
- *               parameters in the GPDMAChannelConfig.
- * @param[in]	GPDMAChannelConfig Pointer to a GPDMA_CH_CFG_Type
- * 									structure that contains the configuration
- * 									information for the specified GPDMA channel peripheral.
- * @return		ERROR if selected channel is enabled before
- * 				or SUCCESS if channel is configured successfully
- *********************************************************************/
-Status GPDMA_Setup(GPDMA_Channel_CFG_Type *GPDMAChannelConfig)
-{
-	LPC_GPDMACH_TypeDef *pDMAch;
-	uint32_t tmp1, tmp2;
+Status GPDMA_Setup(const GPDMA_Channel_CFG_Type *cfg) {
+    CHECK_PARAM(PARAM_GPDMA_CHANNEL_OPT(cfg->channelNum));
+    CHECK_PARAM(cfg->transferSize > 0 && cfg->transferSize <= 4095);
+    CHECK_PARAM(PARAM_GPDMA_TRANSFER_WIDTH(cfg->transferWidth));
+    CHECK_PARAM(PARAM_GPDMA_TRANSFER_TYPE(cfg->transferType));
+    CHECK_PARAM(PARAM_GPDMA_CONNECTION(cfg->srcConn));
+    CHECK_PARAM(PARAM_GPDMA_CONNECTION(cfg->dstConn));
 
-	if (LPC_GPDMA->DMACEnbldChns & (GPDMA_DMACEnbldChns_Ch(GPDMAChannelConfig->ChannelNum))) {
-		// This channel is enabled, return ERROR, need to release this channel first
-		return ERROR;
-	}
+    if (GPDMA_ValidateChannel(cfg->channelNum) == ERROR)
+        return ERROR;
 
-	// Get Channel pointer
-	pDMAch = (LPC_GPDMACH_TypeDef *) pGPDMACh[GPDMAChannelConfig->ChannelNum];
+    LPC_GPDMACH_TypeDef* pDMAch = pGPDMACh[cfg->channelNum];
 
-	// Reset the Interrupt status
-	LPC_GPDMA->DMACIntTCClear = GPDMA_DMACIntTCClear_Ch(GPDMAChannelConfig->ChannelNum);
-	LPC_GPDMA->DMACIntErrClr = GPDMA_DMACIntErrClr_Ch(GPDMAChannelConfig->ChannelNum);
+    GPDMA_ResetChannel(pDMAch, cfg->channelNum);
 
-	// Clear DMA configure
-	pDMAch->DMACCControl = 0x00;
-	pDMAch->DMACCConfig = 0x00;
+    pDMAch->DMACCLLI = cfg->linkedList;
 
-	/* Assign Linker List Item value */
-	pDMAch->DMACCLLI = GPDMAChannelConfig->DMALLI;
+    GPDMA_ConfigChannelRegisters(pDMAch, cfg);
 
-	/* Set value to Channel Control Registers */
-	switch (GPDMAChannelConfig->TransferType)
-	{
-	// Memory to memory
-	case GPDMA_TRANSFERTYPE_M2M:
-		// Assign physical source and destination address
-		pDMAch->DMACCSrcAddr = GPDMAChannelConfig->SrcMemAddr;
-		pDMAch->DMACCDestAddr = GPDMAChannelConfig->DstMemAddr;
-		pDMAch->DMACCControl
-				= GPDMA_DMACCxControl_TransferSize(GPDMAChannelConfig->TransferSize) \
-						| GPDMA_DMACCxControl_SBSize(GPDMA_BSIZE_32) \
-						| GPDMA_DMACCxControl_DBSize(GPDMA_BSIZE_32) \
-						| GPDMA_DMACCxControl_SWidth(GPDMAChannelConfig->TransferWidth) \
-						| GPDMA_DMACCxControl_DWidth(GPDMAChannelConfig->TransferWidth) \
-						| GPDMA_DMACCxControl_SI \
-						| GPDMA_DMACCxControl_DI \
-						| GPDMA_DMACCxControl_I;
-		break;
-	// Memory to peripheral
-	case GPDMA_TRANSFERTYPE_M2P:
-		// Assign physical source
-		pDMAch->DMACCSrcAddr = GPDMAChannelConfig->SrcMemAddr;
-		// Assign peripheral destination address
-		pDMAch->DMACCDestAddr = (uint32_t)GPDMA_LUTPerAddr[GPDMAChannelConfig->DstConn];
-		pDMAch->DMACCControl
-				= GPDMA_DMACCxControl_TransferSize((uint32_t)GPDMAChannelConfig->TransferSize) \
-						| GPDMA_DMACCxControl_SBSize((uint32_t)GPDMA_LUTPerBurst[GPDMAChannelConfig->DstConn]) \
-						| GPDMA_DMACCxControl_DBSize((uint32_t)GPDMA_LUTPerBurst[GPDMAChannelConfig->DstConn]) \
-						| GPDMA_DMACCxControl_SWidth((uint32_t)GPDMA_LUTPerWid[GPDMAChannelConfig->DstConn]) \
-						| GPDMA_DMACCxControl_DWidth((uint32_t)GPDMA_LUTPerWid[GPDMAChannelConfig->DstConn]) \
-						| GPDMA_DMACCxControl_SI \
-						| GPDMA_DMACCxControl_I;
-		break;
-	// Peripheral to memory
-	case GPDMA_TRANSFERTYPE_P2M:
-		// Assign peripheral source address
-		pDMAch->DMACCSrcAddr = (uint32_t)GPDMA_LUTPerAddr[GPDMAChannelConfig->SrcConn];
-		// Assign memory destination address
-		pDMAch->DMACCDestAddr = GPDMAChannelConfig->DstMemAddr;
-		pDMAch->DMACCControl
-				= GPDMA_DMACCxControl_TransferSize((uint32_t)GPDMAChannelConfig->TransferSize) \
-						| GPDMA_DMACCxControl_SBSize((uint32_t)GPDMA_LUTPerBurst[GPDMAChannelConfig->SrcConn]) \
-						| GPDMA_DMACCxControl_DBSize((uint32_t)GPDMA_LUTPerBurst[GPDMAChannelConfig->SrcConn]) \
-						| GPDMA_DMACCxControl_SWidth((uint32_t)GPDMA_LUTPerWid[GPDMAChannelConfig->SrcConn]) \
-						| GPDMA_DMACCxControl_DWidth((uint32_t)GPDMA_LUTPerWid[GPDMAChannelConfig->SrcConn]) \
-						| GPDMA_DMACCxControl_DI \
-						| GPDMA_DMACCxControl_I;
-		break;
-	// Peripheral to peripheral
-	case GPDMA_TRANSFERTYPE_P2P:
-		// Assign peripheral source address
-		pDMAch->DMACCSrcAddr = (uint32_t)GPDMA_LUTPerAddr[GPDMAChannelConfig->SrcConn];
-		// Assign peripheral destination address
-		pDMAch->DMACCDestAddr = (uint32_t)GPDMA_LUTPerAddr[GPDMAChannelConfig->DstConn];
-		pDMAch->DMACCControl
-				= GPDMA_DMACCxControl_TransferSize((uint32_t)GPDMAChannelConfig->TransferSize) \
-						| GPDMA_DMACCxControl_SBSize((uint32_t)GPDMA_LUTPerBurst[GPDMAChannelConfig->SrcConn]) \
-						| GPDMA_DMACCxControl_DBSize((uint32_t)GPDMA_LUTPerBurst[GPDMAChannelConfig->DstConn]) \
-						| GPDMA_DMACCxControl_SWidth((uint32_t)GPDMA_LUTPerWid[GPDMAChannelConfig->SrcConn]) \
-						| GPDMA_DMACCxControl_DWidth((uint32_t)GPDMA_LUTPerWid[GPDMAChannelConfig->DstConn]) \
-						| GPDMA_DMACCxControl_I;
-		break;
-	// Do not support any more transfer type, return ERROR
-	default:
-		return ERROR;
-	}
+    GPDMA_ConfigDMAReqSel(cfg);
 
-	/* Re-Configure DMA Request Select for source peripheral */
-	if (GPDMAChannelConfig->SrcConn > 15)
-	{
-		LPC_SC->DMAREQSEL |= (1<<(GPDMAChannelConfig->SrcConn - 16));
-	} else {
-		LPC_SC->DMAREQSEL &= ~(1<<(GPDMAChannelConfig->SrcConn - 8));
-	}
+    const uint32_t src = (cfg->srcConn > 15) ? (cfg->srcConn - 8) : cfg->srcConn;
+    const uint32_t dst = (cfg->dstConn > 15) ? (cfg->dstConn - 8) : cfg->dstConn;
 
-	/* Re-Configure DMA Request Select for Destination peripheral */
-	if (GPDMAChannelConfig->DstConn > 15)
-	{
-		LPC_SC->DMAREQSEL |= (1<<(GPDMAChannelConfig->DstConn - 16));
-	} else {
-		LPC_SC->DMAREQSEL &= ~(1<<(GPDMAChannelConfig->DstConn - 8));
-	}
+    pDMAch->DMACCConfig = GPDMA_DMACCxConfig_IE
+                        | GPDMA_DMACCxConfig_ITC
+                        | GPDMA_DMACCxConfig_TransferType(cfg->transferType)
+                        | GPDMA_DMACCxConfig_SrcPeripheral(src)
+                        | GPDMA_DMACCxConfig_DestPeripheral(dst);
 
-	/* Enable DMA channels, little endian */
-	LPC_GPDMA->DMACConfig = GPDMA_DMACConfig_E;
-	while (!(LPC_GPDMA->DMACConfig & GPDMA_DMACConfig_E));
-
-	// Calculate absolute value for Connection number
-	tmp1 = GPDMAChannelConfig->SrcConn;
-	tmp1 = ((tmp1 > 15) ? (tmp1 - 8) : tmp1);
-	tmp2 = GPDMAChannelConfig->DstConn;
-	tmp2 = ((tmp2 > 15) ? (tmp2 - 8) : tmp2);
-
-	// Configure DMA Channel, enable Error Counter and Terminate counter
-	pDMAch->DMACCConfig = GPDMA_DMACCxConfig_IE | GPDMA_DMACCxConfig_ITC /*| GPDMA_DMACCxConfig_E*/ \
-		| GPDMA_DMACCxConfig_TransferType((uint32_t)GPDMAChannelConfig->TransferType) \
-		| GPDMA_DMACCxConfig_SrcPeripheral(tmp1) \
-		| GPDMA_DMACCxConfig_DestPeripheral(tmp2);
-
-	return SUCCESS;
+    return SUCCESS;
 }
 
+void GPDMA_ChannelCmd(GPDMA_CHANNEL channelNum, FunctionalState NewState) {
+    CHECK_PARAM(PARAM_GPDMA_CHANNEL_OPT(channelNum));
+    CHECK_PARAM(PARAM_FUNCTIONALSTATE(NewState));
 
-/*********************************************************************//**
- * @brief		Enable/Disable DMA channel
- * @param[in]	channelNum	GPDMA channel, should be in range from 0 to 7
- * @param[in]	NewState	New State of this command, should be:
- * 					- ENABLE.
- * 					- DISABLE.
- * @return		None
- **********************************************************************/
-void GPDMA_ChannelCmd(uint8_t channelNum, FunctionalState NewState)
-{
-	LPC_GPDMACH_TypeDef *pDMAch;
+    LPC_GPDMACH_TypeDef *pDMAch = pGPDMACh[channelNum];
 
-	// Get Channel pointer
-	pDMAch = (LPC_GPDMACH_TypeDef *) pGPDMACh[channelNum];
-
-	if (NewState == ENABLE) {
-		pDMAch->DMACCConfig |= GPDMA_DMACCxConfig_E;
-	} else {
-		pDMAch->DMACCConfig &= ~GPDMA_DMACCxConfig_E;
-	}
-}
-/*********************************************************************//**
- * @brief		Check if corresponding channel does have an active interrupt
- * 				request or not
- * @param[in]	type		type of status, should be:
- * 					- GPDMA_STAT_INT: 		GPDMA Interrupt Status
- * 					- GPDMA_STAT_INTTC: 	GPDMA Interrupt Terminal Count Request Status
- * 					- GPDMA_STAT_INTERR:	GPDMA Interrupt Error Status
- * 					- GPDMA_STAT_RAWINTTC:	GPDMA Raw Interrupt Terminal Count Status
- * 					- GPDMA_STAT_RAWINTERR:	GPDMA Raw Error Interrupt Status
- * 					- GPDMA_STAT_ENABLED_CH:GPDMA Enabled Channel Status
- * @param[in]	channel		GPDMA channel, should be in range from 0 to 7
- * @return		IntStatus	status of DMA channel interrupt after masking
- * 				Should be:
- * 					- SET: the corresponding channel has no active interrupt request
- * 					- RESET: the corresponding channel does have an active interrupt request
- **********************************************************************/
-IntStatus GPDMA_IntGetStatus(GPDMA_Status_Type type, uint8_t channel)
-{
-	CHECK_PARAM(PARAM_GPDMA_STAT(type));
-	CHECK_PARAM(PARAM_GPDMA_CHANNEL(channel));
-
-	switch (type)
-	{
-	case GPDMA_STAT_INT: //check status of DMA channel interrupts
-		if (LPC_GPDMA->DMACIntStat & (GPDMA_DMACIntStat_Ch(channel)))
-			return SET;
-		return RESET;
-	case GPDMA_STAT_INTTC: // check terminal count interrupt request status for DMA
-		if (LPC_GPDMA->DMACIntTCStat & GPDMA_DMACIntTCStat_Ch(channel))
-			return SET;
-		return RESET;
-	case GPDMA_STAT_INTERR: //check interrupt status for DMA channels
-		if (LPC_GPDMA->DMACIntErrStat & GPDMA_DMACIntTCClear_Ch(channel))
-			return SET;
-		return RESET;
-	case GPDMA_STAT_RAWINTTC: //check status of the terminal count interrupt for DMA channels
-		if (LPC_GPDMA->DMACRawIntErrStat & GPDMA_DMACRawIntTCStat_Ch(channel))
-			return SET;
-		return RESET;
-	case GPDMA_STAT_RAWINTERR: //check status of the error interrupt for DMA channels
-		if (LPC_GPDMA->DMACRawIntTCStat & GPDMA_DMACRawIntErrStat_Ch(channel))
-			return SET;
-		return RESET;
-	default: //check enable status for DMA channels
-		if (LPC_GPDMA->DMACEnbldChns & GPDMA_DMACEnbldChns_Ch(channel))
-			return SET;
-		return RESET;
-	}
+    if (NewState == ENABLE) {
+        pDMAch->DMACCConfig |= GPDMA_DMACCxConfig_E;
+    } else {
+        pDMAch->DMACCConfig &= ~GPDMA_DMACCxConfig_E;
+    }
 }
 
-/*********************************************************************//**
- * @brief		Clear one or more interrupt requests on DMA channels
- * @param[in]	type		type of interrupt request, should be:
- * 					- GPDMA_STATCLR_INTTC: 	GPDMA Interrupt Terminal Count Request Clear
- * 					- GPDMA_STATCLR_INTERR: GPDMA Interrupt Error Clear
- * @param[in]	channel		GPDMA channel, should be in range from 0 to 7
- * @return		None
- **********************************************************************/
-void GPDMA_ClearIntPending(GPDMA_StateClear_Type type, uint8_t channel)
-{
-	CHECK_PARAM(PARAM_GPDMA_STATCLR(type));
-	CHECK_PARAM(PARAM_GPDMA_CHANNEL(channel));
+IntStatus GPDMA_IntGetStatus(GPDMA_STATUS_TYPE type, GPDMA_CHANNEL channel) {
+    CHECK_PARAM(PARAM_GPDMA_STAT(type));
+    CHECK_PARAM(PARAM_GPDMA_CHANNEL_OPT(channel));
 
-	if (type == GPDMA_STATCLR_INTTC) // clears the terminal count interrupt request on DMA channel
-		LPC_GPDMA->DMACIntTCClear = GPDMA_DMACIntTCClear_Ch(channel);
-	else // clear the error interrupt request
-		LPC_GPDMA->DMACIntErrClr = GPDMA_DMACIntErrClr_Ch(channel);
+    switch (type) {
+        case GPDMA_INT:
+            if (LPC_GPDMA->DMACIntStat & GPDMA_ChannelBit(channel)) {
+                return SET;
+            }
+            return RESET;
+
+        case GPDMA_INTTC:
+            if (LPC_GPDMA->DMACIntTCStat & GPDMA_ChannelBit(channel)) {
+                return SET;
+            }
+            return RESET;
+
+        case GPDMA_INTERR:
+            if (LPC_GPDMA->DMACIntErrStat & GPDMA_ChannelBit(channel)) {
+                return SET;
+            }
+            return RESET;
+
+        case GPDMA_RAW_INTTC:
+            if (LPC_GPDMA->DMACRawIntErrStat & GPDMA_ChannelBit(channel)) {
+                return SET;
+            }
+            return RESET;
+
+        case GPDMA_RAW_INTERR:
+            if (LPC_GPDMA->DMACRawIntTCStat & GPDMA_ChannelBit(channel)) {
+                return SET;
+            }
+            return RESET;
+
+        default:
+            if (LPC_GPDMA->DMACEnbldChns & GPDMA_ChannelBit(channel)) {
+                return SET;
+            }
+            return RESET;
+    }
+}
+
+void GPDMA_ClearIntPending(GPDMA_CLEAR_INT type, GPDMA_CHANNEL channel) {
+    CHECK_PARAM(PARAM_GPDMA_CLEAR_INT(type));
+    CHECK_PARAM(PARAM_GPDMA_CHANNEL_OPT(channel));
+
+    if (type == GPDMA_CLR_INTTC)
+        LPC_GPDMA->DMACIntTCClear = GPDMA_ChannelBit(channel);
+    if (type == GPDMA_CLR_INTERR)
+        LPC_GPDMA->DMACIntErrClr = GPDMA_ChannelBit(channel);
 }
 
 /**
