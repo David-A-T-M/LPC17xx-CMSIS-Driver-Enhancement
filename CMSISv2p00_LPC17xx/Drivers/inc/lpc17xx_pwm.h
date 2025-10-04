@@ -1,11 +1,11 @@
-/***********************************************************************//**
+/**
  * @file        lpc17xx_pwm.h
- * @brief        Contains all macro definitions and function prototypes
- *                 support for PWM firmware library on LPC17xx
- * @version        2.0
+ * @brief       Contains all macro definitions and function prototypes
+ *              support for PWM firmware library on LPC17xx
+ * @version     2.0
  * @date        21. May. 2010
- * @author        NXP MCU SW Application Team
- **************************************************************************
+ * @author      NXP MCU SW Application Team
+ *
  * Software that is described herein is for illustrative purposes only
  * which provides customers with programming information regarding the
  * products. This software is supplied "AS IS" without any warranties.
@@ -16,7 +16,10 @@
  * notification. NXP Semiconductors also make no representation or
  * warranty that such application will be suitable for the specified
  * use without further testing or modification.
- **************************************************************************/
+ *
+ * @par Refactor:
+ * Date: 04/10/2025, Author: David Trujillo Medina
+ */
 
 /* Peripheral group ----------------------------------------------------------- */
 /** @defgroup PWM PWM
@@ -31,12 +34,9 @@
 #include "LPC17xx.h"
 #include "lpc_types.h"
 
-
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
-
 
 /* Private Macros ------------------------------------------------------------- */
 /** @defgroup PWM_Private_Macros PWM Private Macros
@@ -44,274 +44,473 @@ extern "C"
  */
 
 /* --------------------- BIT DEFINITIONS -------------------------------------- */
-/**********************************************************************
-* IR register definitions
-**********************************************************************/
-/** Interrupt flag for PWM match channel for 6 channel */
-#define PWM_IR_PWMMRn(n)        ((uint32_t)((n<4)?(1<<n):(1<<(n+4))))
-/** Interrupt flag for capture input */
-#define PWM_IR_PWMCAPn(n)        ((uint32_t)(1<<(n+4)))
-/**  IR register mask */
-#define PWM_IR_BITMASK            ((uint32_t)(0x0000073F))
 
-/**********************************************************************
-* TCR register definitions
-**********************************************************************/
-/** TCR register mask */
-#define PWM_TCR_BITMASK                ((uint32_t)(0x0000000B))
-#define PWM_TCR_COUNTER_ENABLE      ((uint32_t)(1<<0)) /*!< PWM Counter Enable */
-#define PWM_TCR_COUNTER_RESET       ((uint32_t)(1<<1)) /*!< PWM Counter Reset */
-#define PWM_TCR_PWM_ENABLE          ((uint32_t)(1<<3)) /*!< PWM Enable */
-
-/**********************************************************************
-* CTCR register definitions
-**********************************************************************/
-/** CTCR register mask */
-#define PWM_CTCR_BITMASK            ((uint32_t)(0x0000000F))
-/** PWM Counter-Timer Mode */
-#define PWM_CTCR_MODE(n)            ((uint32_t)(n&0x03))
+/** CTCR register mode mask. */
+#define PWM_CTCR_MODE_MASK ((0x3))
 /** PWM Capture input select */
-#define PWM_CTCR_SELECT_INPUT(n)    ((uint32_t)((n&0x03)<<2))
+#define PWM_CTCR_SELECT_INPUT(n) ((uint32_t)((n) << 2))
+/** IR register mask */
+#define PWM_IR_BITMASK ((uint32_t)(0x0000073F))
+/** MCR interrupt on MATCHx bit. */
+#define PWM_MCR_INT(MRx) ((uint32_t)(1 << (3 * (MRx))))
+/** MCR reset on MATCHx bit. */
+#define PWM_MCR_RESET(MRx) ((uint32_t)(1 << ((3 * (MRx)) + 1)))
+/** MCR stop on MATCHx bit. */
+#define PWM_MCR_STOP(MRx) ((uint32_t)(1 << ((3 * (MRx)) + 2)))
+/** MCR register channel mask bit. */
+#define PWM_MCR_CHANNEL_MASKBIT(CH) ((uint32_t)(7 << (CH * 3)))
+/** TCR counter enable bit. */
+#define PWM_TCR_COUNTER_ENABLE ((uint32_t)(1 << 0))
+/** TCR counter reset bit. */
+#define PWM_TCR_COUNTER_RESET ((uint32_t)(1 << 1))
+/** TCR PWM enable bit. */
+#define PWM_TCR_PWM_ENABLE ((uint32_t)(1 << 3))
+/** PCR edge select bit. */
+#define PWM_PCR_PWMSELn(CH) ((uint32_t)(_BIT(CH)))
+/** PCR PWM channel output enable bit. */
+#define PWM_PCR_PWMENAn(CH) ((uint32_t)((1) << ((CH) + 8)))
+/** CCR register channel mask bit. */
+#define PWM_CCR_CHANNEL_MASKBIT(CH) ((uint32_t)(7 << (CH * 3)))
+/** CCR rising edge sensitive channel bit. */
+#define PWM_CCR_CAP_RISING(CAPx) ((uint32_t)(1 << (((CAPx & 0x2) << 1) + (CAPx & 0x1))))
+/** CCR falling edge sensitive channel bit.*/
+#define PWM_CCR_CAP_FALLING(CAPx) ((uint32_t)(1 << (((CAPx & 0x2) << 1) + (CAPx & 0x1) + 1)))
+/** CCR interrupt on event channel bit. */
+#define PWM_CCR_INT_ON_CAP(CAPx) ((uint32_t)(1 << (((CAPx & 0x2) << 1) + (CAPx & 0x1) + 2)))
 
-/**********************************************************************
-* MCR register definitions
-**********************************************************************/
-/** MCR register mask */
-#define PWM_MCR_BITMASK                ((uint32_t)(0x001FFFFF))
-/** generate a PWM interrupt when a MATCHn occurs */
-#define PWM_MCR_INT_ON_MATCH(n)     ((uint32_t)(1<<(((n&0x7)<<1)+(n&0x07))))
-/** reset the PWM when a MATCHn occurs */
-#define PWM_MCR_RESET_ON_MATCH(n)   ((uint32_t)(1<<(((n&0x7)<<1)+(n&0x07)+1)))
-/** stop the PWM when a MATCHn occurs */
-#define PWM_MCR_STOP_ON_MATCH(n)    ((uint32_t)(1<<(((n&0x7)<<1)+(n&0x07)+2)))
-
-/**********************************************************************
-* CCR register definitions
-**********************************************************************/
-/** CCR register mask */
-#define PWM_CCR_BITMASK                ((uint32_t)(0x0000003F))
-/** PCAPn is rising edge sensitive */
-#define PWM_CCR_CAP_RISING(n)          ((uint32_t)(1<<(((n&0x2)<<1)+(n&0x1))))
-/** PCAPn is falling edge sensitive */
-#define PWM_CCR_CAP_FALLING(n)         ((uint32_t)(1<<(((n&0x2)<<1)+(n&0x1)+1)))
-/** PWM interrupt is generated on a PCAP event */
-#define PWM_CCR_INT_ON_CAP(n)          ((uint32_t)(1<<(((n&0x2)<<1)+(n&0x1)+2)))
-
-/**********************************************************************
-* PCR register definitions
-**********************************************************************/
-/** PCR register mask */
-#define PWM_PCR_BITMASK            (uint32_t)0x00007E7C
-/** PWM output n is a single edge controlled output */
-#define PWM_PCR_PWMSELn(n)       ((uint32_t)(((n&0x7)<2) ? 0 : (1<<n)))
-/** enable PWM output n */
-#define PWM_PCR_PWMENAn(n)       ((uint32_t)(((n&0x7)<1) ? 0 : (1<<(n+8))))
-
-/**********************************************************************
-* LER register definitions
-**********************************************************************/
-/** LER register mask*/
-#define PWM_LER_BITMASK                ((uint32_t)(0x0000007F))
-/** PWM MATCHn register update control */
-#define PWM_LER_EN_MATCHn_LATCH(n)   ((uint32_t)((n<7) ? (1<<n) : 0))
-
-/* ---------------- CHECK PARAMETER DEFINITIONS ---------------------------- */
-/** Macro to determine if it is valid PWM peripheral or not */
-#define PARAM_PWMx(n)    (((uint32_t *)n)==((uint32_t *)LPC_PWM1))
-
-/** Macro check PWM1 match channel value */
-#define PARAM_PWM1_MATCH_CHANNEL(n)        ((n)<=6)
-
-/** Macro check PWM1 channel value */
-#define PARAM_PWM1_CHANNEL(n)            ((n>=1) && (n<=6))
-
-/** Macro check PWM1 edge channel mode */
-#define PARAM_PWM1_EDGE_MODE_CHANNEL(n)            ((n>=2) && (n<=6))
-
-/** Macro check PWM1 capture channel mode */
-#define PARAM_PWM1_CAPTURE_CHANNEL(n)    ((n==0) || (n==1))
-
-/** Macro check PWM1 interrupt status type */
-#define PARAM_PWM_INTSTAT(n)    ((n==PWM_INTSTAT_MR0) || (n==PWM_INTSTAT_MR1) || (n==PWM_INTSTAT_MR2) \
-|| (n==PWM_INTSTAT_MR3) || (n==PWM_INTSTAT_MR4) || (n==PWM_INTSTAT_MR5) \
-|| (n==PWM_INTSTAT_MR6) || (n==PWM_INTSTAT_CAP0) || (n==PWM_INTSTAT_CAP1))
 /**
  * @}
  */
-
 
 /* Public Types --------------------------------------------------------------- */
 /** @defgroup PWM_Public_Types PWM Public Types
  * @{
  */
 
-/** @brief Configuration structure in PWM TIMER mode */
-typedef struct {
+/**
+ * @brief Timer/counter operating mode.
+ */
+typedef enum {
+    PWM_MODE_TIMER = 0,
+    PWM_COUNTER_RISING_MODE,
+    PWM_COUNTER_FALLING_MODE,
+    PWM_COUNTER_ANY_MODE
+} PWM_TIM_MODE;
+#define PARAM_PWM_TIM_MODE(n) ((n >= PWM_MODE_TIMER) && (n <= PWM_COUNTER_ANY_MODE))
 
-    uint8_t PrescaleOption;        /**< Prescale option, should be:
-                                - PWM_TIMER_PRESCALE_TICKVAL: Prescale in absolute value
-                                - PWM_TIMER_PRESCALE_USVAL: Prescale in microsecond value
-                                */
-    uint8_t Reserved[3];
-    uint32_t PrescaleValue;        /**< Prescale value, 32-bit long, should be matched
-                                with PrescaleOption
-                                */
+/**
+ * @brief Timer/Counter prescale option.
+ */
+typedef enum {
+    PWM_TICKVAL = 0,
+    PWM_USVAL
+} PWM_PRESCALE;
+/** Check PWM prescale option parameter. */
+#define PARAM_PWM_PRESCALE(OPT) ((OPT == PWM_TICKVAL) || (OPT == PWM_USVAL))
+
+/**
+ * @brief Capture channel enum and parameter macro
+ */
+typedef enum {
+    PWM_CAPTURE_0 = 0,
+    PWM_CAPTURE_1
+} PWM_CAPTURE;
+#define PARAM_PWM_CAPTURE(CH) (((CH) >= PWM_CAPTURE_0) && ((CH) <= PWM_CAPTURE_1))
+
+/**
+ *@brief PWM channel enum and parameter macro
+ */
+typedef enum {
+    PWM_CHANNEL_1 = 1,
+    PWM_CHANNEL_2,
+    PWM_CHANNEL_3,
+    PWM_CHANNEL_4,
+    PWM_CHANNEL_5,
+    PWM_CHANNEL_6
+} PWM_CHANNEL;
+#define PARAM_PWM_CHANNEL(CH) ((CH) >= PWM_CHANNEL_1 && (CH) <= PWM_CHANNEL_6)
+
+/**
+ *@brief Match register enum and parameter macro
+ */
+typedef enum {
+    PWM_MATCH_0 = 0,
+    PWM_MATCH_1,
+    PWM_MATCH_2,
+    PWM_MATCH_3,
+    PWM_MATCH_4,
+    PWM_MATCH_5,
+    PWM_MATCH_6
+} PWM_MATCH_OPT;
+#define PARAM_PWM_MATCH_OPT(CH) ((CH) >= PWM_MATCH_0 && (CH) <= PWM_MATCH_6)
+
+/**
+ * @brief PWM operating mode options.
+ */
+typedef enum {
+    PWM_SINGLE_EDGE = 0,
+    PWM_DUAL_EDGE
+} PWM_CHANNEL_EDGE;
+#define PARAM_PWM_CHANNEL_EDGE(n) ((n == PWM_SINGLE_EDGE) || (n == PWM_DUAL_EDGE))
+
+/**
+ * @brief PWM Interrupt status type.
+ */
+typedef enum {
+    PWM_MR0_INT = 0,
+    PWM_MR1_INT,
+    PWM_MR2_INT,
+    PWM_MR3_INT,
+    PWM_CR0_INT,
+    PWM_CR1_INT,
+    PWM_MR4_INT = 8,
+    PWM_MR5_INT,
+    PWM_MR6_INT
+} PWM_INT_TYPE;
+#define PARAM_PWM_INT_TYPE(TYPE) (((TYPE) >= PWM_MR0_INT && (TYPE) <= PWM_CR1_INT) || \
+                                  ((TYPE) >= PWM_MR4_INT && (TYPE) <= PWM_MR6_INT))
+
+/**
+ * @brief PWM Match update options.
+ */
+typedef enum {
+    PWM_UPDATE_NOW = 0,
+    PWM_UPDATE_RESET
+} PWM_UPDATE_OPT;
+#define PARAM_PWM_UPDATE_OPT(OPT) ((OPT == PWM_UPDATE_NOW) || (OPT == PWM_UPDATE_RESET))
+
+/**
+ * @brief PWM pin selection options.
+ */
+typedef enum {
+    PWM1_P1_18,
+    PWM1_P2_0,
+    PWM2_P1_20,
+    PWM2_P2_1,
+    PWM2_P3_25,
+    PWM3_P1_21,
+    PWM3_P2_2,
+    PWM3_P3_26,
+    PWM4_P1_23,
+    PWM4_P2_3,
+    PWM5_P1_24,
+    PWM5_P2_4,
+    PWM6_P1_26,
+    PWM6_P2_5,
+} PWM_PIN_OPTION;
+#define PARAM_PWM_PIN_OPTION(OPT) ((OPT >= PWM1_P1_18) && (OPT <= PWM6_P2_5))
+
+/**
+ * @brief PWM configuration structure for TIMER mode.
+ */
+typedef struct {
+    PWM_PRESCALE prescaleOption; /**< Should be:
+                                    - PWM_TICKVAL : Absolute value.
+                                    - PWM_USVAL   : Value in microseconds. */
+    uint32_t prescaleValue;      /**< Prescale max value. */
 } PWM_TIMERCFG_Type;
 
-/** @brief Configuration structure in PWM COUNTER mode */
+/**
+ * @brief PWM configuration structure for COUNTER mode.
+ */
 typedef struct {
-
-    uint8_t CounterOption;        /**< Counter Option, should be:
-                                - PWM_COUNTER_RISING: Rising Edge
-                                - PWM_COUNTER_FALLING: Falling Edge
-                                - PWM_COUNTER_ANY: Both rising and falling mode
-                                */
-    uint8_t CountInputSelect;    /**< Counter input select, should be:
-                                - PWM_COUNTER_PCAP1_0: PWM Counter input selected is PCAP1.0 pin
-                                - PWM_COUNTER_PCAP1_1: PWM Counter input selected is PCAP1.1 pin
-                                */
-    uint8_t Reserved[2];
+    PWM_CAPTURE     countInputSelect;   /**< Should be:
+                                        - PWM_CAPTURE_0 : CAPn.0 input pin for PWM timer.
+                                        - PWM_CAPTURE_1 : CAPn.1 input pin for PWM timer. */
 } PWM_COUNTERCFG_Type;
 
-/** @brief PWM Match channel configuration structure */
+/**
+ * @brief Match channel configuration structure.
+ */
 typedef struct {
-    uint8_t MatchChannel;    /**< Match channel, should be in range
-                            from 0..6 */
-    uint8_t IntOnMatch;        /**< Interrupt On match, should be:
-                            - ENABLE: Enable this function.
-                            - DISABLE: Disable this function.
-                            */
-    uint8_t StopOnMatch;    /**< Stop On match, should be:
-                            - ENABLE: Enable this function.
-                            - DISABLE: Disable this function.
-                            */
-    uint8_t ResetOnMatch;    /**< Reset On match, should be:
-                            - ENABLE: Enable this function.
-                            - DISABLE: Disable this function.
-                            */
+    PWM_MATCH_OPT matchChannel;   /**< PWM_MATCH_x [0...6]. */
+    FunctionalState intOnMatch;   /**< Should be:
+                                            - ENABLE  : Enable interrupt on match.
+                                            - DISABLE : Disable interrupt on match. */
+    FunctionalState stopOnMatch;  /**< Should be:
+                                            - ENABLE  : Stop timer on match.
+                                            - DISABLE : Do not stop timer on match. */
+    FunctionalState resetOnMatch; /**< Should be:
+                                            - ENABLE  : Reset timer on match.
+                                            - DISABLE : Do not reset timer on match. */
+    uint32_t matchValue;          /**< Match value to compare with timer counter. */
 } PWM_MATCHCFG_Type;
 
-
-/** @brief PWM Capture Input configuration structure */
+/**
+ * @brief Capture input configuration structure.
+ */
 typedef struct {
-    uint8_t CaptureChannel;    /**< Capture channel, should be in range
-                            from 0..1 */
-    uint8_t RisingEdge;        /**< caption rising edge, should be:
-                            - ENABLE: Enable rising edge.
-                            - DISABLE: Disable this function.
-                            */
-    uint8_t FallingEdge;        /**< caption falling edge, should be:
-                            - ENABLE: Enable falling edge.
-                            - DISABLE: Disable this function.
-                                */
-    uint8_t IntOnCaption;    /**< Interrupt On caption, should be:
-                            - ENABLE: Enable interrupt function.
-                            - DISABLE: Disable this function.
-                            */
+    PWM_CAPTURE captureChannel;     /**< PWM_CAPTURE_x [0...1]. */
+    FunctionalState risingEdge;     /**< Should be:
+                                        - ENABLE  : Enable capture on rising edge.
+                                        - DISABLE : Disable capture on rising edge. */
+    FunctionalState fallingEdge;    /**< Should be:
+                                        - ENABLE  : Enable capture on falling edge.
+                                        - DISABLE : Disable capture on falling edge. */
+    FunctionalState intOnCapture;   /**< Should be:
+                                        - ENABLE  : Enable interrupt on capture event.
+                                        - DISABLE : Disable interrupt on capture event. */
 } PWM_CAPTURECFG_Type;
-
-/* Timer/Counter in PWM configuration type definition -----------------------------------*/
-
-/** @brief PMW TC mode select option */
-typedef enum {
-    PWM_MODE_TIMER = 0,        /*!< PWM using Timer mode */
-    PWM_MODE_COUNTER,        /*!< PWM using Counter mode */
-} PWM_TC_MODE_OPT;
-
-#define PARAM_PWM_TC_MODE(n) ((n==PWM_MODE_TIMER) || (n==PWM_MODE_COUNTER))
-
-
-/** @brief PWM Timer/Counter prescale option */
-typedef enum
-{
-    PWM_TIMER_PRESCALE_TICKVAL = 0,            /*!< Prescale in absolute value */
-    PWM_TIMER_PRESCALE_USVAL                /*!< Prescale in microsecond value */
-} PWM_TIMER_PRESCALE_OPT;
-
-#define PARAM_PWM_TIMER_PRESCALE(n) ((n==PWM_TIMER_PRESCALE_TICKVAL) || (n==PWM_TIMER_PRESCALE_USVAL))
-
-
-/** @brief PWM Input Select in counter mode */
-typedef enum {
-    PWM_COUNTER_PCAP1_0 = 0,        /*!< PWM Counter input selected is PCAP1.0 pin */
-    PWM_COUNTER_PCAP1_1            /*!< PWM counter input selected is CAP1.1 pin */
-} PWM_COUNTER_INPUTSEL_OPT;
-
-#define PARAM_PWM_COUNTER_INPUTSEL(n) ((n==PWM_COUNTER_PCAP1_0) || (n==PWM_COUNTER_PCAP1_1))
-
-/** @brief PWM Input Edge Option in counter mode */
-typedef enum {
-    PWM_COUNTER_RISING = 1,        /*!< Rising edge mode */
-    PWM_COUNTER_FALLING = 2,    /*!< Falling edge mode */
-    PWM_COUNTER_ANY = 3            /*!< Both rising and falling mode */
-} PWM_COUNTER_EDGE_OPT;
-
-#define PARAM_PWM_COUNTER_EDGE(n)    ((n==PWM_COUNTER_RISING) || (n==PWM_COUNTER_FALLING) \
-|| (n==PWM_COUNTER_ANY))
-
-
-/* PWM configuration type definition ----------------------------------------------------- */
-/** @brief PWM operating mode options */
-typedef enum {
-    PWM_CHANNEL_SINGLE_EDGE,    /*!< PWM Channel Single edge mode */
-    PWM_CHANNEL_DUAL_EDGE        /*!< PWM Channel Dual edge mode */
-} PWM_CHANNEL_EDGE_OPT;
-
-#define PARAM_PWM_CHANNEL_EDGE(n)    ((n==PWM_CHANNEL_SINGLE_EDGE) || (n==PWM_CHANNEL_DUAL_EDGE))
-
-
-/** @brief PWM update type */
-typedef enum {
-    PWM_MATCH_UPDATE_NOW = 0,            /**< PWM Match Channel Update Now */
-    PWM_MATCH_UPDATE_NEXT_RST            /**< PWM Match Channel Update on next
-                                            PWM Counter resetting */
-} PWM_MATCH_UPDATE_OPT;
-
-#define PARAM_PWM_MATCH_UPDATE(n)    ((n==PWM_MATCH_UPDATE_NOW) || (n==PWM_MATCH_UPDATE_NEXT_RST))
-
-
-/** @brief PWM interrupt status type definition ----------------------------------------------------- */
-/** @brief PWM Interrupt status type */
-typedef enum
-{
-    PWM_INTSTAT_MR0 = PWM_IR_PWMMRn(0),     /**< Interrupt flag for PWM match channel 0 */
-    PWM_INTSTAT_MR1 = PWM_IR_PWMMRn(1),        /**< Interrupt flag for PWM match channel 1 */
-    PWM_INTSTAT_MR2 = PWM_IR_PWMMRn(2),        /**< Interrupt flag for PWM match channel 2 */
-    PWM_INTSTAT_MR3 = PWM_IR_PWMMRn(3),        /**< Interrupt flag for PWM match channel 3 */
-    PWM_INTSTAT_CAP0 = PWM_IR_PWMCAPn(0),    /**< Interrupt flag for capture input 0 */
-    PWM_INTSTAT_CAP1 = PWM_IR_PWMCAPn(1),    /**< Interrupt flag for capture input 1 */
-    PWM_INTSTAT_MR4 = PWM_IR_PWMMRn(4),        /**< Interrupt flag for PWM match channel 4 */
-    PWM_INTSTAT_MR6 = PWM_IR_PWMMRn(5),        /**< Interrupt flag for PWM match channel 5 */
-    PWM_INTSTAT_MR5 = PWM_IR_PWMMRn(6),        /**< Interrupt flag for PWM match channel 6 */
-}PWM_INTSTAT_TYPE;
-
 
 /**
  * @}
  */
 
-
-/* Public Functions ----------------------------------------------------------- */
+/* ---------------------------- Public Functions ---------------------------- */
 /** @defgroup PWM_Public_Functions PWM Public Functions
  * @{
  */
 
-void PWM_PinConfig(LPC_PWM_TypeDef *PWMx, uint8_t PWM_Channel, uint8_t PinselOption);
-IntStatus PWM_GetIntStatus(LPC_PWM_TypeDef *PWMx, uint32_t IntFlag);
-void PWM_ClearIntPending(LPC_PWM_TypeDef *PWMx, uint32_t IntFlag);
-void PWM_ConfigStructInit(uint8_t PWMTimerCounterMode, void *PWM_InitStruct);
-void PWM_Init(LPC_PWM_TypeDef *PWMx, uint32_t PWMTimerCounterMode, void *PWM_ConfigStruct);
-void PWM_DeInit (LPC_PWM_TypeDef *PWMx);
-void PWM_Cmd(LPC_PWM_TypeDef *PWMx, FunctionalState NewState);
-void PWM_CounterCmd(LPC_PWM_TypeDef *PWMx, FunctionalState NewState);
-void PWM_ResetCounter(LPC_PWM_TypeDef *PWMx);
-void PWM_ConfigMatch(LPC_PWM_TypeDef *PWMx, PWM_MATCHCFG_Type *PWM_MatchConfigStruct);
-void PWM_ConfigCapture(LPC_PWM_TypeDef *PWMx, PWM_CAPTURECFG_Type *PWM_CaptureConfigStruct);
-uint32_t PWM_GetCaptureValue(LPC_PWM_TypeDef *PWMx, uint8_t CaptureChannel);
-void PWM_MatchUpdate(LPC_PWM_TypeDef *PWMx, uint8_t MatchChannel, \
-                    uint32_t MatchValue, uint8_t UpdateType);
-void PWM_ChannelConfig(LPC_PWM_TypeDef *PWMx, uint8_t PWMChannel, uint8_t ModeOption);
-void PWM_ChannelCmd(LPC_PWM_TypeDef *PWMx, uint8_t PWMChannel, FunctionalState NewState);
+/**
+ * @brief      Initializes the PWM peripheral in timer or counter mode.
+ *
+ * This function enables power and clock for the PWM peripheral, configures
+ * its mode (timer or counter), sets the prescaler or counter input as required,
+ * and resets all relevant registers. The PWM is left in a disabled state after initialization.
+ *
+ * @param[in]  mode         PWM timer/counter mode selection:
+ *                          - PWM_MODE_TIMER
+ *                          - PWM_COUNTER_RISING_MODE
+ *                          - PWM_COUNTER_FALLING_MODE
+ *                          - PWM_COUNTER_ANY_MODE
+ * @param[in]  pwmCfg       Pointer to configuration structure:
+ *                          - PWM_TIMERCFG_Type for timer mode
+ *                          - PWM_COUNTERCFG_Type for counter mode
+ *
+ * @note:
+ * - The function enables the PWM's power and sets the peripheral clock divider.
+ * - It resets and initializes the prescaler and counters.
+ * - It clears all interrupt flags in the IR register.
+ */
+void PWM_Init(PWM_TIM_MODE mode, void* pwmCfg);
+
+/**
+ * @brief      De-initializes the PWM peripheral.
+ *
+ * This function disables the PWM by clearing its control register and powers down
+ * the PWM peripheral to save power. After calling this function, the PWM must be
+ * re-initialized before use.
+ *
+ * @note:
+ * - The function disables the PWM and its clock.
+ */
+void PWM_DeInit(void);
+
+/**
+ * @brief      Initializes a PWM configuration structure with default values.
+ *
+ * This function sets default values for the provided configuration structure,
+ * depending on the selected mode. For timer mode, it sets the prescale option
+ * to microseconds and the prescale value to 1. For counter mode, it sets the
+ * count input select to capture channel 0.
+ *
+ * @param[in]  mode     PWM timer/counter mode selection:
+ *                      - PWM_MODE_TIMER
+ *                      - PWM_COUNTER_RISING_MODE
+ *                      - PWM_COUNTER_FALLING_MODE
+ *                      - PWM_COUNTER_ANY_MODE
+ * @param[out] pwmCfg   Pointer to configuration structure to initialize:
+ *                      - PWM_TIMERCFG_Type for timer mode
+ *                      - PWM_COUNTERCFG_Type for counter mode
+ *
+ * @note       Call this function before configuring the PWM to ensure
+ *             the structure has valid default values.
+ */
+void PWM_ConfigStructInit(PWM_TIM_MODE mode, void* pwmCfg);
+
+/**
+ * @brief      Configures the pin for the specified PWM output channel.
+ *
+ * This function selects and configures the appropriate pin for the given
+ * PWM output channel using the PINSEL API. Only output channels are supported.
+ * Capture pins (for PWM capture functionality) must be configured manually.
+ *
+ * @param[in]  option  PWM output pin option (see PWM_PIN_OPTION).
+ *
+ * @note
+ * - Only output channels are configurable with this function.
+ * - For capture channels, configure the pin manually with PINSEL_ConfigPin.
+ * - The mapping is fixed and based on the device datasheet.
+ */
+void PWM_PinConfig(PWM_PIN_OPTION option);
+
+/**
+ * @brief      Configures the edge mode for a specified PWM channel.
+ *
+ * This function sets the selected PWM channel to single or dual edge mode by updating
+ * the PWM Control Register (PCR). Only channels 2 to 6 support edge mode configuration.
+ * Channel 1 is not configurable for edge mode.
+ *
+ * @param[in]  channel   PWM match channel to configure (PWM_CHANNEL_x [2...6]).
+ * @param[in]  edgeMode  Edge mode option:
+ *                       - PWM_SINGLE_EDGE : Single edge mode.
+ *                       - PWM_DUAL_EDGE   : Dual edge mode.
+ *
+ * @note
+ * - Channel 1 is not configurable for edge mode.
+ * - Use this function after initializing the PWM peripheral.
+ */
+void PWM_ChannelConfig(PWM_CHANNEL channel, PWM_CHANNEL_EDGE edgeMode);
+
+/**
+ * @brief      Enables or disables the output for a specific PWM channel.
+ *
+ * This function sets or clears the output enable bit for the selected PWM channel
+ * in the PWM Control Register (PCR).
+ *
+ * @param[in]  channel   PWM channel to control (PWM_CHANNEL_x [1...6]).
+ * @param[in]  newState  Functional state:
+ *                       - ENABLE  : Enable output for this PWM channel.
+ *                       - DISABLE : Disable output for this PWM channel.
+ *
+ * @note
+ * - Use this function to enable or disable the PWM output on a per-channel basis.
+ * - The PWM peripheral must be initialized before calling this function.
+ */
+void PWM_ChannelCmd(PWM_CHANNEL channel, FunctionalState newState);
+
+/**
+ * @brief      Enables or disables the PWM peripheral.
+ *
+ * This function sets or clears the PWM enable bit in the TCR register of LPC_PWM1.
+ *
+ * @param[in]  newState  Functional state:
+ *                       - ENABLE  : Enable PWM operation.
+ *                       - DISABLE : Disable PWM operation.
+ *
+ * @note:
+ * - Use this function to start or stop PWM output after configuration.
+ */
+void PWM_Cmd(FunctionalState newState);
+
+/**
+ * @brief      Enables or disables the PWM counter.
+ *
+ * This function sets or clears the counter enable bit in the TCR register of LPC_PWM1.
+ *
+ * @param[in]  NewState  Functional state:
+ *                       - ENABLE  : Enable the counter.
+ *                       - DISABLE : Disable the counter.
+ *
+ * @note:
+ * - Use this function to start or stop the PWM counter.
+ */
+void PWM_CounterCmd(FunctionalState NewState);
+
+/**
+ * @brief      Resets the PWM counter.
+ *
+ * This function synchronously resets the Timer Counter (TC) and Prescale Counter (PC)
+ * of the PWM peripheral (LPC_PWM1) by setting and then clearing the reset bit in the TCR register.
+ *
+ * @note:
+ * - Use this function to reset the PWM counters to zero.
+ */
+void PWM_ResetCounter(void);
+
+/**
+ * @brief      Configures the match channel for the PWM peripheral.
+ *
+ * This function sets up the interrupt, reset, and stop actions for the specified
+ * PWM match channel according to the provided configuration structure. It updates
+ * the PWM Match Control Register (MCR) to enable or disable interrupt, reset, and
+ * stop on match for the selected channel, and sets the match value in the corresponding
+ * match register.
+ *
+ * @param[in]  pwmMatchCfg  Pointer to a PWM_MATCHCFG_Type structure.
+ *
+ * @note:
+ * - This function only configures the match control actions and sets the match value.
+ * - Call this function after initializing the PWM to set up match behavior.
+ */
+void PWM_ConfigMatch(const PWM_MATCHCFG_Type* pwmMatchCfg);
+
+/**
+ * @brief      Updates the match value for a specified PWM channel.
+ *
+ * This function sets the match register (MR0-MR6) of LPC_PWM1 to the provided value
+ * for the selected channel and optionally resets the PWM counter immediately.
+ *
+ * @param[in]  channel        PWM match channel to update (PWM_MATCH_x [0...6]).
+ * @param[in]  newMatchValue  New value to set in the match register.
+ * @param[in]  updateType     Update type:
+ *                            - PWM_UPDATE_NOW      : Update and reset the counter immediately.
+ *                            - PWM_UPDATE_RESET    : Update on next PWM reset event.
+ *
+ * @note
+ * - Only the specified channel is affected.
+ * - Use this function to change the match value during runtime.
+ */
+void PWM_MatchUpdate(PWM_MATCH_OPT channel, uint32_t newMatchValue, PWM_UPDATE_OPT updateType);
+
+/**
+ * @brief      Clears the specified PWM interrupt pending flag.
+ *
+ * This function clears the interrupt pending flag for the given PWM match or capture
+ * channel in the PWM's interrupt register (IR). It should be used to acknowledge and
+ * clear PWM interrupts after they are handled.
+ *
+ * @param[in]  intFlag  Interrupt type to clear:
+ *                      - PWM_MRx_INT [0...6].
+ *                      - PWM_CRx_INT [0...1].
+ *
+ * @note:
+ * - Only the specified interrupt flag is cleared.
+ * - The function operates on LPC_PWM1.
+ */
+void PWM_ClearIntPending(PWM_INT_TYPE intFlag);
+
+/**
+ * @brief      Gets the interrupt status for the specified PWM channel.
+ *
+ * This function checks if the interrupt flag for the given match or capture channel
+ * is set in the PWM's interrupt register (IR). It can be used for both match and
+ * capture interrupts.
+ *
+ * @param[in]  intFlag  Interrupt type to check:
+ *                      - PWM_MRx_INT [0...6].
+ *                      - PWM_CRx_INT [0...1].
+ *
+ * @return     FlagStatus
+ *             - SET   : Interrupt is pending
+ *             - RESET : No interrupt pending
+ *
+ * @note:
+ * - Only the specified interrupt flag is checked.
+ */
+FlagStatus PWM_GetIntStatus(PWM_INT_TYPE intFlag);
+
+/**
+ * @brief      Configures the capture channel for the PWM peripheral.
+ *
+ * This function sets up the capture behavior for the selected channel, including
+ * edge detection (rising, falling), interrupt generation, and channel selection.
+ *
+ * @param[in]  capCfg  Pointer to a PWM_CAPTURECFG_Type structure.
+ *
+ * @note
+ * - Only the specified channel is affected.
+ * - Call this function after initializing the PWM to set up capture behavior.
+ */
+void PWM_ConfigCapture(PWM_CAPTURECFG_Type* capCfg);
+
+/**
+ * @brief      Reads the value of the capture register for the specified PWM channel.
+ *
+ * This function returns the value stored in the capture register (CR0 or CR1)
+ * of the PWM peripheral, depending on the selected capture channel.
+ *
+ * @param[in]  capChannel  Capture channel to read:
+ *                         - PWM_CAPTURE_0 : CAP0 input pin for PWM
+ *                         - PWM_CAPTURE_1 : CAP1 input pin for PWM
+ *
+ * @return     Value of the selected capture register.
+ *
+ * @note
+ * - Use this function to obtain the timestamp captured on the specified input.
+ * - The PWM must be configured for capture mode before using this function.
+ */
+uint32_t PWM_GetCaptureValue(PWM_CAPTURE capChannel);
 
 /**
  * @}

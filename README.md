@@ -30,18 +30,18 @@ Initially built for educational purposes in the course _Digital Electronics 3_ a
 
 ## 📦 Module Status
 
-| Module    |  Refactored   |  Documented  |     Tested     |
-|-----------|:-------------:|:------------:|:--------------:|
-| `PINSEL`  |  ✅ Complete   |  ✅ Complete  |   ✅ Complete   |
-| `GPIO`    |  ✅ Complete   |  ✅ Complete  |   ✅ Complete   |
-| `EINT`    |  ✅ Complete   |  ✅ Complete  |   ✅ Complete   |
-| `SysTick` |  ✅ Complete   |  ✅ Complete  |   ✅ Complete   |
-| `Timer`   |  ✅ Complete   |  ✅ Complete  |   ✅ Complete   |
-| `ADC`     |  ✅ Complete   |  ✅ Complete  |   ✅ Complete   |
-| `DAC`     |  ✅ Complete   |  ✅ Complete  |   🔲 Planned   |
-| `GPDMA`   |  🔲 Planned   |  🔲 Planned  |   🔲 Planned   |
-| `USART`   |  🔲 Planned   |  🔲 Planned  |   🔲 Planned   |
-| `PWM`     |  🔲 Planned   |  🔲 Planned  |   🔲 Planned   |
+| Module    | Refactored | Documented |     Tested     |
+|-----------|:----------:|:----------:|:--------------:|
+| `PINSEL`  | ✅ Complete | ✅ Complete |   ✅ Complete   |
+| `GPIO`    | ✅ Complete | ✅ Complete |   ✅ Complete   |
+| `EINT`    | ✅ Complete | ✅ Complete |   ✅ Complete   |
+| `SysTick` | ✅ Complete | ✅ Complete |   ✅ Complete   |
+| `Timer`   | ✅ Complete | ✅ Complete |   ✅ Complete   |
+| `ADC`     | ✅ Complete | ✅ Complete |   ✅ Complete   |
+| `DAC`     | ✅ Complete | ✅ Complete |   🔲 Planned   |
+| `GPDMA`   | ✅ Complete | ✅ Complete |   🔲 Planned   |
+| `USART`   | 🔲 Planned | 🔲 Planned |   🔲 Planned   |
+| `PWM`     | ✅ Complete | ✅ Complete |   🔲 Planned   |
 
 _This table is continuously updated as development progresses._
 
