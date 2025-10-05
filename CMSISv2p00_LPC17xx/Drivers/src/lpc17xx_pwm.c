@@ -20,12 +20,12 @@
  * Date: 04/10/2025, Author: David Trujillo Medina
  */
 
-/* Peripheral group ----------------------------------------------------------- */
+/* ---------------------------- Peripheral group ---------------------------- */
 /** @addtogroup PWM
  * @{
  */
 
-/* Includes ------------------------------------------------------------------- */
+/* -------------------------------- Includes -------------------------------- */
 #include "lpc17xx_pwm.h"
 #include "lpc17xx_clkpwr.h"
 #include "lpc17xx_pinsel.h"
@@ -57,7 +57,7 @@ static uint32_t converUSecToVal(uint32_t uSec) {
     return (uint32_t)(pclk * uSec / 1000000);
 }
 
-/* Public Functions ----------------------------------------------------------- */
+/* ---------------------------- Public Functions ---------------------------- */
 /** @addtogroup PWM_Public_Functions
  * @{
  */
@@ -68,7 +68,7 @@ void PWM_Init(PWM_TIM_MODE mode, void* pwmCfg) {
     CLKPWR_ConfigPPWR(CLKPWR_PCONP_PCPWM1, ENABLE);
     CLKPWR_SetPCLKDiv(CLKPWR_PCLKSEL_PWM1, CLKPWR_PCLKSEL_CCLK_DIV_4);
 
-    LPC_PWM1->IR = PWM_IR_BITMASK;
+    LPC_PWM1->IR  = PWM_IR_BITMASK;
     LPC_PWM1->TCR = 0x00;
     LPC_PWM1->MCR = 0x00;
     LPC_PWM1->CCR = 0x00;
@@ -82,10 +82,11 @@ void PWM_Init(PWM_TIM_MODE mode, void* pwmCfg) {
         const PWM_TIMERCFG_Type* pTimeCfg = (PWM_TIMERCFG_Type*)pwmCfg;
         CHECK_PARAM(PARAM_PWM_PRESCALE(pTimeCfg->prescaleOption));
 
-        if (pTimeCfg->prescaleOption == PWM_TICKVAL)
+        if (pTimeCfg->prescaleOption == PWM_TICKVAL) {
             LPC_PWM1->PR = pTimeCfg->prescaleValue - 1;
-        else
+        } else {
             LPC_PWM1->PR = converUSecToVal(pTimeCfg->prescaleValue) - 1;
+        }
     } else {
         const PWM_COUNTERCFG_Type* pCounterCfg = (PWM_COUNTERCFG_Type*)pwmCfg;
         CHECK_PARAM(PARAM_PWM_CAPTURE(pCounterCfg->countInputSelect));
@@ -104,33 +105,31 @@ void PWM_ConfigStructInit(PWM_TIM_MODE mode, void* pwmCfg) {
 
     if (mode == PWM_MODE_TIMER) {
         PWM_TIMERCFG_Type* pTimeCfg = (PWM_TIMERCFG_Type*)pwmCfg;
-        pTimeCfg->prescaleOption = PWM_USVAL;
-        pTimeCfg->prescaleValue = 1;
+        pTimeCfg->prescaleOption    = PWM_USVAL;
+        pTimeCfg->prescaleValue     = 1;
     } else {
         PWM_COUNTERCFG_Type* pCounterCfg = (PWM_COUNTERCFG_Type*)pwmCfg;
-        pCounterCfg->countInputSelect = PWM_CAPTURE_0;
+        pCounterCfg->countInputSelect    = PWM_CAPTURE_0;
     }
 }
 
 void PWM_PinConfig(PWM_PIN_OPTION option) {
     CHECK_PARAM(PARAM_PWM_PIN_OPTION(option));
 
-    static const PINSEL_CFG_Type PinCfg[14] ={
-        {PINSEL_PORT_1, PINSEL_PIN_18, PINSEL_FUNC_2, PINSEL_TRISTATE},
-        {PINSEL_PORT_2, PINSEL_PIN_0, PINSEL_FUNC_1, PINSEL_TRISTATE},
-        {PINSEL_PORT_1, PINSEL_PIN_20, PINSEL_FUNC_2, PINSEL_TRISTATE},
-        {PINSEL_PORT_2, PINSEL_PIN_1, PINSEL_FUNC_1, PINSEL_TRISTATE},
-        {PINSEL_PORT_3, PINSEL_PIN_25, PINSEL_FUNC_3, PINSEL_TRISTATE},
-        {PINSEL_PORT_1, PINSEL_PIN_21, PINSEL_FUNC_2, PINSEL_TRISTATE},
-        {PINSEL_PORT_2, PINSEL_PIN_2, PINSEL_FUNC_1, PINSEL_TRISTATE},
-        {PINSEL_PORT_3, PINSEL_PIN_26, PINSEL_FUNC_3, PINSEL_TRISTATE},
-        {PINSEL_PORT_1, PINSEL_PIN_23, PINSEL_FUNC_2, PINSEL_TRISTATE},
-        {PINSEL_PORT_2, PINSEL_PIN_3, PINSEL_FUNC_1, PINSEL_TRISTATE},
-        {PINSEL_PORT_1, PINSEL_PIN_24, PINSEL_FUNC_2, PINSEL_TRISTATE},
-        {PINSEL_PORT_2, PINSEL_PIN_4, PINSEL_FUNC_1, PINSEL_TRISTATE},
-        {PINSEL_PORT_1, PINSEL_PIN_26, PINSEL_FUNC_2, PINSEL_TRISTATE},
-        {PINSEL_PORT_2, PINSEL_PIN_5, PINSEL_FUNC_1, PINSEL_TRISTATE}
-    };
+    static const PINSEL_CFG_Type PinCfg[14] = {{PINSEL_PORT_1, PINSEL_PIN_18, PINSEL_FUNC_2, PINSEL_TRISTATE},
+                                               {PINSEL_PORT_2, PINSEL_PIN_0, PINSEL_FUNC_1, PINSEL_TRISTATE},
+                                               {PINSEL_PORT_1, PINSEL_PIN_20, PINSEL_FUNC_2, PINSEL_TRISTATE},
+                                               {PINSEL_PORT_2, PINSEL_PIN_1, PINSEL_FUNC_1, PINSEL_TRISTATE},
+                                               {PINSEL_PORT_3, PINSEL_PIN_25, PINSEL_FUNC_3, PINSEL_TRISTATE},
+                                               {PINSEL_PORT_1, PINSEL_PIN_21, PINSEL_FUNC_2, PINSEL_TRISTATE},
+                                               {PINSEL_PORT_2, PINSEL_PIN_2, PINSEL_FUNC_1, PINSEL_TRISTATE},
+                                               {PINSEL_PORT_3, PINSEL_PIN_26, PINSEL_FUNC_3, PINSEL_TRISTATE},
+                                               {PINSEL_PORT_1, PINSEL_PIN_23, PINSEL_FUNC_2, PINSEL_TRISTATE},
+                                               {PINSEL_PORT_2, PINSEL_PIN_3, PINSEL_FUNC_1, PINSEL_TRISTATE},
+                                               {PINSEL_PORT_1, PINSEL_PIN_24, PINSEL_FUNC_2, PINSEL_TRISTATE},
+                                               {PINSEL_PORT_2, PINSEL_PIN_4, PINSEL_FUNC_1, PINSEL_TRISTATE},
+                                               {PINSEL_PORT_1, PINSEL_PIN_26, PINSEL_FUNC_2, PINSEL_TRISTATE},
+                                               {PINSEL_PORT_2, PINSEL_PIN_5, PINSEL_FUNC_1, PINSEL_TRISTATE}};
 
     PINSEL_ConfigPin(&PinCfg[option]);
 }
@@ -139,8 +138,9 @@ void PWM_ChannelConfig(PWM_CHANNEL channel, PWM_CHANNEL_EDGE edgeMode) {
     CHECK_PARAM(PARAM_PWM_CHANNEL(channel));
     CHECK_PARAM(PARAM_PWM_CHANNEL_EDGE(edgeMode));
 
-    if (channel == PWM_CHANNEL_1)
+    if (channel == PWM_CHANNEL_1) {
         return;
+    }
 
     if (edgeMode == PWM_SINGLE_EDGE) {
         LPC_PWM1->PCR &= ~PWM_PCR_PWMSELn(channel);
@@ -152,27 +152,30 @@ void PWM_ChannelConfig(PWM_CHANNEL channel, PWM_CHANNEL_EDGE edgeMode) {
 void PWM_ChannelCmd(PWM_CHANNEL channel, FunctionalState newState) {
     CHECK_PARAM(PARAM_PWM_CHANNEL(channel));
 
-    if (newState == ENABLE)
+    if (newState == ENABLE) {
         LPC_PWM1->PCR |= PWM_PCR_PWMENAn(channel);
-    else
+    } else {
         LPC_PWM1->PCR &= ~PWM_PCR_PWMENAn(channel);
+    }
 }
 
 void PWM_Cmd(FunctionalState newState) {
     CHECK_PARAM(PARAM_FUNCTIONALSTATE(newState));
 
-    if (newState == ENABLE)
+    if (newState == ENABLE) {
         LPC_PWM1->TCR |= PWM_TCR_PWM_ENABLE;
-    else
+    } else {
         LPC_PWM1->TCR &= ~PWM_TCR_PWM_ENABLE;
+    }
 }
 
 void PWM_CounterCmd(FunctionalState newState) {
     CHECK_PARAM(PARAM_FUNCTIONALSTATE(newState));
-    if (newState == ENABLE)
+    if (newState == ENABLE) {
         LPC_PWM1->TCR |= PWM_TCR_COUNTER_ENABLE;
-    else
+    } else {
         LPC_PWM1->TCR &= ~PWM_TCR_COUNTER_ENABLE;
+    }
 }
 
 void PWM_ResetCounter(void) {
@@ -188,17 +191,20 @@ void PWM_ConfigMatch(const PWM_MATCHCFG_Type* pwmMatchCfg) {
 
     LPC_PWM1->MCR &= ~PWM_MCR_CHANNEL_MASKBIT(pwmMatchCfg->matchChannel);
 
-    if (pwmMatchCfg->intOnMatch == ENABLE)
+    if (pwmMatchCfg->intOnMatch == ENABLE) {
         LPC_PWM1->MCR |= PWM_MCR_INT(pwmMatchCfg->matchChannel);
+    }
 
-    if (pwmMatchCfg->resetOnMatch == ENABLE)
+    if (pwmMatchCfg->resetOnMatch == ENABLE) {
         LPC_PWM1->MCR |= PWM_MCR_RESET(pwmMatchCfg->matchChannel);
+    }
 
-    if (pwmMatchCfg->stopOnMatch == ENABLE)
+    if (pwmMatchCfg->stopOnMatch == ENABLE) {
         LPC_PWM1->MCR |= PWM_MCR_STOP(pwmMatchCfg->matchChannel);
+    }
 
-    volatile uint32_t* MR[] = {&LPC_PWM1->MR0, &LPC_PWM1->MR1, &LPC_PWM1->MR2, &LPC_PWM1->MR3,
-                               &LPC_PWM1->MR4, &LPC_PWM1->MR5, &LPC_PWM1->MR6};
+    volatile uint32_t* MR[]        = {&LPC_PWM1->MR0, &LPC_PWM1->MR1, &LPC_PWM1->MR2, &LPC_PWM1->MR3,
+                                      &LPC_PWM1->MR4, &LPC_PWM1->MR5, &LPC_PWM1->MR6};
     *MR[pwmMatchCfg->matchChannel] = pwmMatchCfg->matchValue;
 }
 
@@ -208,7 +214,7 @@ void PWM_MatchUpdate(PWM_MATCH_OPT channel, uint32_t newMatchValue, PWM_UPDATE_O
 
     volatile uint32_t* MR[] = {&LPC_PWM1->MR0, &LPC_PWM1->MR1, &LPC_PWM1->MR2, &LPC_PWM1->MR3,
                                &LPC_PWM1->MR4, &LPC_PWM1->MR5, &LPC_PWM1->MR6};
-    *MR[channel] = newMatchValue;
+    *MR[channel]            = newMatchValue;
 
     LPC_PWM1->LER |= _BIT(channel);
 
@@ -238,14 +244,17 @@ void PWM_ConfigCapture(PWM_CAPTURECFG_Type* capCfg) {
 
     LPC_PWM1->CCR &= ~PWM_CCR_CHANNEL_MASKBIT(capCfg->captureChannel);
 
-    if (capCfg->risingEdge == ENABLE)
+    if (capCfg->risingEdge == ENABLE) {
         LPC_PWM1->CCR |= PWM_CCR_CAP_RISING(capCfg->captureChannel);
+    }
 
-    if (capCfg->fallingEdge == ENABLE)
+    if (capCfg->fallingEdge == ENABLE) {
         LPC_PWM1->CCR |= PWM_CCR_CAP_FALLING(capCfg->captureChannel);
+    }
 
-    if (capCfg->intOnCapture == ENABLE)
+    if (capCfg->intOnCapture == ENABLE) {
         LPC_PWM1->CCR |= PWM_CCR_INT_ON_CAP(capCfg->captureChannel);
+    }
 }
 
 uint32_t PWM_GetCaptureValue(PWM_CAPTURE capChannel) {
@@ -270,4 +279,4 @@ uint32_t PWM_GetCaptureValue(PWM_CAPTURE capChannel) {
  * @}
  */
 
-/* --------------------------------- End Of File ------------------------------ */
+/* ------------------------------ End Of File ------------------------------- */

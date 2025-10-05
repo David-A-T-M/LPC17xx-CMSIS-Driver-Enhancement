@@ -16,9 +16,12 @@
  * notification. NXP Semiconductors also make no representation or
  * warranty that such application will be suitable for the specified
  * use without further testing or modification.
+ *
+ * @par Refactor:
+ * Date: 28/09/2025, Author: David Trujillo Medina
  */
 
-/* Peripheral group ----------------------------------------------------------- */
+/* ---------------------------- Peripheral group ---------------------------- */
 /** @defgroup GPDMA GPDMA (General Purpose Direct Memory Access)
  * @ingroup LPC1700CMSIS_FwLib_Drivers
  * @{
@@ -27,76 +30,74 @@
 #ifndef LPC17XX_GPDMA_H_
 #define LPC17XX_GPDMA_H_
 
-/* Includes ------------------------------------------------------------------- */
+/* -------------------------------- Includes -------------------------------- */
 #include "LPC17xx.h"
 #include "lpc_types.h"
 
-
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
-/* Private Macros ------------------------------------------------------------- */
+/* ----------------------------- Private Macros ----------------------------- */
 /** @defgroup GPDMA_Private_Macros GPDMA Private Macros
  * @{
  */
 
-#define GPDMA_NUM_CHANNELS                      ((8))
+#define GPDMA_NUM_CHANNELS ((8))
 
-/* --------------------- BIT DEFINITIONS -------------------------------------- */
+/* ---------------------------- BIT DEFINITIONS ----------------------------- */
 /** Bit mask for an especific channel. */
-#define GPDMA_ChannelBit(n)                     ((1UL<<n))
+#define GPDMA_ChannelBit(n)       ((1UL << n))
 /** Bit mask for an especific request source. */
-#define GPDMA_DMACSoftBReq_Src(n)               ((1UL<<n))
+#define GPDMA_DMACSoftBReq_Src(n) ((1UL << n))
 
 /** DMACConfig register, enable bit. */
-#define GPDMA_DMACConfig_E                      ((0x01))
+#define GPDMA_DMACConfig_E ((0x01))
 /** DMACConfig register, endianness configuration bit. */
-#define GPDMA_DMACConfig_M                      ((0x02))
+#define GPDMA_DMACConfig_M ((0x02))
 
 /** Transfer size bits mask. */
-#define GPDMA_DMACCxControl_TransferSize(n)     (((n&0xFFF)<<0))
+#define GPDMA_DMACCxControl_TransferSize(n) (((n & 0xFFF) << 0))
 /** Source burst size bits mask. */
-#define GPDMA_DMACCxControl_SBSize(n)           (((n&0x07)<<12))
+#define GPDMA_DMACCxControl_SBSize(n)       (((n & 0x07) << 12))
 /** Destination burst size bits mask. */
-#define GPDMA_DMACCxControl_DBSize(n)           (((n&0x07)<<15))
+#define GPDMA_DMACCxControl_DBSize(n)       (((n & 0x07) << 15))
 /** Source transfer width bits mask. */
-#define GPDMA_DMACCxControl_SWidth(n)           (((n&0x07)<<18))
+#define GPDMA_DMACCxControl_SWidth(n)       (((n & 0x07) << 18))
 /** Destination transfer width bits mask. */
-#define GPDMA_DMACCxControl_DWidth(n)           (((n&0x07)<<21))
+#define GPDMA_DMACCxControl_DWidth(n)       (((n & 0x07) << 21))
 /** Source increment control bit. */
-#define GPDMA_DMACCxControl_SI                  ((1UL<<26))
+#define GPDMA_DMACCxControl_SI              ((1UL << 26))
 /** Destination increment control bit. */
-#define GPDMA_DMACCxControl_DI                  ((1UL<<27))
+#define GPDMA_DMACCxControl_DI              ((1UL << 27))
 /** Terminal count interrupt enable bit. */
-#define GPDMA_DMACCxControl_I                   ((1UL<<31))
+#define GPDMA_DMACCxControl_I               ((1UL << 31))
 
 /** Channel enable bit. */
-#define GPDMA_DMACCxConfig_E                    ((1UL<<0))
+#define GPDMA_DMACCxConfig_E                 ((1UL << 0))
 /** Source peripheral bits mask. */
-#define GPDMA_DMACCxConfig_SrcPeripheral(n)     (((n)<<1))
+#define GPDMA_DMACCxConfig_SrcPeripheral(n)  (((n) << 1))
 /** Destination peripheral bits mask. */
-#define GPDMA_DMACCxConfig_DestPeripheral(n)    (((n)<<6))
+#define GPDMA_DMACCxConfig_DestPeripheral(n) (((n) << 6))
 /** Transfer type bits mask. */
-#define GPDMA_DMACCxConfig_TransferType(n)      (((n)<<11))
+#define GPDMA_DMACCxConfig_TransferType(n)   (((n) << 11))
 /** Interrupt error mask. */
-#define GPDMA_DMACCxConfig_IE                   ((1UL<<14))
+#define GPDMA_DMACCxConfig_IE                ((1UL << 14))
 /** Interrupt terminal count mask. */
-#define GPDMA_DMACCxConfig_ITC                  ((1UL<<15))
+#define GPDMA_DMACCxConfig_ITC               ((1UL << 15))
 /** Active status bit. */
-#define GPDMA_DMACCxConfig_A                    ((1UL<<17))
+#define GPDMA_DMACCxConfig_A                 ((1UL << 17))
 /** Halt status bit. */
-#define GPDMA_DMACCxConfig_H                    ((1UL<<18))
+#define GPDMA_DMACCxConfig_H                 ((1UL << 18))
 
-/* --------------------- MASK DEFINITIONS -------------------------------------- */
-#define GPDMA_DMACIntStat_ALL                   ((0xFF))
+/* ---------------------------- MASK DEFINITIONS ---------------------------- */
+#define GPDMA_DMACIntStat_ALL ((0xFF))
 
 /**
  * @}
  */
 
-/* Public Types --------------------------------------------------------------- */
+/* ------------------------------ Public Types ------------------------------ */
 /** @defgroup GPDMA_Public_Types GPDMA Public Types
  * @{
  */
@@ -114,7 +115,8 @@ typedef enum {
     GPDMA_CHANNEL_6,
     GPDMA_CHANNEL_7
 } GPDMA_CHANNEL;
-#define PARAM_GPDMA_CHANNEL_OPT(CHANNEL)    ((CHANNEL>=GPDMA_CHANNEL_0) && (CHANNEL<=GPDMA_CHANNEL_7))
+/** Check GPDMA channel option parameter. */
+#define PARAM_GPDMA_CHANNEL(CHANNEL) ((CHANNEL >= GPDMA_CHANNEL_0) && (CHANNEL <= GPDMA_CHANNEL_7))
 
 /**
  * @brief GPDMA Connection type enumeration.
@@ -145,7 +147,8 @@ typedef enum {
     GPDMA_MAT3_0,
     GPDMA_MAT3_1
 } GPDMA_CONNECTION;
-#define PARAM_GPDMA_CONNECTION(CONN)    ((CONN>=GPDMA_SSP0_Tx) && (CONN<=GPDMA_MAT3_1))
+/** Check GPDMA connection option parameter. */
+#define PARAM_GPDMA_CONNECTION(CONN) ((CONN >= GPDMA_SSP0_Tx) && (CONN <= GPDMA_MAT3_1))
 
 /**
  * @brief GPDMA Transfer type enumeration.
@@ -156,7 +159,8 @@ typedef enum {
     GPDMA_P2M,
     GPDMA_P2P
 } GPDMA_TRANSFER_TYPE;
-#define PARAM_GPDMA_TRANSFER_TYPE(TYPE) ((TYPE>=GPDMA_M2M) && (TYPE<=GPDMA_P2P))
+/** Check GPDMA transfer type option parameter. */
+#define PARAM_GPDMA_TRANSFER_TYPE(TYPE) ((TYPE >= GPDMA_M2M) && (TYPE <= GPDMA_P2P))
 
 /**
  * @brief Burst size in Source and Destination enumeration.
@@ -171,7 +175,8 @@ typedef enum {
     GPDMA_BSIZE_128,
     GPDMA_BSIZE_256
 } GPDMA_BURST_SIZE;
-#define PARAM_GPDMA_BURST_SIZE(SIZE)    ((SIZE>=GPDMA_BSIZE_1) && (SIZE<=GPDMA_BSIZE_256))
+/** Check GPDMA burst size option parameter. */
+#define PARAM_GPDMA_BURST_SIZE(SIZE) ((SIZE >= GPDMA_BSIZE_1) && (SIZE <= GPDMA_BSIZE_256))
 
 /**
  * @brief Transfer width in Source and Destination enumeration.
@@ -181,7 +186,8 @@ typedef enum {
     GPDMA_HALFWORD,
     GPDMA_WORD
 } GPDMA_TRANSFER_WIDTH;
-#define PARAM_GPDMA_TRANSFER_WIDTH(WIDTH)   ((WIDTH>=GPDMA_BYTE) && (WIDTH<=GPDMA_WORD))
+/** Check GPDMA transfer width option parameter. */
+#define PARAM_GPDMA_TRANSFER_WIDTH(WIDTH) ((WIDTH >= GPDMA_BYTE) && (WIDTH <= GPDMA_WORD))
 
 /**
  * @brief GPDMA Request select enumeration.
@@ -190,67 +196,70 @@ typedef enum {
     GPDMA_UART = 0,
     GPDMA_TIMER
 } GPDMA_REQUEST_SELECT;
-#define PARAM_GPDMA_REQUEST_SELECT(SEL) ((SEL==GPDMA_UART) || (SEL==GPDMA_TIMER))
+/** Check GPDMA request select option parameter. */
+#define PARAM_GPDMA_REQUEST_SELECT(SEL) ((SEL == GPDMA_UART) || (SEL == GPDMA_TIMER))
 
 /**
  * @brief GPDMA Status type enumeration
  */
 typedef enum {
-    GPDMA_INT,          /**< GPDMA Interrupt Status */
-    GPDMA_INTTC,        /**< GPDMA Interrupt Terminal Count Request Status */
-    GPDMA_INTERR,       /**< GPDMA Interrupt Error Status */
-    GPDMA_RAW_INTTC,    /**< GPDMA Raw Interrupt Terminal Count Status */
-    GPDMA_RAW_INTERR,   /**< GPDMA Raw Error Interrupt Status */
-    GPDMA_ENABLED_CH    /**< GPDMA Enabled Channel Status */
+    GPDMA_INT,        /**< GPDMA Interrupt Status */
+    GPDMA_INTTC,      /**< GPDMA Interrupt Terminal Count Request Status */
+    GPDMA_INTERR,     /**< GPDMA Interrupt Error Status */
+    GPDMA_RAW_INTTC,  /**< GPDMA Raw Interrupt Terminal Count Status */
+    GPDMA_RAW_INTERR, /**< GPDMA Raw Error Interrupt Status */
+    GPDMA_ENABLED_CH  /**< GPDMA Enabled Channel Status */
 } GPDMA_STATUS_TYPE;
-#define PARAM_GPDMA_STAT(TYPE)  ((TYPE>=GPDMA_INT) && (TYPE<=GPDMA_ENABLED_CH))
+/** Check GPDMA status type option parameter. */
+#define PARAM_GPDMA_STAT(TYPE) ((TYPE >= GPDMA_INT) && (TYPE <= GPDMA_ENABLED_CH))
 
 /**
  * @brief GPDMA Interrupt clear status enumeration
  */
-typedef enum{
-    GPDMA_CLR_INTTC,    /**< GPDMA Interrupt Terminal Count Request Clear */
-    GPDMA_CLR_INTERR    /**< GPDMA Interrupt Error Clear */
+typedef enum {
+    GPDMA_CLR_INTTC, /**< GPDMA Interrupt Terminal Count Request Clear */
+    GPDMA_CLR_INTERR /**< GPDMA Interrupt Error Clear */
 } GPDMA_CLEAR_INT;
-#define PARAM_GPDMA_CLEAR_INT(TYPE) ((TYPE==GPDMA_CLR_INTTC) || (TYPE==GPDMA_CLR_INTERR))
+/** Check GPDMA clear interrupt option parameter. */
+#define PARAM_GPDMA_CLEAR_INT(TYPE) ((TYPE == GPDMA_CLR_INTTC) || (TYPE == GPDMA_CLR_INTERR))
 
 /**
  * @brief GPDMA Channel configuration structure.
  */
 typedef struct {
-    GPDMA_CHANNEL channelNum;               /**< GPDMA_CHANNEL_x [0...7]. */
-    uint32_t transferSize;                  /**< Block transfer size (4095 max). */
-    GPDMA_TRANSFER_WIDTH transferWidth;     /**< Used only for GPDMA_M2M only. Should be:
+    GPDMA_CHANNEL channelNum;           /**< GPDMA_CHANNEL_x [0...7]. */
+    uint32_t transferSize;              /**< Block transfer size (4095 max). */
+    GPDMA_TRANSFER_WIDTH transferWidth; /**< Used only for GPDMA_M2M only. Should be:
                                             - GPDMA_BYTE: 8-bit transfer.
                                             - GPDMA_HALFWORD: 16-bit transfer.
                                             - GPDMA_WORD: 32-bit transfer. */
-    uint32_t srcMemAddr;                    /**< Physical source address. Used only if source is memory */
-    uint32_t dstMemAddr;                    /**< Physical Destination Address. Used only if destination is memory */
-    GPDMA_TRANSFER_TYPE transferType;       /**< Should be:
+    uint32_t srcMemAddr;                /**< Physical source address. Used only if source is memory */
+    uint32_t dstMemAddr;                /**< Physical Destination Address. Used only if destination is memory */
+    GPDMA_TRANSFER_TYPE transferType;   /**< Should be:
                                             - GPDMA_M2M: Memory to Memory transfer.
                                             - GPDMA_M2P: Memory to Peripheral transfer.
                                             - GPDMA_P2M: Peripheral to Memory transfer.
                                             - GPDMA_P2P: Peripheral to Peripheral transfer. */
-    GPDMA_CONNECTION srcConn;               /**< Source peripheral connection. Used only if source is peripheral. */
-    GPDMA_CONNECTION dstConn;               /**< Destination peripheral connection. Used only if destination is peripheral. */
-    uint32_t linkedList;                    /**< Linker List Item, otherwise set to '0' */
+    GPDMA_CONNECTION srcConn;           /**< Source peripheral connection. Used only if source is peripheral. */
+    GPDMA_CONNECTION dstConn; /**< Destination peripheral connection. Used only if destination is peripheral. */
+    uint32_t linkedList;      /**< Linker List Item, otherwise set to '0' */
 } GPDMA_Channel_CFG_Type;
 
 /**
  * @brief GPDMA Linker List Item structure.
  */
 typedef struct {
-    uint32_t srcAddr;   /**< Source Address */
-    uint32_t dstAddr;   /**< Destination address */
-    uint32_t nextLLI;   /**< Next LLI address, otherwise set to '0' */
-    uint32_t control;   /**< GPDMA Control of this LLI */
+    uint32_t srcAddr; /**< Source Address */
+    uint32_t dstAddr; /**< Destination address */
+    uint32_t nextLLI; /**< Next LLI address, otherwise set to '0' */
+    uint32_t control; /**< GPDMA Control of this LLI */
 } GPDMA_LLI_Type;
 
 /**
  * @}
  */
 
-/* Public Functions ----------------------------------------------------------- */
+/* ---------------------------- Public Functions ---------------------------- */
 /** @defgroup GPDMA_Public_Functions GPDMA Public Functions
  * @{
  */
@@ -276,7 +285,7 @@ void GPDMA_Init(void);
  * configures channel registers and DMA request selection, and finally sets the channel configuration
  * for the transfer type and peripheral connections.
  *
- * @param[in]  cfg  Pointer to a GPDMA_Channel_CFG_Type structure containing the channel configuration.
+ * @param[in]  dmaCfg  Pointer to a GPDMA_Channel_CFG_Type structure containing the channel configuration.
  *
  * @return     Status
  *             - SUCCESS : Channel setup completed successfully.
@@ -286,7 +295,7 @@ void GPDMA_Init(void);
  * - The DMA must be initialized before calling this function.
  * - Only one transfer can be active per channel at a time.
  */
-Status GPDMA_Setup(const GPDMA_Channel_CFG_Type *cfg);
+Status GPDMA_Setup(const GPDMA_Channel_CFG_Type* dmaCfg);
 
 /**
  * @brief      Enables or disables the specified GPDMA channel.
@@ -294,8 +303,8 @@ Status GPDMA_Setup(const GPDMA_Channel_CFG_Type *cfg);
  * This function sets or clears the enable bit in the DMACCConfig register of the given DMA channel,
  * effectively starting or stopping the DMA transfer for that channel.
  *
- * @param[in]  channelNum  DMA channel to control (GPDMA_CHANNEL_x [0...7]).
- * @param[in]  NewState    Functional state:
+ * @param[in]  channel     DMA channel to control (GPDMA_CHANNEL_x [0...7]).
+ * @param[in]  newState    Functional state:
  *                         - ENABLE  : Start the DMA channel.
  *                         - DISABLE : Stop the DMA channel.
  *
@@ -306,7 +315,7 @@ Status GPDMA_Setup(const GPDMA_Channel_CFG_Type *cfg);
  * - Restarting a channel by just setting Enable is not recommended; re-configure the channel.
  * - The channel is also disabled automatically when the last LLI is reached, the transfer completes, or on error.
  */
-void GPDMA_ChannelCmd(GPDMA_CHANNEL channelNum, FunctionalState NewState);
+void GPDMA_ChannelCmd(GPDMA_CHANNEL channel, FunctionalState newState);
 
 /**
  * @brief      Gets the interrupt status for the specified GPDMA channel.
@@ -404,4 +413,4 @@ static __INLINE void DMA_SoftBurstRequest(GPDMA_CONNECTION line) {
  * @}
  */
 
-/* --------------------------------- End Of File ------------------------------ */
+/* ------------------------------ End Of File ------------------------------- */
