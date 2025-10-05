@@ -15,14 +15,17 @@
  * notification. NXP Semiconductors also make no representation or
  * warranty that such application will be suitable for the specified
  * use without further testing or modification.
+ *
+ * @par Refactor:
+ * Date: 25/07/2025, Author: David Trujillo Medina
  */
 
-/* Peripheral group ----------------------------------------------------------- */
+/* ---------------------------- Peripheral group ---------------------------- */
 /** @addtogroup EXTI
  * @{
  */
 
-/* Includes ------------------------------------------------------------------- */
+/* -------------------------------- Includes -------------------------------- */
 #include "lpc17xx_exti.h"
 
 /* If this source file built with example, the LPC17xx FW library configuration
@@ -37,50 +40,49 @@
 
 #ifdef _EXTI
 
-/* Private Functions ----------------------------------------------------------- */
-/** @addtogroup EXTI_Private_Functions
- * @{
- */
-
-/*********************************************************************/ /**
+/* ---------------------- Private Function Prototypes ----------------------- */
+/**
  * @brief       Sets the mode (level or edge sensitivity) for a specific EXTI line.
  *
- * @param[in]   EXTILine  EXTI_EINTx [0...3].
- * @param[in]   mode      Mode selection, must be:
- *                        - EXTI_LEVEL_SENSITIVE
- *                        - EXTI_EDGE_SENSITIVE
+ * @param[in]   line    EXTI_EINTx [0...3].
+ * @param[in]   mode    Mode selection, must be:
+ *                      - EXTI_LEVEL_SENSITIVE
+ *                      - EXTI_EDGE_SENSITIVE
  * @note        If the mode value is invalid, the function does nothing.
-*********************************************************************/
-static void EXTI_SetMode(EXTI_LINE_OPT EXTILine, EXTI_MODE_OPT mode) {
-    if (mode == EXTI_EDGE_SENSITIVE) {
-        LPC_SC->EXTMODE |= (1 << EXTILine);
-    } else if (mode == EXTI_LEVEL_SENSITIVE) {
-        LPC_SC->EXTMODE &= ~(1 << EXTILine);
-    }
-}
-
-/*********************************************************************/ /**
- * @brief       Sets the polarity (active level or edge) for a specific EXTI line.
- *
- * @param[in]   EXTILine  EXTI_EINTx [0...3].
- * @param[in]   polarity  Polarity selection, should be:
- *                        - EXTI_LOW_ACTIVE or EXTI_FALLING_EDGE (equivalent)
- *                        - EXTI_HIGH_ACTIVE or EXTI_RISING_EDGE (equivalent)
- * @note        If the polarity value is invalid, the function does nothing.
-*********************************************************************/
-static void EXTI_SetPolarity(EXTI_LINE_OPT EXTILine, EXTI_POLARITY_ENUM polarity) {
-    if (polarity == EXTI_HIGH_ACTIVE) {
-        LPC_SC->EXTPOLAR |= (1 << EXTILine);
-    } else if (polarity == EXTI_LOW_ACTIVE) {
-        LPC_SC->EXTPOLAR &= ~(1 << EXTILine);
-    }
-}
+ */
+static void EXTI_SetMode(EXTI_LINE line, EXTI_MODE mode);
 
 /**
- * @}
- */
+ * @brief       Sets the polarity (active level or edge) for a specific EXTI line.
+ *
+ * @param[in]   line        EXTI_EINTx [0...3].
+ * @param[in]   polarity    Polarity selection, should be:
+ *                          - EXTI_LOW_ACTIVE or EXTI_FALLING_EDGE (equivalent)
+ *                          - EXTI_HIGH_ACTIVE or EXTI_RISING_EDGE (equivalent)
+ * @note        If the polarity value is invalid, the function does nothing.
+*/
+static void EXTI_SetPolarity(EXTI_LINE line, EXTI_POLARITY polarity);
+/* ------------------- End of Private Function Prototypes ------------------- */
 
-/* Public Functions ----------------------------------------------------------- */
+/* --------------------------- Private Functions ---------------------------- */
+static void EXTI_SetMode(EXTI_LINE line, EXTI_MODE mode) {
+    if (mode == EXTI_EDGE_SENSITIVE) {
+        LPC_SC->EXTMODE |= (1 << line);
+    } else {
+        LPC_SC->EXTMODE &= ~(1 << line);
+    }
+}
+
+static void EXTI_SetPolarity(EXTI_LINE line, EXTI_POLARITY polarity) {
+    if (polarity == EXTI_HIGH_ACTIVE) {
+        LPC_SC->EXTPOLAR |= (1 << line);
+    } else {
+        LPC_SC->EXTPOLAR &= ~(1 << line);
+    }
+}
+/* ------------------------ End of Private Functions ------------------------ */
+
+/* ---------------------------- Public Functions ---------------------------- */
 /** @addtogroup EXTI_Public_Functions
  * @{
  */
@@ -91,48 +93,64 @@ void EXTI_Init(void) {
     NVIC_DisableIRQ(EINT2_IRQn);
     NVIC_DisableIRQ(EINT3_IRQn);
 
-    LPC_SC->EXTMODE = 0x0;
+    LPC_SC->EXTMODE  = 0x0;
     LPC_SC->EXTPOLAR = 0x0;
 }
 
-void EXTI_Config(const EXTI_CFG_Type* EXTICfg) {
-    CHECK_PARAM(PARAM_EXTI_LINE(EXTICfg->line));
-    CHECK_PARAM(PARAM_EXTI_MODE(EXTICfg->mode));
-    CHECK_PARAM(PARAM_EXTI_POLARITY(EXTICfg->polarity));
+void EXTI_PinConfig(EXTI_LINE line, EXTI_RESISTOR resMode) {
+    CHECK_PARAM(PARAM_EXTI_LINE(line));
+    CHECK_PARAM(PARAM_EXTI_RESISTOR(resMode));
 
-    NVIC_DisableIRQ((IRQn_Type)(EINT0_IRQn + EXTICfg->line));
+    LPC_PINCON->PINSEL4 &= ~(0x3 << (line * 2 + 20));
+    LPC_PINCON->PINSEL4 |= (0x1 << (line * 2 + 20));
 
-    EXTI_SetMode(EXTICfg->line, EXTICfg->mode);
-    EXTI_SetPolarity(EXTICfg->line, EXTICfg->polarity);
+    LPC_PINCON->PINMODE4 &= ~(0x3 << (line * 2 + 20));
+
+    if (resMode == EXTI_PULLDOWN) {
+        LPC_PINCON->PINMODE4 |= (0x3 << (line * 2 + 20));
+    } else if (resMode == EXTI_NOPULL) {
+        LPC_PINCON->PINMODE4 |= (0x2 << (line * 2 + 20));
+    }
 }
 
-void EXTI_ConfigEnable(const EXTI_CFG_Type* EXTICfg) {
-    CHECK_PARAM(PARAM_EXTI_LINE(EXTICfg->line));
-    CHECK_PARAM(PARAM_EXTI_MODE(EXTICfg->mode));
-    CHECK_PARAM(PARAM_EXTI_POLARITY(EXTICfg->polarity));
+void EXTI_Config(const EXTI_CFG_Type* extiCfg) {
+    CHECK_PARAM(PARAM_EXTI_LINE(extiCfg->line));
+    CHECK_PARAM(PARAM_EXTI_MODE(extiCfg->mode));
+    CHECK_PARAM(PARAM_EXTI_POLARITY(extiCfg->polarity));
 
-    EXTI_Config(EXTICfg);
-    EXTI_EnableIRQ(EXTICfg->line);
+    NVIC_DisableIRQ((IRQn_Type)(EINT0_IRQn + extiCfg->line));
+
+    EXTI_SetMode(extiCfg->line, extiCfg->mode);
+    EXTI_SetPolarity(extiCfg->line, extiCfg->polarity);
 }
 
-void EXTI_ClearFlag(EXTI_LINE_OPT EXTILine) {
-    CHECK_PARAM(PARAM_EXTI_LINE(EXTILine));
+void EXTI_ConfigEnable(const EXTI_CFG_Type* extiCfg) {
+    CHECK_PARAM(PARAM_EXTI_LINE(extiCfg->line));
+    CHECK_PARAM(PARAM_EXTI_MODE(extiCfg->mode));
+    CHECK_PARAM(PARAM_EXTI_POLARITY(extiCfg->polarity));
 
-    LPC_SC->EXTINT |= (1 << EXTILine);
+    EXTI_Config(extiCfg);
+    EXTI_EnableIRQ(extiCfg->line);
 }
 
-FlagStatus EXTI_GetFlag(EXTI_LINE_OPT EXTILine) {
-    CHECK_PARAM(PARAM_EXTI_LINE(EXTILine));
+void EXTI_ClearFlag(EXTI_LINE line) {
+    CHECK_PARAM(PARAM_EXTI_LINE(line));
 
-    return (LPC_SC->EXTINT & (1 << EXTILine)) ? SET : RESET;
+    LPC_SC->EXTINT |= (1 << line);
 }
 
-void EXTI_EnableIRQ(EXTI_LINE_OPT EXTILine) {
-    CHECK_PARAM(PARAM_EXTI_LINE(EXTILine));
+FlagStatus EXTI_GetFlag(EXTI_LINE line) {
+    CHECK_PARAM(PARAM_EXTI_LINE(line));
 
-    EXTI_ClearFlag(EXTILine);
-    NVIC_ClearPendingIRQ((IRQn_Type)(EINT0_IRQn + EXTILine));
-    NVIC_EnableIRQ((IRQn_Type)(EINT0_IRQn + EXTILine));
+    return (LPC_SC->EXTINT & (1 << line)) ? SET : RESET;
+}
+
+void EXTI_EnableIRQ(EXTI_LINE line) {
+    CHECK_PARAM(PARAM_EXTI_LINE(line));
+
+    EXTI_ClearFlag(line);
+    NVIC_ClearPendingIRQ((IRQn_Type)(EINT0_IRQn + line));
+    NVIC_EnableIRQ((IRQn_Type)(EINT0_IRQn + line));
 }
 
 /**
@@ -145,4 +163,4 @@ void EXTI_EnableIRQ(EXTI_LINE_OPT EXTILine) {
  * @}
  */
 
-/* --------------------------------- End Of File ------------------------------ */
+/* ------------------------------ End Of File ------------------------------- */

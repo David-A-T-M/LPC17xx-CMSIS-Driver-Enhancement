@@ -15,14 +15,17 @@
  * notification. NXP Semiconductors also make no representation or
  * warranty that such application will be suitable for the specified
  * use without further testing or modification.
+ *
+ * @par Refactor:
+ * Date: 09/07/2025, Author: David Trujillo Medina
  */
 
-/* Peripheral group ----------------------------------------------------------- */
+/* ---------------------------- Peripheral group ---------------------------- */
 /** @addtogroup SYSTICK
  * @{
  */
 
-/* Includes ------------------------------------------------------------------- */
+/* -------------------------------- Includes -------------------------------- */
 #include "lpc17xx_systick.h"
 #include "lpc17xx_clkpwr.h"
 
@@ -37,44 +40,76 @@
 #endif /* __BUILD_WITH_EXAMPLE__ */
 
 #ifdef _SYSTICK
+/* ---------------------- Private Function Prototypes ----------------------- */
+/**
+ * @brief       Configures the pin for external SysTick clock input.
+ *
+ * Sets the appropriate function and mode for the pin used as the external
+ * clock input for the SysTick timer. The pin is set to the correct function
+ * in `PINSEL7` and configured in tristate (no pull-up/pull-down) in `PINMODE7`.
+ */
+static void SYSTICK_PinConfig(void);
+/* ------------------- End of Private Function Prototypes ------------------- */
 
-/* Public Functions ----------------------------------------------------------- */
+/* --------------------------- Private Functions ---------------------------- */
+static void SYSTICK_PinConfig(void) {
+    LPC_PINCON->PINSEL7 &= ~(0x3 << ST_PIN_PCB_POS);
+    LPC_PINCON->PINSEL7 |= (0x1 << ST_PIN_PCB_POS);
+
+    LPC_PINCON->PINMODE7 &= ~(0x3 << ST_PIN_PCB_POS);
+    LPC_PINCON->PINMODE7 |= (0x2 << ST_PIN_PCB_POS);
+}
+/* ------------------------ End of Private Functions ------------------------ */
+
+/* ---------------------------- Public Functions ---------------------------- */
 /** @addtogroup SYSTICK_Public_Functions
  * @{
  */
 
 void SYSTICK_InternalInit(uint32_t time) {
-    SYSTICK_ExternalInit(SystemCoreClock, time);
+    const float maxtime = (float)(ST_MAX_LOAD) * 1000 / (float)SystemCoreClock;
+
     SysTick->CTRL |= ST_CTRL_CLKSOURCE;
+
+    if ((float)time > maxtime) {
+        SysTick->LOAD = ST_MAX_LOAD;
+    } else {
+        SysTick->LOAD = (SystemCoreClock / 1000) * time - 1;
+    }
 }
 
 void SYSTICK_ExternalInit(uint32_t extFreq, uint32_t time) {
     const float maxtime = (float)(ST_MAX_LOAD) * 1000 / (float)extFreq;
 
-    SysTick->CTRL &= ~ ST_CTRL_CLKSOURCE;
+    SYSTICK_PinConfig();
 
-    if ((float)time > maxtime)
+    SysTick->CTRL &= ~ST_CTRL_CLKSOURCE;
+
+    if ((float)time > maxtime) {
         SysTick->LOAD = ST_MAX_LOAD;
-    else
-        SysTick->LOAD = (extFreq/1000)*time - 1;
+    } else {
+        SysTick->LOAD = (extFreq / 1000) * time - 1;
+    }
 }
 
-void SYSTICK_Cmd(FunctionalState NewState) {
-    CHECK_PARAM(PARAM_FUNCTIONALSTATE(NewState));
+void SYSTICK_Cmd(FunctionalState newState) {
+    CHECK_PARAM(PARAM_FUNCTIONALSTATE(newState));
 
-    if(NewState == ENABLE)
+    if (newState == ENABLE) {
         SysTick->CTRL |= ST_CTRL_ENABLE;
-    else
+    } else {
         SysTick->CTRL &= ~ST_CTRL_ENABLE;
+    }
 }
 
-void SYSTICK_IntCmd(FunctionalState NewState) {
-    CHECK_PARAM(PARAM_FUNCTIONALSTATE(NewState));
+void SYSTICK_IntCmd(FunctionalState newState) {
+    CHECK_PARAM(PARAM_FUNCTIONALSTATE(newState));
 
-    if(NewState == ENABLE)
+    if (newState == ENABLE) {
         SysTick->CTRL |= ST_CTRL_TICKINT;
-    else
+    } else {
         SysTick->CTRL &= ~ST_CTRL_TICKINT;
+    }
 }
 
 /**
@@ -87,5 +122,4 @@ void SYSTICK_IntCmd(FunctionalState NewState) {
  * @}
  */
 
-/* --------------------------------- End Of File ------------------------------ */
-
+/* ------------------------------ End Of File ------------------------------- */

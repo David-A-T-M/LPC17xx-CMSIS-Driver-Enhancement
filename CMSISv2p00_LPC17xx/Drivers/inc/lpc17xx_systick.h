@@ -16,9 +16,12 @@
  * notification. NXP Semiconductors also make no representation or
  * warranty that such application will be suitable for the specified
  * use without further testing or modification.
+ *
+ * @par Refactor:
+ * Date: 09/07/2025, Author: David Trujillo Medina
  */
 
-/* Peripheral group ----------------------------------------------------------- */
+/* ---------------------------- Peripheral group ---------------------------- */
 /** @defgroup SYSTICK SYSTICK
  * @ingroup LPC1700CMSIS_FwLib_Drivers
  * @{
@@ -27,47 +30,37 @@
 #ifndef LPC17XX_SYSTICK_H_
 #define LPC17XX_SYSTICK_H_
 
-/* Includes ------------------------------------------------------------------- */
+/* -------------------------------- Includes -------------------------------- */
 #include "LPC17xx.h"
 #include "lpc_types.h"
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
-/* Private Macros ------------------------------------------------------------- */
+/* ----------------------------- Private Macros ----------------------------- */
 /** @defgroup SYSTICK_Private_Macros SYSTICK Private Macros
  * @{
  */
 
-/* ------------------- STCRL REGISTER DEFINITIONS ------------------------- */
-#define ST_CTRL_ENABLE          ((uint32_t)(1<<0))
-#define ST_CTRL_TICKINT         ((uint32_t)(1<<1))
-#define ST_CTRL_CLKSOURCE       ((uint32_t)(1<<2))
-#define ST_CTRL_COUNTFLAG       ((uint32_t)(1<<16))
-
-/* ------------------- STRELOAD REGISTER DEFINITIONS ------------------------- */
-#define ST_RELOAD(n)            ((uint32_t)(n & 0x00FFFFFF))
-
-/* ------------------- STCURRENT REGISTER DEFINITIONS ------------------------- */
-#define ST_CURRENT(n)           ((uint32_t)(n & 0x00FFFFFF))
-
-/* ------------------- STCALIB REGISTER DEFINITIONS ------------------------- */
-#define ST_CALIB_TENMS(n)       ((uint32_t)(n & 0x00FFFFFF))
-#define ST_CALIB_SKEW           ((uint32_t)(1<<30))
-#define ST_CALIB_NOREF          ((uint32_t)(1<<31))
-
-#define CLKSOURCE_EXT           ((uint32_t)(0))
-#define CLKSOURCE_CPU           ((uint32_t)(1))
-
-#define ST_MAX_LOAD             ((uint32_t)(0x00FFFFFF))
+/** Enable SysTick Counter bit. */
+#define ST_CTRL_ENABLE    ((uint32_t)(1 << 0))
+/** Enable SysTick Interrupt bit. */
+#define ST_CTRL_TICKINT   ((uint32_t)(1 << 1))
+/** Clock Source selection bit. */
+#define ST_CTRL_CLKSOURCE ((uint32_t)(1 << 2))
+/** Count Flag bit. */
+#define ST_CTRL_COUNTFLAG ((uint32_t)(1 << 16))
+/** Maximum reload value for SysTick timer (24 bits). */
+#define ST_MAX_LOAD       ((uint32_t)(0x00FFFFFF))
+/** PCB bit position in PINSEL7 register. */
+#define ST_PIN_PCB_POS    ((uint32_t)(20))
 
 /**
  * @}
  */
 
-/* Public Functions ----------------------------------------------------------- */
+/* ---------------------------- Public Functions ---------------------------- */
 /** @defgroup SYSTICK_Public_Functions SYSTICK Public Functions
  * @{
  */
@@ -86,6 +79,11 @@ void SYSTICK_InternalInit(uint32_t time);
 /**
  * @brief       Initializes the System Tick timer using an external clock source.
  *
+ * This function configures the pin for external SysTick clock input, and initializes the
+ * SysTick timer to use the external clock source. If the requested time exceeds the maximum
+ * possible interval for the SysTick timer with the given external frequency, the LOAD register
+ * is set to its maximum value ST_MAX_LOAD, resulting in the longest possible timer interval.
+ *
  * @param[in]   extFreq External clock frequency in Hz.
  * @param[in]   time    Time interval in milliseconds.
  *
@@ -98,20 +96,20 @@ void SYSTICK_ExternalInit(uint32_t extFreq, uint32_t time);
 /**
  * @brief       Enable or disable the System Tick counter.
  *
- * @param[in]   NewState    System Tick counter status, should be:
+ * @param[in]   newState    System Tick counter status, should be:
  *                          - ENABLE
  *                          - DISABLE
  */
-void SYSTICK_Cmd(FunctionalState NewState);
+void SYSTICK_Cmd(FunctionalState newState);
 
 /**
  * @brief       Enable or disable the System Tick interrupt.
  *
- * @param[in]   NewState    System Tick interrupt status, should be:
+ * @param[in]   newState    System Tick interrupt status, should be:
  *                          - ENABLE
  *                          - DISABLE
  */
-void SYSTICK_IntCmd(FunctionalState NewState);
+void SYSTICK_IntCmd(FunctionalState newState);
 
 /**
  * @brief       Get the current value of the System Tick counter.
@@ -175,10 +173,10 @@ static __INLINE FlagStatus SYSTICK_HasFired(void) {
 }
 #endif
 
-#endif // LPC17XX_SYSTICK_H_
+#endif  // LPC17XX_SYSTICK_H_
 
 /**
  * @}
  */
 
-/* --------------------------------- End Of File ------------------------------ */
+/* ------------------------------ End Of File ------------------------------- */
