@@ -350,39 +350,7 @@ typedef struct
   __IO uint8_t  TER;
        uint8_t  RESERVED6[39];
   __IO uint32_t FIFOLVL;
-} LPC_UART_TypeDef;
-
-typedef struct
-{
-  union {
-  __I  uint8_t  RBR;
-  __O  uint8_t  THR;
-  __IO uint8_t  DLL;
-       uint32_t RESERVED0;
-  };
-  union {
-  __IO uint8_t  DLM;
-  __IO uint32_t IER;
-  };
-  union {
-  __I  uint32_t IIR;
-  __O  uint8_t  FCR;
-  };
-  __IO uint8_t  LCR;
-       uint8_t  RESERVED1[7];
-  __I  uint8_t  LSR;
-       uint8_t  RESERVED2[7];
-  __IO uint8_t  SCR;
-       uint8_t  RESERVED3[3];
-  __IO uint32_t ACR;
-  __IO uint8_t  ICR;
-       uint8_t  RESERVED4[3];
-  __IO uint8_t  FDR;
-       uint8_t  RESERVED5[7];
-  __IO uint8_t  TER;
-       uint8_t  RESERVED6[39];
-  __IO uint32_t FIFOLVL;
-} LPC_UART0_TypeDef;
+} LPC_UARTX_TypeDef;
 
 typedef struct
 {
@@ -996,10 +964,10 @@ typedef struct
 #define LPC_TIM2              ((LPC_TIM_TypeDef       *) LPC_TIM2_BASE     )
 #define LPC_TIM3              ((LPC_TIM_TypeDef       *) LPC_TIM3_BASE     )
 #define LPC_RIT               ((LPC_RIT_TypeDef       *) LPC_RIT_BASE      )
-#define LPC_UART0             ((LPC_UART0_TypeDef     *) LPC_UART0_BASE    )
+#define LPC_UART0             ((LPC_UARTX_TypeDef     *) LPC_UART0_BASE    )
 #define LPC_UART1             ((LPC_UART1_TypeDef     *) LPC_UART1_BASE    )
-#define LPC_UART2             ((LPC_UART_TypeDef      *) LPC_UART2_BASE    )
-#define LPC_UART3             ((LPC_UART_TypeDef      *) LPC_UART3_BASE    )
+#define LPC_UART2             ((LPC_UARTX_TypeDef     *) LPC_UART2_BASE    )
+#define LPC_UART3             ((LPC_UARTX_TypeDef     *) LPC_UART3_BASE    )
 #define LPC_PWM1              ((LPC_PWM_TypeDef       *) LPC_PWM1_BASE     )
 #define LPC_I2C0              ((LPC_I2C_TypeDef       *) LPC_I2C0_BASE     )
 #define LPC_I2C1              ((LPC_I2C_TypeDef       *) LPC_I2C1_BASE     )
