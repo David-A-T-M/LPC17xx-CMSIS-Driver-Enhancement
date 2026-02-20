@@ -43,6 +43,9 @@ extern "C" {
  * @{
  */
 
+/* External interrupt pin offset definition. */
+#define EINT_PIN_BASE_OFFSET (20)
+
 /* ------------------------ MACROS MASKS DEFINITIONS ------------------------ */
 /** All external interrupt lines mask. */
 #define EINT_ALL_MASK ((0xF))

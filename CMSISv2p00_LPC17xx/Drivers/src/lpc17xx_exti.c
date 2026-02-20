@@ -67,17 +67,17 @@ static void EXTI_SetPolarity(EXTI_LINE line, EXTI_POLARITY polarity);
 /* --------------------------- Private Functions ---------------------------- */
 static void EXTI_SetMode(EXTI_LINE line, EXTI_MODE mode) {
     if (mode == EXTI_EDGE_SENSITIVE) {
-        LPC_SC->EXTMODE |= (1 << line);
+        LPC_SC->EXTMODE |= (1UL << line);
     } else {
-        LPC_SC->EXTMODE &= ~(1 << line);
+        LPC_SC->EXTMODE &= ~(1UL << line);
     }
 }
 
 static void EXTI_SetPolarity(EXTI_LINE line, EXTI_POLARITY polarity) {
     if (polarity == EXTI_HIGH_ACTIVE) {
-        LPC_SC->EXTPOLAR |= (1 << line);
+        LPC_SC->EXTPOLAR |= (1UL << line);
     } else {
-        LPC_SC->EXTPOLAR &= ~(1 << line);
+        LPC_SC->EXTPOLAR &= ~(1UL << line);
     }
 }
 /* ------------------------ End of Private Functions ------------------------ */
@@ -101,15 +101,17 @@ void EXTI_PinConfig(EXTI_LINE line, EXTI_RESISTOR resMode) {
     CHECK_PARAM(PARAM_EXTI_LINE(line));
     CHECK_PARAM(PARAM_EXTI_RESISTOR(resMode));
 
-    LPC_PINCON->PINSEL4 &= ~(0x3 << (line * 2 + 20));
-    LPC_PINCON->PINSEL4 |= (0x1 << (line * 2 + 20));
+    const uint8_t bitPos = (uint8_t)(EINT_PIN_BASE_OFFSET + (line * 2));
 
-    LPC_PINCON->PINMODE4 &= ~(0x3 << (line * 2 + 20));
+    LPC_PINCON->PINSEL4 &= ~(0x03UL << bitPos);
+    LPC_PINCON->PINSEL4 |=  (0x01UL << bitPos);
+
+    LPC_PINCON->PINMODE4 &= ~(0x03UL << bitPos);
 
     if (resMode == EXTI_PULLDOWN) {
-        LPC_PINCON->PINMODE4 |= (0x3 << (line * 2 + 20));
+        LPC_PINCON->PINMODE4 |= (0x3UL << bitPos);
     } else if (resMode == EXTI_NOPULL) {
-        LPC_PINCON->PINMODE4 |= (0x2 << (line * 2 + 20));
+        LPC_PINCON->PINMODE4 |= (0x2UL << bitPos);
     }
 }
 
@@ -136,7 +138,7 @@ void EXTI_ConfigEnable(const EXTI_CFG_Type* extiCfg) {
 void EXTI_ClearFlag(EXTI_LINE line) {
     CHECK_PARAM(PARAM_EXTI_LINE(line));
 
-    LPC_SC->EXTINT |= (1 << line);
+    LPC_SC->EXTINT = (1 << line);
 }
 
 FlagStatus EXTI_GetFlag(EXTI_LINE line) {
