@@ -32,7 +32,7 @@ Initially built for educational purposes in the course _Digital Electronics 3_ a
 
 | Module   | Refactored | Documented |     Tested     |
 |----------|:----------:|:----------:|:--------------:|
-| `PINSEL` | 🔲 Planned | 🔲 Planned |   🔲 Planned   |
+| `PINSEL` | ✅ Planned | ✅ Planned |   ✅ Planned   |
 | `GPIO`   | 🔲 Planned | 🔲 Planned |   🔲 Planned   |
 | `EINT`   | 🔲 Planned | 🔲 Planned |   🔲 Planned   |
 | `SysTick` | 🔲 Planned | 🔲 Planned |   🔲 Planned   |
