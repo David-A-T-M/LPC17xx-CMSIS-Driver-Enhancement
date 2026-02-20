@@ -30,18 +30,19 @@ Initially built for educational purposes in the course _Digital Electronics 3_ a
 
 ## 📦 Module Status
 
-| Module    | Refactored | Documented |     Tested     |
-|-----------|:----------:|:----------:|:--------------:|
-| `PINSEL`  | ✅ Complete | ✅ Complete |   ✅ Complete   |
-| `GPIO`    | ✅ Complete | ✅ Complete |   ✅ Complete   |
-| `EINT`    | ✅ Complete | ✅ Complete |   ✅ Complete   |
-| `SysTick` | ✅ Complete | ✅ Complete |   ✅ Complete   |
-| `Timer`   | ✅ Complete | ✅ Complete |   ✅ Complete   |
-| `ADC`     | ✅ Complete | ✅ Complete |   ✅ Complete   |
-| `DAC`     | ✅ Complete | ✅ Complete |   🔲 Planned   |
-| `GPDMA`   | ✅ Complete | ✅ Complete |   🔲 Planned   |
-| `USART`   | 🔲 Planned | 🔲 Planned |   🔲 Planned   |
-| `PWM`     | ✅ Complete | ✅ Complete |   🔲 Planned   |
+| Module   | Refactored | Documented |     Tested     |
+|----------|:----------:|:----------:|:--------------:|
+| `PINSEL` | 🔲 Planned | 🔲 Planned |   🔲 Planned   |
+| `GPIO`   | 🔲 Planned | 🔲 Planned |   🔲 Planned   |
+| `EINT`   | 🔲 Planned | 🔲 Planned |   🔲 Planned   |
+| `SysTick` | 🔲 Planned | 🔲 Planned |   🔲 Planned   |
+| `Timer`  | 🔲 Planned | 🔲 Planned |   🔲 Planned   |
+| `ADC`    | 🔲 Planned | 🔲 Planned |   🔲 Planned   |
+| `DAC`    | 🔲 Planned | 🔲 Planned |   🔲 Planned   |
+| `GPDMA`  | 🔲 Planned | 🔲 Planned |   🔲 Planned   |
+| `UART_X` | 🔲 Planned | 🔲 Planned |   🔲 Planned   |
+| `UART_1` | 🔲 Planned | 🔲 Planned |   🔲 Planned   |
+| `PWM`    | 🔲 Planned | 🔲 Planned |   🔲 Planned   |
 
 _This table is continuously updated as development progresses._
 
@@ -73,7 +74,7 @@ This project ensures the library is not only a usable HAL but also a **maintaina
 
 A [companion repository](https://github.com/David-A-T-M/DigitalElectronics3_2025) is being developed alongside this one, providing:
 
-- ✅ Example projects at **register-level** and using the **modern HAL**
+- 🔲 Example projects at **register-level** and using the **modern HAL**
 - 📚 Guides and working examples for the **LPC1769** and **STM32 Blue Pill**
 - 🔁 Migration paths between LPC and STM32, encouraging platform independence
 
