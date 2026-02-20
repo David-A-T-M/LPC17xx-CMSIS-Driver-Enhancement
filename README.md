@@ -30,19 +30,19 @@ Initially built for educational purposes in the course _Digital Electronics 3_ a
 
 ## 📦 Module Status
 
-| Module   | Refactored | Documented |     Tested     |
-|----------|:----------:|:----------:|:--------------:|
-| `PINSEL` | ✅ Planned | ✅ Planned |   ✅ Planned   |
-| `GPIO`   | 🔲 Planned | 🔲 Planned |   🔲 Planned   |
-| `EINT`   | 🔲 Planned | 🔲 Planned |   🔲 Planned   |
-| `SysTick` | 🔲 Planned | 🔲 Planned |   🔲 Planned   |
-| `Timer`  | 🔲 Planned | 🔲 Planned |   🔲 Planned   |
-| `ADC`    | 🔲 Planned | 🔲 Planned |   🔲 Planned   |
-| `DAC`    | 🔲 Planned | 🔲 Planned |   🔲 Planned   |
-| `GPDMA`  | 🔲 Planned | 🔲 Planned |   🔲 Planned   |
-| `UART_X` | 🔲 Planned | 🔲 Planned |   🔲 Planned   |
-| `UART_1` | 🔲 Planned | 🔲 Planned |   🔲 Planned   |
-| `PWM`    | 🔲 Planned | 🔲 Planned |   🔲 Planned   |
+| Module   | Refactored  | Documented |     Tested     |
+|----------|:-----------:|:----------:|:--------------:|
+| `PINSEL` | ✅ Completed | ✅ Completed |   ✅ Completed   |
+| `GPIO`   |  ✅ Completed  | ✅ Completed |   ✅ Completed   |
+| `EINT`   | 🔲 Planned  | 🔲 Planned |   🔲 Planned   |
+| `SysTick` | 🔲 Planned  | 🔲 Planned |   🔲 Planned   |
+| `Timer`  | 🔲 Planned  | 🔲 Planned |   🔲 Planned   |
+| `ADC`    | 🔲 Planned  | 🔲 Planned |   🔲 Planned   |
+| `DAC`    | 🔲 Planned  | 🔲 Planned |   🔲 Planned   |
+| `GPDMA`  | 🔲 Planned  | 🔲 Planned |   🔲 Planned   |
+| `UART_X` | 🔲 Planned  | 🔲 Planned |   🔲 Planned   |
+| `UART_1` | 🔲 Planned  | 🔲 Planned |   🔲 Planned   |
+| `PWM`    | 🔲 Planned  | 🔲 Planned |   🔲 Planned   |
 
 _This table is continuously updated as development progresses._
 
