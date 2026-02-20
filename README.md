@@ -34,7 +34,7 @@ Initially built for educational purposes in the course _Digital Electronics 3_ a
 |----------|:-----------:|:----------:|:--------------:|
 | `PINSEL` | ✅ Completed | ✅ Completed |   ✅ Completed   |
 | `GPIO`   |  ✅ Completed  | ✅ Completed |   ✅ Completed   |
-| `EINT`   | 🔲 Planned  | 🔲 Planned |   🔲 Planned   |
+| `EINT`   | ✅ Completed  | ✅ Completed |   ✅ Completed   |
 | `SysTick` | 🔲 Planned  | 🔲 Planned |   🔲 Planned   |
 | `Timer`  | 🔲 Planned  | 🔲 Planned |   🔲 Planned   |
 | `ADC`    | 🔲 Planned  | 🔲 Planned |   🔲 Planned   |
