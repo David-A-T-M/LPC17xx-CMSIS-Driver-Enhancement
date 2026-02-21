@@ -17,7 +17,7 @@
  * use without further testing or modification.
  *
  * @par Refactor:
- * Date: 01/08/2025, Author: David Trujillo Medina
+ * Last update: 21/02/2025, Author: David Trujillo Medina
  */
 
 /* ---------------------------- Peripheral group ---------------------------- */
@@ -77,6 +77,21 @@ static uint32_t converUSecToVal(uint32_t timerNum, uint32_t uSec);
  * - The return value 0xFFFFFFFF indicates an invalid or unknown timer pointer.
  */
 static uint32_t converPtrToTimeNum(LPC_TIM_TypeDef* TIMx);
+
+/**
+ * @brief      Initializes the specified Timer/Counter peripheral.
+ *
+ * This function enables power and clock for the given timer peripheral, resets
+ * its counters, and clears all interrupt flags. It prepares the timer for
+ * subsequent configuration and use.
+ *
+ * @param[in]  TIMx  Pointer to the timer peripheral (LPC_TIM0/1/2/3).
+ *
+ * @note
+ * - Does not enable the timer; it only initializes the peripheral.
+ * - After calling this function, the timer is ready for configuration.
+ */
+static void TIM_Init(LPC_TIM_TypeDef* TIMx);
 /* ------------------- End of Private Function Prototypes ------------------- */
 
 /* --------------------------- Private Functions ---------------------------- */
@@ -107,63 +122,58 @@ static uint32_t converPtrToTimeNum(LPC_TIM_TypeDef* TIMx) {
     }
     return 0xFFFFFFFF;
 }
+
+static void TIM_Init(LPC_TIM_TypeDef* TIMx) {
+    if (TIMx == LPC_TIM0) {
+        CLKPWR_ConfigPPWR(CLKPWR_PCONP_PCTIM0, ENABLE);
+        CLKPWR_SetPCLKDiv(CLKPWR_PCLKSEL_TIMER0, CLKPWR_PCLKSEL_CCLK_DIV_4);
+    } else if (TIMx == LPC_TIM1) {
+        CLKPWR_ConfigPPWR(CLKPWR_PCONP_PCTIM1, ENABLE);
+        CLKPWR_SetPCLKDiv(CLKPWR_PCLKSEL_TIMER1, CLKPWR_PCLKSEL_CCLK_DIV_4);
+    } else if (TIMx == LPC_TIM2) {
+        CLKPWR_ConfigPPWR(CLKPWR_PCONP_PCTIM2, ENABLE);
+        CLKPWR_SetPCLKDiv(CLKPWR_PCLKSEL_TIMER2, CLKPWR_PCLKSEL_CCLK_DIV_4);
+    } else if (TIMx == LPC_TIM3) {
+        CLKPWR_ConfigPPWR(CLKPWR_PCONP_PCTIM3, ENABLE);
+        CLKPWR_SetPCLKDiv(CLKPWR_PCLKSEL_TIMER3, CLKPWR_PCLKSEL_CCLK_DIV_4);
+    }
+    TIMx->TCR = 0;
+    TIM_ResetCounter(TIMx);
+    TIMx->IR = 0x3F;
+}
 /* ------------------------ End of Private Functions ------------------------ */
 
 /* ---------------------------- Public Functions ---------------------------- */
 /** @addtogroup TIM_Public_Functions
  * @{
  */
-
-void TIM_Init(LPC_TIM_TypeDef* TIMx, TIM_MODE mode, void* timCtrCfg) {
+void TIM_InitTimer(LPC_TIM_TypeDef* TIMx, const TIM_TIMERCFG_T* timerCfg) {
     CHECK_PARAM(PARAM_TIMx(TIMx));
-    CHECK_PARAM(PARAM_TIM_MODE(mode));
+    CHECK_PARAM(PARAM_TIM_PRESCALE(timerCfg->prescaleOpt));
 
-    switch ((uintptr_t)TIMx) {
-        case (uintptr_t)LPC_TIM0:
-            CLKPWR_ConfigPPWR(CLKPWR_PCONP_PCTIM0, ENABLE);
-            CLKPWR_SetPCLKDiv(CLKPWR_PCLKSEL_TIMER0, CLKPWR_PCLKSEL_CCLK_DIV_4);
-            break;
-        case (uintptr_t)LPC_TIM1:
-            CLKPWR_ConfigPPWR(CLKPWR_PCONP_PCTIM1, ENABLE);
-            CLKPWR_SetPCLKDiv(CLKPWR_PCLKSEL_TIMER1, CLKPWR_PCLKSEL_CCLK_DIV_4);
-            break;
-        case (uintptr_t)LPC_TIM2:
-            CLKPWR_ConfigPPWR(CLKPWR_PCONP_PCTIM2, ENABLE);
-            CLKPWR_SetPCLKDiv(CLKPWR_PCLKSEL_TIMER2, CLKPWR_PCLKSEL_CCLK_DIV_4);
-            break;
-        case (uintptr_t)LPC_TIM3:
-            CLKPWR_ConfigPPWR(CLKPWR_PCONP_PCTIM3, ENABLE);
-            CLKPWR_SetPCLKDiv(CLKPWR_PCLKSEL_TIMER3, CLKPWR_PCLKSEL_CCLK_DIV_4);
-            break;
-        default: break;
-    }
+    TIM_Init(TIMx);
 
-    TIMx->CTCR &= ~TIM_CTCR_MODE_MASK;
-    TIMx->CTCR |= mode;
-
-    TIMx->PR = 0;
-    TIMx->TCR |= (1 << 1);
-    TIMx->TCR &= ~(1 << 1);
-
-    if (mode == TIM_TIMER_MODE) {
-        const TIM_TIMERCFG_Type* pTimeCfg = (TIM_TIMERCFG_Type*)timCtrCfg;
-
-        if (pTimeCfg->prescaleOption == TIM_TICKVAL) {
-            TIMx->PR = pTimeCfg->prescaleValue - 1;
+    if (timerCfg->prescaleOpt == TIM_TICK) {
+        if (timerCfg->prescaleValue > 0) {
+            TIMx->PR = timerCfg->prescaleValue - 1;
         } else {
-            TIMx->PR = converUSecToVal(converPtrToTimeNum(TIMx), pTimeCfg->prescaleValue) - 1;
+            TIMx->PR = 0;
         }
     } else {
-        const TIM_COUNTERCFG_Type* pCounterCfg = (TIM_COUNTERCFG_Type*)timCtrCfg;
+        const uint32_t prVal = converUSecToVal(converPtrToTimeNum(TIMx), timerCfg->prescaleValue);
 
-        TIMx->CTCR &= ~TIM_CTCR_INPUT_MASK;
-
-        if (pCounterCfg->countInputSelect == TIM_CAPTURE_1) {
-            TIMx->CTCR |= _BIT(2);
-        }
+        TIMx->PR = (prVal > 0) ? (prVal - 1) : 0;
     }
+}
 
-    TIMx->IR = 0x3F;
+void TIM_InitCounter(LPC_TIM_TypeDef* TIMx, const TIM_COUNTERCFG_T* counterCfg) {
+    CHECK_PARAM(PARAM_TIMx(TIMx));
+    CHECK_PARAM(PARAM_TIM_CAPTURE_CH(counterCfg->input));
+    CHECK_PARAM(PARAM_TIM_CTR_EDGE(counterCfg->edge));
+
+    TIM_Init(TIMx);
+
+    TIMx->CTCR = counterCfg->edge | (counterCfg->input << 2);
 }
 
 void TIM_DeInit(LPC_TIM_TypeDef* TIMx) {
@@ -171,37 +181,39 @@ void TIM_DeInit(LPC_TIM_TypeDef* TIMx) {
 
     TIMx->TCR = 0x00;
 
-    switch ((uintptr_t)TIMx) {
-        case (uintptr_t)LPC_TIM0: CLKPWR_ConfigPPWR(CLKPWR_PCONP_PCTIM0, DISABLE); break;
-        case (uintptr_t)LPC_TIM1: CLKPWR_ConfigPPWR(CLKPWR_PCONP_PCTIM1, DISABLE); break;
-        case (uintptr_t)LPC_TIM2: CLKPWR_ConfigPPWR(CLKPWR_PCONP_PCTIM2, DISABLE); break;
-        case (uintptr_t)LPC_TIM3: CLKPWR_ConfigPPWR(CLKPWR_PCONP_PCTIM3, DISABLE); break;
-        default: break;
+    if (TIMx == LPC_TIM0) {
+        CLKPWR_ConfigPPWR(CLKPWR_PCONP_PCTIM0, DISABLE);
+    } else if (TIMx == LPC_TIM1) {
+        CLKPWR_ConfigPPWR(CLKPWR_PCONP_PCTIM1, DISABLE);
+    } else if (TIMx == LPC_TIM2) {
+        CLKPWR_ConfigPPWR(CLKPWR_PCONP_PCTIM2, DISABLE);
+    } else if (TIMx == LPC_TIM3) {
+        CLKPWR_ConfigPPWR(CLKPWR_PCONP_PCTIM3, DISABLE);
     }
 }
 
-void TIM_ConfigStructInit(TIM_MODE mode, void* timCtrCfg) {
-    CHECK_PARAM(PARAM_TIM_MODE(mode));
-
-    if (mode == TIM_TIMER_MODE) {
-        TIM_TIMERCFG_Type* pTimeCfg = (TIM_TIMERCFG_Type*)timCtrCfg;
-        pTimeCfg->prescaleOption    = TIM_USVAL;
-        pTimeCfg->prescaleValue     = 1;
-    } else {
-        TIM_COUNTERCFG_Type* pCounterCfg = (TIM_COUNTERCFG_Type*)timCtrCfg;
-        pCounterCfg->countInputSelect    = TIM_CAPTURE_0;
-    }
-}
-
-void TIM_Cmd(LPC_TIM_TypeDef* TIMx, FunctionalState newState) {
+void TIM_Enable(LPC_TIM_TypeDef* TIMx) {
     CHECK_PARAM(PARAM_TIMx(TIMx));
-    CHECK_PARAM(PARAM_FUNCTIONALSTATE(newState));
 
-    if (newState == ENABLE) {
-        TIMx->TCR |= TIM_ENABLE;
-    } else {
-        TIMx->TCR &= ~TIM_ENABLE;
-    }
+    TIMx->TCR |= 1UL;
+}
+
+void TIM_Disable(LPC_TIM_TypeDef* TIMx) {
+    CHECK_PARAM(PARAM_TIMx(TIMx));
+
+    TIMx->TCR &= ~1UL;
+}
+
+uint32_t TIM_ReadTimer(LPC_TIM_TypeDef* TIMx) {
+    CHECK_PARAM(PARAM_TIMx(TIMx));
+
+    return TIMx->TC;
+}
+
+uint32_t TIM_ReadPrescale(LPC_TIM_TypeDef* TIMx) {
+    CHECK_PARAM(PARAM_TIMx(TIMx));
+
+    return TIMx->PC;
 }
 
 void TIM_ResetCounter(LPC_TIM_TypeDef* TIMx) {
@@ -211,98 +223,71 @@ void TIM_ResetCounter(LPC_TIM_TypeDef* TIMx) {
     TIMx->TCR &= ~TIM_RESET;
 }
 
-void TIM_ConfigMatch(LPC_TIM_TypeDef* TIMx, const TIM_MATCHCFG_Type* matchCfg) {
+void TIM_ConfigMatch(LPC_TIM_TypeDef* TIMx, const TIM_MATCHCFG_T* matchCfg) {
     CHECK_PARAM(PARAM_TIMx(TIMx));
-    CHECK_PARAM(PARAM_TIM_MATCH_CHANNEL(matchCfg->matchChannel));
-    CHECK_PARAM(PARAM_FUNCTIONALSTATE(matchCfg->intOnMatch));
-    CHECK_PARAM(PARAM_FUNCTIONALSTATE(matchCfg->stopOnMatch));
-    CHECK_PARAM(PARAM_FUNCTIONALSTATE(matchCfg->resetOnMatch));
-    CHECK_PARAM(PARAM_TIM_EXTMATCH_OPT(matchCfg->extMatchOutputType));
+    CHECK_PARAM(PARAM_TIM_MATCH_CH(matchCfg->channel));
+    CHECK_PARAM(PARAM_FUNCTIONALSTATE(matchCfg->intEn));
+    CHECK_PARAM(PARAM_FUNCTIONALSTATE(matchCfg->stopEn));
+    CHECK_PARAM(PARAM_FUNCTIONALSTATE(matchCfg->resetEn));
+    CHECK_PARAM(PARAM_TIM_EXTMATCH_OPT(matchCfg->extOpt));
 
-    TIMx->IR |= TIM_IR_CLR(matchCfg->matchChannel);
+    TIM_UpdateMatchValue(TIMx, matchCfg->channel, matchCfg->matchValue);
 
-    switch (matchCfg->matchChannel) {
-        case 0: TIMx->MR0 = matchCfg->matchValue; break;
-        case 1: TIMx->MR1 = matchCfg->matchValue; break;
-        case 2: TIMx->MR2 = matchCfg->matchValue; break;
-        case 3: TIMx->MR3 = matchCfg->matchValue; break;
-        default: return;
-    }
+    TIMx->MCR &= ~TIM_MCR_CHANNEL_MASKBIT(matchCfg->channel);
 
-    TIMx->MCR &= ~TIM_MCR_CHANNEL_MASKBIT(matchCfg->matchChannel);
+    const uint32_t mcrMask = matchCfg->intEn | matchCfg->resetEn << 1 | matchCfg->stopEn << 2;
+    TIMx->MCR &= ~TIM_MCR_CHANNEL_MASKBIT(matchCfg->channel);
+    TIMx->MCR |= mcrMask << (matchCfg->channel * 3);
 
-    if (matchCfg->intOnMatch) {
-        TIMx->MCR |= TIM_INT_ON_MATCH(matchCfg->matchChannel);
-    }
-
-    if (matchCfg->resetOnMatch) {
-        TIMx->MCR |= TIM_RESET_ON_MATCH(matchCfg->matchChannel);
-    }
-
-    if (matchCfg->stopOnMatch) {
-        TIMx->MCR |= TIM_STOP_ON_MATCH(matchCfg->matchChannel);
-    }
-
-    TIMx->EMR &= ~TIM_EMR_MASK(matchCfg->matchChannel);
-    TIMx->EMR |= TIM_EM_SET(matchCfg->matchChannel, matchCfg->extMatchOutputType);
+    TIM_SetMatchExt(TIMx, matchCfg->channel, matchCfg->extOpt);
 }
 
-void TIM_UpdateMatchValue(LPC_TIM_TypeDef* TIMx, TIM_MATCH_CHANNEL channel, uint32_t matchValue) {
+void TIM_UpdateMatchValue(LPC_TIM_TypeDef* TIMx, TIM_MATCH_CH channel, uint32_t matchValue) {
     CHECK_PARAM(PARAM_TIMx(TIMx));
-    CHECK_PARAM(PARAM_TIM_MATCH_CHANNEL(channel));
+    CHECK_PARAM(PARAM_TIM_MATCH_CH(channel));
 
-    switch (channel) {
-        case 0: TIMx->MR0 = matchValue; break;
-        case 1: TIMx->MR1 = matchValue; break;
-        case 2: TIMx->MR2 = matchValue; break;
-        case 3: TIMx->MR3 = matchValue; break;
-        default: break;
-    }
+    TIMx->IR = TIM_IR_CLR(channel);
+
+    volatile uint32_t* mReg = &TIMx->MR0;
+    mReg[channel]           = matchValue;
 }
 
-void TIM_SetMatchExt(LPC_TIM_TypeDef* TIMx, TIM_MATCH_CHANNEL channel, TIM_EXTMATCH_OPT type) {
+void TIM_SetMatchExt(LPC_TIM_TypeDef* TIMx, TIM_MATCH_CH channel, TIM_EXTMATCH_OPT type) {
     CHECK_PARAM(PARAM_TIMx(TIMx));
-    CHECK_PARAM(PARAM_TIM_MATCH_CHANNEL(channel));
+    CHECK_PARAM(PARAM_TIM_MATCH_CH(channel));
     CHECK_PARAM(PARAM_TIM_EXTMATCH_OPT(type));
 
     TIMx->EMR &= ~TIM_EMR_MASK(channel);
     TIMx->EMR |= TIM_EM_SET(channel, type);
 }
 
-void TIM_ConfigCapture(LPC_TIM_TypeDef* TIMx, const TIM_CAPTURECFG_Type* capCfg) {
+void TIM_ConfigCapture(LPC_TIM_TypeDef* TIMx, const TIM_CAPTURECFG_T* capCfg) {
     CHECK_PARAM(PARAM_TIMx(TIMx));
-    CHECK_PARAM(PARAM_TIM_CAPTURE_CHANNEL(capCfg->captureChannel));
-    CHECK_PARAM(PARAM_FUNCTIONALSTATE(capCfg->risingEdge));
-    CHECK_PARAM(PARAM_FUNCTIONALSTATE(capCfg->fallingEdge));
-    CHECK_PARAM(PARAM_FUNCTIONALSTATE(capCfg->intOnCapture));
+    CHECK_PARAM(PARAM_TIM_CAPTURE_CH(capCfg->channel));
+    CHECK_PARAM(PARAM_FUNCTIONALSTATE(capCfg->risingEn));
+    CHECK_PARAM(PARAM_FUNCTIONALSTATE(capCfg->fallingEn));
+    CHECK_PARAM(PARAM_FUNCTIONALSTATE(capCfg->intEn));
 
-    TIMx->CCR &= ~TIM_CCR_CHANNEL_MASKBIT(capCfg->captureChannel);
+    TIMx->CCR &= ~TIM_CCR_CHANNEL_MASKBIT(capCfg->channel);
 
-    if (capCfg->risingEdge) {
-        TIMx->CCR |= TIM_CAP_RISING(capCfg->captureChannel);
-    }
-
-    if (capCfg->fallingEdge) {
-        TIMx->CCR |= TIM_CAP_FALLING(capCfg->captureChannel);
-    }
-
-    if (capCfg->intOnCapture) {
-        TIMx->CCR |= TIM_INT_ON_CAP(capCfg->captureChannel);
-    }
+    const uint32_t capMask = capCfg->risingEn | capCfg->fallingEn << 1 | capCfg->intEn << 2;
+    TIMx->CCR &= ~TIM_CCR_CHANNEL_MASKBIT(capCfg->channel);
+    TIMx->CCR |= capMask << (capCfg->channel * 3);
 }
 
-uint32_t TIM_GetCaptureValue(LPC_TIM_TypeDef* TIMx, TIM_CAPTURE_CHANNEL channel) {
+uint32_t TIM_GetCaptureValue(LPC_TIM_TypeDef* TIMx, TIM_CAPTURE_CH channel) {
     CHECK_PARAM(PARAM_TIMx(TIMx));
-    CHECK_PARAM(PARAM_TIM_CAPTURE_CHANNEL(channel));
+    CHECK_PARAM(PARAM_TIM_CAPTURE_CH(channel));
 
-    return (channel == 0) ? TIMx->CR0 : TIMx->CR1;
+    volatile const uint32_t* pCR = &TIMx->CR0;
+    return pCR[channel];
 }
 
 void TIM_ClearIntPending(LPC_TIM_TypeDef* TIMx, TIM_INT intFlag) {
     CHECK_PARAM(PARAM_TIMx(TIMx));
     CHECK_PARAM(PARAM_TIM_INT(intFlag));
 
-    TIMx->IR |= TIM_IR_CLR(intFlag);
+    TIMx->IR = TIM_IR_CLR(intFlag);
 }
 
 FlagStatus TIM_GetIntStatus(LPC_TIM_TypeDef* TIMx, TIM_INT intFlag) {
@@ -312,31 +297,21 @@ FlagStatus TIM_GetIntStatus(LPC_TIM_TypeDef* TIMx, TIM_INT intFlag) {
     return ((TIMx->IR & TIM_IR_CLR(intFlag)) ? SET : RESET);
 }
 
-void PWM_PinConfig(TIM_PIN_OPTION option) {
+void TIM_PinConfig(TIM_PIN_OPTION option) {
     CHECK_PARAM(PARAM_TIM_PIN_OPTION(option));
 
-    static const PINSEL_CFG_Type PinCfg[22] = {{PINSEL_PORT_1, PINSEL_PIN_26, PINSEL_FUNC_3, PINSEL_TRISTATE},
-                                               {PINSEL_PORT_1, PINSEL_PIN_27, PINSEL_FUNC_3, PINSEL_TRISTATE},
-                                               {PINSEL_PORT_1, PINSEL_PIN_28, PINSEL_FUNC_3, PINSEL_TRISTATE},
-                                               {PINSEL_PORT_3, PINSEL_PIN_25, PINSEL_FUNC_2, PINSEL_TRISTATE},
-                                               {PINSEL_PORT_1, PINSEL_PIN_29, PINSEL_FUNC_3, PINSEL_TRISTATE},
-                                               {PINSEL_PORT_3, PINSEL_PIN_26, PINSEL_FUNC_2, PINSEL_TRISTATE},
-                                               {PINSEL_PORT_1, PINSEL_PIN_18, PINSEL_FUNC_3, PINSEL_TRISTATE},
-                                               {PINSEL_PORT_1, PINSEL_PIN_19, PINSEL_FUNC_3, PINSEL_TRISTATE},
-                                               {PINSEL_PORT_1, PINSEL_PIN_22, PINSEL_FUNC_3, PINSEL_TRISTATE},
-                                               {PINSEL_PORT_1, PINSEL_PIN_25, PINSEL_FUNC_3, PINSEL_TRISTATE},
-                                               {PINSEL_PORT_0, PINSEL_PIN_4, PINSEL_FUNC_3, PINSEL_TRISTATE},
-                                               {PINSEL_PORT_0, PINSEL_PIN_5, PINSEL_FUNC_3, PINSEL_TRISTATE},
-                                               {PINSEL_PORT_0, PINSEL_PIN_6, PINSEL_FUNC_3, PINSEL_TRISTATE},
-                                               {PINSEL_PORT_4, PINSEL_PIN_28, PINSEL_FUNC_2, PINSEL_TRISTATE},
-                                               {PINSEL_PORT_0, PINSEL_PIN_7, PINSEL_FUNC_3, PINSEL_TRISTATE},
-                                               {PINSEL_PORT_4, PINSEL_PIN_29, PINSEL_FUNC_2, PINSEL_TRISTATE},
-                                               {PINSEL_PORT_0, PINSEL_PIN_8, PINSEL_FUNC_3, PINSEL_TRISTATE},
-                                               {PINSEL_PORT_0, PINSEL_PIN_9, PINSEL_FUNC_3, PINSEL_TRISTATE},
-                                               {PINSEL_PORT_0, PINSEL_PIN_23, PINSEL_FUNC_3, PINSEL_TRISTATE},
-                                               {PINSEL_PORT_0, PINSEL_PIN_24, PINSEL_FUNC_3, PINSEL_TRISTATE},
-                                               {PINSEL_PORT_0, PINSEL_PIN_10, PINSEL_FUNC_3, PINSEL_TRISTATE},
-                                               {PINSEL_PORT_0, PINSEL_PIN_11, PINSEL_FUNC_3, PINSEL_TRISTATE}};
+    static const PINSEL_CFG_T PinCfg[22] = {
+        {PORT_1, PIN_26, PINSEL_FUNC_11, PINSEL_TRISTATE}, {PORT_1, PIN_27, PINSEL_FUNC_11, PINSEL_TRISTATE},
+        {PORT_1, PIN_28, PINSEL_FUNC_11, PINSEL_TRISTATE}, {PORT_3, PIN_25, PINSEL_FUNC_10, PINSEL_TRISTATE},
+        {PORT_1, PIN_29, PINSEL_FUNC_11, PINSEL_TRISTATE}, {PORT_3, PIN_26, PINSEL_FUNC_10, PINSEL_TRISTATE},
+        {PORT_1, PIN_18, PINSEL_FUNC_11, PINSEL_TRISTATE}, {PORT_1, PIN_19, PINSEL_FUNC_11, PINSEL_TRISTATE},
+        {PORT_1, PIN_22, PINSEL_FUNC_11, PINSEL_TRISTATE}, {PORT_1, PIN_25, PINSEL_FUNC_11, PINSEL_TRISTATE},
+        {PORT_0, PIN_4, PINSEL_FUNC_11, PINSEL_TRISTATE},  {PORT_0, PIN_5, PINSEL_FUNC_11, PINSEL_TRISTATE},
+        {PORT_0, PIN_6, PINSEL_FUNC_11, PINSEL_TRISTATE},  {PORT_4, PIN_28, PINSEL_FUNC_10, PINSEL_TRISTATE},
+        {PORT_0, PIN_7, PINSEL_FUNC_11, PINSEL_TRISTATE},  {PORT_4, PIN_29, PINSEL_FUNC_10, PINSEL_TRISTATE},
+        {PORT_0, PIN_8, PINSEL_FUNC_11, PINSEL_TRISTATE},  {PORT_0, PIN_9, PINSEL_FUNC_11, PINSEL_TRISTATE},
+        {PORT_0, PIN_23, PINSEL_FUNC_11, PINSEL_TRISTATE}, {PORT_0, PIN_24, PINSEL_FUNC_11, PINSEL_TRISTATE},
+        {PORT_0, PIN_10, PINSEL_FUNC_11, PINSEL_TRISTATE}, {PORT_0, PIN_11, PINSEL_FUNC_11, PINSEL_TRISTATE}};
 
     PINSEL_ConfigPin(&PinCfg[option]);
 }
