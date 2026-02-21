@@ -18,7 +18,7 @@
  * use without further testing or modification.
  *
  * @par Refactor:
- * Date: 25/07/2025, Author: David Trujillo Medina
+ * Last update: 20/02/2025, Author: David Trujillo Medina
  */
 
 /* ---------------------------- Peripheral group ---------------------------- */
@@ -114,7 +114,7 @@ typedef struct {
                                  - EXTI_FALLING_EDGE
                                  - EXTI_HIGH_ACTIVE
                                  - EXTI_RISING_EDGE */
-} EXTI_CFG_Type;
+} EXTI_CFG_T;
 
 /**
  * @}
@@ -162,7 +162,7 @@ void EXTI_PinConfig(EXTI_LINE line, EXTI_RESISTOR resMode);
  * @param[in]   extiCfg  Pointer to an EXTI_CFG_Type structure containing the configuration
  *                       information for the specified external interrupt line.
  */
-void EXTI_Config(const EXTI_CFG_Type* extiCfg);
+void EXTI_Config(const EXTI_CFG_T* extiCfg);
 
 /**
  * @brief       Configures and enables a specific External Interrupt (EXTI) line.
@@ -177,7 +177,7 @@ void EXTI_Config(const EXTI_CFG_Type* extiCfg);
  * @param[in]   extiCfg  Pointer to an EXTI_CFG_Type structure containing the configuration
  *                       information for the specified external interrupt line.
  */
-void EXTI_ConfigEnable(const EXTI_CFG_Type* extiCfg);
+void EXTI_ConfigEnable(const EXTI_CFG_T* extiCfg);
 
 /**
  * @brief       Clears the external interrupt flag for the specified EXTI line.

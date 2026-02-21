@@ -17,7 +17,7 @@
  * use without further testing or modification.
  *
  * @par Refactor:
- * Date: 25/07/2025, Author: David Trujillo Medina
+ * Last update: 20/02/2025, Author: David Trujillo Medina
  */
 
 /* ---------------------------- Peripheral group ---------------------------- */
@@ -115,7 +115,7 @@ void EXTI_PinConfig(EXTI_LINE line, EXTI_RESISTOR resMode) {
     }
 }
 
-void EXTI_Config(const EXTI_CFG_Type* extiCfg) {
+void EXTI_Config(const EXTI_CFG_T* extiCfg) {
     CHECK_PARAM(PARAM_EXTI_LINE(extiCfg->line));
     CHECK_PARAM(PARAM_EXTI_MODE(extiCfg->mode));
     CHECK_PARAM(PARAM_EXTI_POLARITY(extiCfg->polarity));
@@ -126,7 +126,7 @@ void EXTI_Config(const EXTI_CFG_Type* extiCfg) {
     EXTI_SetPolarity(extiCfg->line, extiCfg->polarity);
 }
 
-void EXTI_ConfigEnable(const EXTI_CFG_Type* extiCfg) {
+void EXTI_ConfigEnable(const EXTI_CFG_T* extiCfg) {
     CHECK_PARAM(PARAM_EXTI_LINE(extiCfg->line));
     CHECK_PARAM(PARAM_EXTI_MODE(extiCfg->mode));
     CHECK_PARAM(PARAM_EXTI_POLARITY(extiCfg->polarity));
