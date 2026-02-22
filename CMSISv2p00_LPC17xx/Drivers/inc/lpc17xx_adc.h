@@ -18,7 +18,7 @@
  * use without further testing or modification.
  *
  * @par Refactor:
- * Date: 08/08/2025, Author: David Trujillo Medina
+ * Last update: 22/02/2025, Author: David Trujillo Medina
  */
 
 /* ---------------------------- Peripheral group ---------------------------- */
@@ -151,6 +151,23 @@ typedef enum {
 #define PARAM_ADC_CHANNEL(SEL) ((SEL) >= ADC_CHANNEL_0 && (SEL) <= ADC_CHANNEL_7)
 
 /**
+ * @brief ADC interrupt source selection.
+ */
+typedef enum {
+    ADC_INT_CH0 = 0,
+    ADC_INT_CH1,
+    ADC_INT_CH2,
+    ADC_INT_CH3,
+    ADC_INT_CH4,
+    ADC_INT_CH5,
+    ADC_INT_CH6,
+    ADC_INT_CH7,
+    ADC_INT_GLOBAL
+} ADC_INT_SOURCE;
+/** Check ADC interrupt source selection parameter. */
+#define PARAM_ADC_INT_SOURCE(SEL) ((SEL) >= ADC_INT_CH0 && (SEL) <= ADC_INT_GLOBAL)
+
+/**
  * @brief ADC start option.
  */
 typedef enum {
@@ -235,35 +252,48 @@ void ADC_DeInit(void);
 void ADC_PinConfig(ADC_CHANNEL channel);
 
 /**
- * @brief      Enables or disables ADC burst mode.
+ * @brief      Enables burst mode for ADC conversions.
  *
- * This function sets or clears the burst mode bit in the ADC control register.
+ * This function sets the burst mode bit in the ADC control register, starting continuous conversions.
  *
- * @param[in]  newState  Functional state:
- *                       - ENABLE  : Enable burst mode.
- *                       - DISABLE : Disable burst mode.
  * @note:
  * - START bits must be 000 before enabling burst mode.
- * - Enabling burst mode starts conversions immediately.
- * - Disabling burst mode stops conversions.
+ * - ADGINTEN bit must be disabled for burst mode operation.
+ * - Burst mode starts conversions immediately.
  */
-void ADC_BurstCmd(FunctionalState newState);
+void ADC_BurstEnable(void);
 
 /**
- * @brief      Powers up or powers down the ADC.
+ * @brief      Disables burst mode for ADC conversions.
  *
- * This function sets or clears the power-down bit in the ADC control register.
+ * This function clears the burst mode bit in the ADC control register, stopping continuous conversions.
  *
- * @param[in]  newState  Functional state:
- *                       - ENABLE  : Power up ADC.
- *                       - DISABLE : Power down ADC.
  * @note:
- * - Disables the ADC power.
- * - Does not disable the ADC clock.
- * - Enable after enabling the ADC clock.
- * - Disable before disabling the ADC clock.
+ * - Disabling burst mode stops conversions.
  */
-void ADC_PowerdownCmd(FunctionalState newState);
+void ADC_BurstDisable(void);
+
+/**
+ * @brief      Powers up the ADC.
+ *
+ * This function sets the power-down bit in the ADC control register to power up the ADC.
+ *
+ * @note:
+ * - Enable only after enabling the ADC clock.
+ * - Does not enable the ADC clock.
+ */
+void ADC_PowerUp(void);
+
+/**
+ * @brief      Powers down the ADC.
+ *
+ * This function clears the power-down bit in the ADC control register to power down the ADC.
+ *
+ * @note:
+ * - Disable before disabling the ADC clock.
+ * - Does not disable the ADC clock.
+ */
+void ADC_PowerDown(void);
 
 /**
  * @brief      Starts ADC conversion in the specified mode.
@@ -283,17 +313,24 @@ void ADC_PowerdownCmd(FunctionalState newState);
 void ADC_StartCmd(ADC_START_MODE mode);
 
 /**
- * @brief      Enables or disables the specified ADC channel.
+ * @brief      Enables the specified ADC channel for conversion.
  *
- * This function sets or clears the channel select bit in the ADC control register.
+ * This function sets the channel select bit in the ADC control register to enable the channel for conversion.
  *
- * @param[in]  channel    ADC channel to configure:
- *                        - ADC_CHANNEL_x [0...7]
- * @param[in]  newState   Functional state:
- *                        - ENABLE  : Enable channel.
- *                        - DISABLE : Disable channel.
+ * @param[in]  channel  ADC channel to enable:
+ *                      - ADC_CHANNEL_x [0...7]
  */
-void ADC_ChannelCmd(ADC_CHANNEL channel, FunctionalState newState);
+void ADC_ChannelEnable(ADC_CHANNEL channel);
+
+/**
+ * @brief      Disables the specified ADC channel for conversion.
+ *
+ * This function clears the channel select bit in the ADC control register to disable the channel for conversion.
+ *
+ * @param[in]  channel  ADC channel to disable:
+ *                      - ADC_CHANNEL_x [0...7]
+ */
+void ADC_ChannelDisable(ADC_CHANNEL channel);
 
 /**
  * @brief      Configures the edge for ADC start on external signal.
@@ -309,21 +346,29 @@ void ADC_ChannelCmd(ADC_CHANNEL channel, FunctionalState newState);
 void ADC_EdgeStartConfig(ADC_START_ON_EDGE edge);
 
 /**
- * @brief      Enables or disables ADC interrupt for the specified type.
+ * @brief      Enables ADC interrupt for the specified channel.
  *
- * This function sets or clears the interrupt enable bit for the given channel or global interrupt.
+ * This function sets the interrupt enable bit for the given channel or global interrupt.
  *
- * @param[in]  channel   ADC interrupt type:
- *                       - ADC_ADINTENx [0...7]
- *                       - ADC_ADGINTEN
- * @param[in]  newState  Functional state:
- *                       - ENABLE  : Enable interrupt.
- *                       - DISABLE : Disable interrupt.
+ * @param[in]  source   ADC channel:
+ *                      - ADC_INT_CHx [0...7]
+ *                      - ADC_ADGINTEN
  * @note:
  * - If ADC_ADGINTEN is selected, only the global DONE flag is enabled to generate an interrupt.
- * - ADC_ADGINTEN must be disabled for burst mode operation.
+ * - Do not enable ADC_ADGINTEN if burst mode is enabled.
  */
-void ADC_IntConfig(ADC_CHANNEL channel, FunctionalState newState);
+void ADC_IntEnable(ADC_INT_SOURCE source);
+
+/**
+ * @brief      Disables ADC interrupt for the specified channel.
+ *
+ * This function clears the interrupt enable bit for the given channel or global interrupt.
+ *
+ * @param[in]  source   ADC channel:
+ *                      - ADC_INT_CHx [0...7]
+ *                      - ADC_ADGINTEN
+ */
+void ADC_IntDisable(ADC_INT_SOURCE source);
 
 /**
  * @brief      Gets the global ADC status flag.
@@ -366,7 +411,7 @@ FlagStatus ADC_ChannelGetStatus(ADC_CHANNEL channel, ADC_DATA_STATUS type);
  * @note:
  * - The returned value is right-aligned to bits [11:0].
  */
-uint32_t ADC_GlobalGetData(void);
+uint16_t ADC_GlobalGetData(void);
 
 /**
  * @brief      Gets the conversion result for the specified ADC channel.
