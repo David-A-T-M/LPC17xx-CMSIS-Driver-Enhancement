@@ -17,7 +17,7 @@
  * use without further testing or modification.
  *
  * @par Refactor:
- * Date: 11/08/2025, Author: David Trujillo Medina
+ * Last update: 22/02/2025, Author: David Trujillo Medina
  */
 
 /* ---------------------------- Peripheral group ---------------------------- */
@@ -47,8 +47,8 @@
  */
 
 void DAC_Init(void) {
-    LPC_PINCON->PINSEL1 &= ~(0x3 << 20);
-    LPC_PINCON->PINSEL1 |= (0x1 << 21);
+    LPC_PINCON->PINSEL1  = (LPC_PINCON->PINSEL1 & ~(0x3 << 20)) | (0x2 << 20);
+    LPC_PINCON->PINMODE1 = (LPC_PINCON->PINMODE1 & ~(0x3 << 20)) | (0x2 << 20);
 
     CLKPWR_SetPCLKDiv(CLKPWR_PCLKSEL_DAC, CLKPWR_PCLKSEL_CCLK_DIV_4);
 
@@ -56,39 +56,26 @@ void DAC_Init(void) {
 }
 
 void DAC_UpdateValue(uint32_t newValue) {
-    LPC_DAC->DACR &= ~DAC_VALUE(0x3FF);
-    LPC_DAC->DACR |= DAC_VALUE(newValue);
+    LPC_DAC->DACR = (LPC_DAC->DACR & ~(0x3FF << 6)) | ((newValue & 0x3FF) << 6);
 }
 
 void DAC_SetBias(DAC_MAX_CURRENT maxCurr) {
     CHECK_PARAM(PARAM_DAC_MAX_CURRENT(maxCurr));
 
-    LPC_DAC->DACR &= ~DAC_BIAS_EN;
-
-    if (maxCurr == DAC_350uA) {
-        LPC_DAC->DACR |= DAC_BIAS_EN;
-    }
+    LPC_DAC->DACR = (LPC_DAC->DACR & ~DAC_BIAS_EN) | (maxCurr == DAC_350uA ? DAC_BIAS_EN : 0);
 }
 
-void DAC_ConfigDAConverterControl(const DAC_CONVERTER_CFG_Type* dacCfg) {
+void DAC_ConfigDAConverterControl(const DAC_CONVERTER_CFG_T* dacCfg) {
     CHECK_PARAM(PARAM_FUNCTIONALSTATE(dacCfg->doubleBufferEnable));
     CHECK_PARAM(PARAM_FUNCTIONALSTATE(dacCfg->counterEnable));
     CHECK_PARAM(PARAM_FUNCTIONALSTATE(dacCfg->dmaEnable));
 
-    LPC_DAC->DACCTRL &= ~DAC_DACCTRL_MASK;
-
-    if (dacCfg->doubleBufferEnable) {
-        LPC_DAC->DACCTRL |= DAC_DBLBUF_ENA;
-    }
-    if (dacCfg->counterEnable) {
-        LPC_DAC->DACCTRL |= DAC_CNT_ENA;
-    }
-    if (dacCfg->dmaEnable) {
-        LPC_DAC->DACCTRL |= DAC_DMA_ENA;
-    }
+    const uint32_t ctrl = (dacCfg->doubleBufferEnable ? DAC_DBLBUF_ENA : 0) |
+                          (dacCfg->counterEnable ? DAC_CNT_ENA : 0) | (dacCfg->dmaEnable ? DAC_DMA_ENA : 0);
+    LPC_DAC->DACCTRL = ctrl;
 }
 
-void DAC_SetDMATimeOut(uint32_t timeOut) {
+void DAC_SetDMATimeOut(uint16_t timeOut) {
     LPC_DAC->DACCNTVAL = DAC_CCNT_VALUE(timeOut);
 }
 
