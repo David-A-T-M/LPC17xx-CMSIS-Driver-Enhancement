@@ -8,6 +8,7 @@ void run_all_tests(void) {
     SYSTICK_RunTests();
     EXTI_RunTests();
     TIMER_RunTests();
+    PWM_RunTests();
     ADC_RunTests();
 }
 
