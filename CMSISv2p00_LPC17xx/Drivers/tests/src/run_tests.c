@@ -10,6 +10,7 @@ void run_all_tests(void) {
     TIMER_RunTests();
     PWM_RunTests();
     ADC_RunTests();
+    DAC_RunTests();
 }
 
 #endif //UNIT_TESTING_ENABLED
