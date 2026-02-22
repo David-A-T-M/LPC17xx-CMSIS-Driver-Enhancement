@@ -23,7 +23,7 @@ static uint8_t ADC_ChannelGetDataTest(void);
 
 void ADC_Setup(void) {
     ADC_Init(200000);
-    ADC_ChannelCmd(ADC_CHANNEL_0, ENABLE);
+    ADC_ChannelEnable(ADC_CHANNEL_0);
 }
 
 void ADC_TearDown(void) {
@@ -58,7 +58,7 @@ static uint8_t ADC_InitTest(void) {
     TEST_INIT();
 
     ADC_Init(200000);
-    EXPECT_EQUAL(LPC_ADC->ADCR, 0x00200000);
+    EXPECT_EQUAL(LPC_ADC->ADCR, 0x1 << 21 | 0x1 << 8);
     EXPECT_EQUAL(LPC_SC->PCONP & (0x1 << 12), (0x1 << 12));
 
     ASSERT_TEST();
@@ -78,8 +78,11 @@ static uint8_t ADC_BurstCmdTest(void) {
     ADC_Setup();
     TEST_INIT();
 
-    ADC_BurstCmd(ENABLE);
+    ADC_BurstEnable();
     EXPECT_EQUAL(LPC_ADC->ADCR & ADC_CR_BURST, ADC_CR_BURST);
+
+    ADC_BurstDisable();
+    EXPECT_EQUAL(LPC_ADC->ADCR & ADC_CR_BURST, 0x0);
 
     ASSERT_TEST();
 }
@@ -88,9 +91,10 @@ static uint8_t ADC_PowerdownCmdTest(void) {
     ADC_Setup();
     TEST_INIT();
 
-    ADC_PowerdownCmd(ENABLE);
+    ADC_PowerUp();
     EXPECT_EQUAL(LPC_ADC->ADCR & ADC_CR_PDN, ADC_CR_PDN);
-    ADC_PowerdownCmd(DISABLE);
+
+    ADC_PowerDown();
     EXPECT_EQUAL(LPC_ADC->ADCR & ADC_CR_PDN, 0x0);
 
     ASSERT_TEST();
@@ -102,8 +106,10 @@ static uint8_t ADC_StartCmdTest(void) {
 
     ADC_StartCmd(ADC_START_NOW);
     EXPECT_EQUAL(LPC_ADC->ADCR & ADC_CR_START_MASK, ADC_CR_START_NOW);
+
     ADC_StartCmd(ADC_START_ON_EINT0);
     EXPECT_EQUAL(LPC_ADC->ADCR & ADC_CR_START_MASK, ADC_CR_START_EINT0);
+
     ADC_StartCmd(ADC_START_CONTINUOUS);
     EXPECT_EQUAL(LPC_ADC->ADCR & ADC_CR_START_MASK, 0x0);
 
@@ -114,9 +120,10 @@ static uint8_t ADC_ChannelCmdTest(void) {
     ADC_Setup();
     TEST_INIT();
 
-    ADC_ChannelCmd(ADC_CHANNEL_1, ENABLE);
+    ADC_ChannelEnable(ADC_CHANNEL_1);
     EXPECT_EQUAL(LPC_ADC->ADCR & ADC_CR_CH_SEL(1), ADC_CR_CH_SEL(1));
-    ADC_ChannelCmd(ADC_CHANNEL_1, DISABLE);
+
+    ADC_ChannelDisable(ADC_CHANNEL_1);
     EXPECT_EQUAL(LPC_ADC->ADCR & ADC_CR_CH_SEL(1), 0x0);
 
     ASSERT_TEST();
@@ -128,6 +135,7 @@ static uint8_t ADC_EdgeStartConfigTest(void) {
 
     ADC_EdgeStartConfig(ADC_START_ON_FALLING);
     EXPECT_EQUAL(LPC_ADC->ADCR & ADC_CR_EDGE, ADC_CR_EDGE);
+
     ADC_EdgeStartConfig(ADC_START_ON_RISING);
     EXPECT_EQUAL(LPC_ADC->ADCR & ADC_CR_EDGE, 0x0);
 
@@ -138,10 +146,14 @@ static uint8_t ADC_IntConfigTest(void) {
     ADC_Setup();
     TEST_INIT();
 
-    ADC_IntConfig(ADC_ADINTEN0, ENABLE);
+    ADC_IntEnable(ADC_INT_CH0);
     EXPECT_EQUAL(LPC_ADC->ADINTEN & ADC_INTEN_CH(0), ADC_INTEN_CH(0));
-    ADC_IntConfig(ADC_ADINTEN0, DISABLE);
+
+    ADC_IntDisable(ADC_INT_CH0);
     EXPECT_EQUAL(LPC_ADC->ADINTEN & ADC_INTEN_CH(0), 0x0);
+
+    ADC_IntEnable(ADC_INT_GLOBAL);
+    EXPECT_EQUAL(LPC_ADC->ADINTEN & ADC_INTEN_CH(8), ADC_INTEN_CH(8));
 
     ASSERT_TEST();
 }
