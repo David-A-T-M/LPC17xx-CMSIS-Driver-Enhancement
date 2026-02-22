@@ -43,7 +43,7 @@ robust, production-ready foundation for embedded development on the LPC17xx plat
 | `SysTick` | ✅ Completed | ✅ Completed | ✅ Completed |
 | `Timer`   | ✅ Completed | ✅ Completed | ✅ Completed |
 | `PWM`     | ✅ Completed | ✅ Completed | ✅ Completed |
-| `ADC`     | 🔲 Planned  | 🔲 Planned  | 🔲 Planned  |
+| `ADC`     | ✅ Completed | ✅ Completed | ✅ Completed |
 | `DAC`     | 🔲 Planned  | 🔲 Planned  | 🔲 Planned  |
 | `GPDMA`   | 🔲 Planned  | 🔲 Planned  | 🔲 Planned  |
 | `UART_X`  | 🔲 Planned  | 🔲 Planned  | 🔲 Planned  |
