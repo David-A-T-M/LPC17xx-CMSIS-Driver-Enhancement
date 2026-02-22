@@ -44,7 +44,7 @@ robust, production-ready foundation for embedded development on the LPC17xx plat
 | `Timer`   | ✅ Completed | ✅ Completed | ✅ Completed |
 | `PWM`     | ✅ Completed | ✅ Completed | ✅ Completed |
 | `ADC`     | ✅ Completed | ✅ Completed | ✅ Completed |
-| `DAC`     | 🔲 Planned  | 🔲 Planned  | 🔲 Planned  |
+| `DAC`     | ✅ Completed | ✅ Completed | ✅ Completed |
 | `GPDMA`   | 🔲 Planned  | 🔲 Planned  | 🔲 Planned  |
 | `UART_X`  | 🔲 Planned  | 🔲 Planned  | 🔲 Planned  |
 | `UART_1`  | 🔲 Planned  | 🔲 Planned  | 🔲 Planned  |
