@@ -42,12 +42,12 @@ robust, production-ready foundation for embedded development on the LPC17xx plat
 | `EINT`    | ✅ Completed | ✅ Completed | ✅ Completed |
 | `SysTick` | ✅ Completed | ✅ Completed | ✅ Completed |
 | `Timer`   | ✅ Completed | ✅ Completed | ✅ Completed |
+| `PWM`     | ✅ Completed | ✅ Completed | ✅ Completed |
 | `ADC`     | 🔲 Planned  | 🔲 Planned  | 🔲 Planned  |
 | `DAC`     | 🔲 Planned  | 🔲 Planned  | 🔲 Planned  |
 | `GPDMA`   | 🔲 Planned  | 🔲 Planned  | 🔲 Planned  |
 | `UART_X`  | 🔲 Planned  | 🔲 Planned  | 🔲 Planned  |
 | `UART_1`  | 🔲 Planned  | 🔲 Planned  | 🔲 Planned  |
-| `PWM`     | 🔲 Planned  | 🔲 Planned  | 🔲 Planned  |
 
 _This table is continuously updated as development progresses._
 
