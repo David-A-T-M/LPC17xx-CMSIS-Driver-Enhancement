@@ -18,7 +18,7 @@
  * use without further testing or modification.
  *
  * @par Refactor:
- * Date: 28/09/2025, Author: David Trujillo Medina
+ * Last update: 28/02/2025, Author: David Trujillo Medina
  */
 
 /* ---------------------------- Peripheral group ---------------------------- */
@@ -106,17 +106,17 @@ extern "C" {
  * @brief GPDMA Channel enumeration.
  */
 typedef enum {
-    GPDMA_CHANNEL_0 = 0,
-    GPDMA_CHANNEL_1,
-    GPDMA_CHANNEL_2,
-    GPDMA_CHANNEL_3,
-    GPDMA_CHANNEL_4,
-    GPDMA_CHANNEL_5,
-    GPDMA_CHANNEL_6,
-    GPDMA_CHANNEL_7
-} GPDMA_CHANNEL;
+    GPDMA_CH_0 = 0,
+    GPDMA_CH_1,
+    GPDMA_CH_2,
+    GPDMA_CH_3,
+    GPDMA_CH_4,
+    GPDMA_CH_5,
+    GPDMA_CH_6,
+    GPDMA_CH_7
+} GPDMA_CH;
 /** Check GPDMA channel option parameter. */
-#define PARAM_GPDMA_CHANNEL(CHANNEL) ((CHANNEL >= GPDMA_CHANNEL_0) && (CHANNEL <= GPDMA_CHANNEL_7))
+#define PARAM_GPDMA_CHANNEL(CH) ((CH >= GPDMA_CH_0) && (CH <= GPDMA_CH_7))
 
 /**
  * @brief GPDMA Connection type enumeration.
@@ -173,10 +173,11 @@ typedef enum {
     GPDMA_BSIZE_32,
     GPDMA_BSIZE_64,
     GPDMA_BSIZE_128,
-    GPDMA_BSIZE_256
+    GPDMA_BSIZE_256,
+    GPDMA_BURST_AUTO
 } GPDMA_BURST_SIZE;
 /** Check GPDMA burst size option parameter. */
-#define PARAM_GPDMA_BURST_SIZE(SIZE) ((SIZE >= GPDMA_BSIZE_1) && (SIZE <= GPDMA_BSIZE_256))
+#define PARAM_GPDMA_BURST_SIZE(SIZE) ((SIZE >= GPDMA_BSIZE_1) && (SIZE <= GPDMA_BURST_AUTO))
 
 /**
  * @brief Transfer width in Source and Destination enumeration.
@@ -184,10 +185,11 @@ typedef enum {
 typedef enum {
     GPDMA_BYTE = 0,
     GPDMA_HALFWORD,
-    GPDMA_WORD
+    GPDMA_WORD,
+    GPDMA_WIDTH_AUTO
 } GPDMA_TRANSFER_WIDTH;
 /** Check GPDMA transfer width option parameter. */
-#define PARAM_GPDMA_TRANSFER_WIDTH(WIDTH) ((WIDTH >= GPDMA_BYTE) && (WIDTH <= GPDMA_WORD))
+#define PARAM_GPDMA_TRANSFER_WIDTH(WIDTH) ((WIDTH >= GPDMA_BYTE) && (WIDTH <= GPDMA_WIDTH_AUTO))
 
 /**
  * @brief GPDMA Request select enumeration.
@@ -224,26 +226,35 @@ typedef enum {
 #define PARAM_GPDMA_CLEAR_INT(TYPE) ((TYPE == GPDMA_CLR_INTTC) || (TYPE == GPDMA_CLR_INTERR))
 
 /**
+ * @brief GPDMA Endpoint configuration structure.
+ */
+typedef struct {
+    GPDMA_TRANSFER_WIDTH width; /**< GPDMA_BYTE, GPDMA_HALFWORD, GPDMA_WORD, GPDMA_WIDTH_AUTO. */
+    GPDMA_BURST_SIZE burst;     /**< PDMA_BSIZE_x [1, 4, 8, 16, 32, 64, 128, 256] or GPDMA_BURST_AUTO. */
+    FunctionalState increment;  /**< ENABLE or DISABLE. */
+} GPDMA_Endpoint_T;
+
+/**
  * @brief GPDMA Channel configuration structure.
  */
 typedef struct {
-    GPDMA_CHANNEL channelNum;           /**< GPDMA_CHANNEL_x [0...7]. */
-    uint32_t transferSize;              /**< Block transfer size (4095 max). */
-    GPDMA_TRANSFER_WIDTH transferWidth; /**< Used only for GPDMA_M2M only. Should be:
-                                            - GPDMA_BYTE: 8-bit transfer.
-                                            - GPDMA_HALFWORD: 16-bit transfer.
-                                            - GPDMA_WORD: 32-bit transfer. */
-    uint32_t srcMemAddr;                /**< Physical source address. Used only if source is memory */
-    uint32_t dstMemAddr;                /**< Physical Destination Address. Used only if destination is memory */
-    GPDMA_TRANSFER_TYPE transferType;   /**< Should be:
-                                            - GPDMA_M2M: Memory to Memory transfer.
-                                            - GPDMA_M2P: Memory to Peripheral transfer.
-                                            - GPDMA_P2M: Peripheral to Memory transfer.
-                                            - GPDMA_P2P: Peripheral to Peripheral transfer. */
-    GPDMA_CONNECTION srcConn;           /**< Source peripheral connection. Used only if source is peripheral. */
-    GPDMA_CONNECTION dstConn; /**< Destination peripheral connection. Used only if destination is peripheral. */
-    uint32_t linkedList;      /**< Linker List Item, otherwise set to '0' */
-} GPDMA_Channel_CFG_Type;
+    GPDMA_CH channelNum;      /**< GPDMA_CH_x [0...7]. */
+    uint32_t transferSize;    /**< Number of transfers (in `src.width` units). Max 4095. */
+    GPDMA_TRANSFER_TYPE type; /**< GPDMA_M2M, GPDMA_M2P, GPDMA_P2M, GPDMA_P2P. */
+
+    uint32_t srcMemAddr;      /**< Memory address. Ignored if source is a peripheral. */
+    uint32_t dstMemAddr;      /**< Memory address. Ignored if destination is a peripheral. */
+    GPDMA_CONNECTION srcConn; /**< Source hardware request. Triggers the DMA to READ from source. */
+    GPDMA_CONNECTION dstConn; /**< Destination hardware request. Triggers the DMA to WRITE to destination. */
+
+    GPDMA_Endpoint_T src; /**< Source transfer configuration (width, burst size, increment). */
+    GPDMA_Endpoint_T dst; /**< Destination transfer configuration (width, burst size, increment). */
+
+    FunctionalState intTC;  /**< Terminal Count Interrupt. ENABLE or DISABLE. */
+    FunctionalState intErr; /**< Error Interrupt. ENABLE or DISABLE. */
+
+    uint32_t linkedList; /**< Address of next LLI for scatter/gather; set to 0 if not used. */
+} GPDMA_Channel_CFG_T;
 
 /**
  * @brief GPDMA Linker List Item structure.
@@ -253,7 +264,7 @@ typedef struct {
     uint32_t dstAddr; /**< Destination address */
     uint32_t nextLLI; /**< Next LLI address, otherwise set to '0' */
     uint32_t control; /**< GPDMA Control of this LLI */
-} GPDMA_LLI_Type;
+} GPDMA_LLI_T;
 
 /**
  * @}
@@ -278,6 +289,14 @@ typedef struct {
  */
 void GPDMA_Init(void);
 
+/** @brief      De-initializes the GPDMA controller.
+ *
+ * This function disables the DMA controller, waits for it to be fully disabled, and then
+ * turns off power to the GPDMA peripheral. After calling this function, the DMA is no longer
+ * operational until it is initialized again.
+ */
+void GPDMA_DeInit(void);
+
 /**
  * @brief      Configures and sets up a GPDMA channel according to the provided configuration.
  *
@@ -295,27 +314,73 @@ void GPDMA_Init(void);
  * - The DMA must be initialized before calling this function.
  * - Only one transfer can be active per channel at a time.
  */
-Status GPDMA_Setup(const GPDMA_Channel_CFG_Type* dmaCfg);
+Status GPDMA_SetupChannel(const GPDMA_Channel_CFG_T* dmaCfg);
 
 /**
- * @brief      Enables or disables the specified GPDMA channel.
+ * @brief      Starts the DMA transfer on the specified channel.
  *
- * This function sets or clears the enable bit in the DMACCConfig register of the given DMA channel,
- * effectively starting or stopping the DMA transfer for that channel.
+ * This function sets the enable bit in the channel configuration register to start the DMA transfer.
  *
- * @param[in]  channel     DMA channel to control (GPDMA_CHANNEL_x [0...7]).
- * @param[in]  newState    Functional state:
- *                         - ENABLE  : Start the DMA channel.
- *                         - DISABLE : Stop the DMA channel.
+ * @param[in]  channel  DMA channel to start (GPDMA_CHANNEL_x [0...7]).
  *
  * @note:
- * - The channel must be properly configured before enabling.
- * - Disabling the channel will halt any ongoing transfer.
- * - Disabling a channel finishes the current AHB transfer, but FIFO data is lost.
- * - Restarting a channel by just setting Enable is not recommended; re-configure the channel.
- * - The channel is also disabled automatically when the last LLI is reached, the transfer completes, or on error.
+ * - The channel must be properly configured before starting.
+ * - Once started, the DMA will perform the transfer according to its configuration.
  */
-void GPDMA_ChannelCmd(GPDMA_CHANNEL channel, FunctionalState newState);
+void GPDMA_ChannelStart(GPDMA_CH channel);
+
+/**
+ * @brief      Stops the DMA transfer on the specified channel immediately.
+ *
+ * This function clears the enable bit in the channel configuration register to stop the DMA transfer.
+ * The ongoing transfer is completed, FIFO data is lost.
+ *
+ * @param[in]  channel  DMA channel to stop (GPDMA_CHANNEL_x [0...7]).
+ *
+ * @note:
+ * - The channel can't be restarted without reconfiguration after being stopped.
+ */
+void GPDMA_ChannelStop(GPDMA_CH channel);
+
+/**
+ * @brief      Stops the DMA transfer on the specified channel gracefully.
+ *
+ * This function clears the enable bit in the channel configuration register to stop the DMA transfer.
+ * The ongoing transfer is completed, FIFO data is transferred.
+ *
+ * @param[in]  channel  DMA channel to stop (GPDMA_CHANNEL_x [0...7]).
+ *
+ * @note:
+ * - The channel can't be restarted without reconfiguration after being stopped.
+ */
+void GPDMA_ChannelGracefulStop(GPDMA_CH channel);
+
+/**
+ * @brief      Pauses the DMA transfer on the specified channel.
+ *
+ * This function sets the halt bit in the channel configuration register to pause the DMA transfer.
+ * The ongoing transfer is paused, FIFO data is retained.
+ *
+ * @param[in]  channel  DMA channel to pause (GPDMA_CHANNEL_x [0...7]).
+ *
+ * @note:
+ * - The channel can be resumed after being paused without reconfiguration.
+ */
+void GPDMA_ChannelPause(GPDMA_CH channel);
+
+/**
+ * @brief      Resumes the DMA transfer on the specified channel.
+ *
+ * This function clears the halt bit in the channel configuration register to resume the DMA transfer.
+ * The paused transfer is resumed, FIFO data is retained.
+ *
+ * @param[in]  channel  DMA channel to resume (GPDMA_CHANNEL_x [0...7]).
+ *
+ * @note:
+ * - This function should only be called on channels that are currently paused.
+ * - Resuming a stopped channel requires reconfiguration and starting the channel again.
+ */
+void GPDMA_ChannelResume(GPDMA_CH channel);
 
 /**
  * @brief      Gets the interrupt status for the specified GPDMA channel.
@@ -340,7 +405,7 @@ void GPDMA_ChannelCmd(GPDMA_CHANNEL channel, FunctionalState newState);
  * - Use this function to check the status of DMA interrupts or channel enable state.
  * - The status is read directly from the DMA controller registers.
  */
-IntStatus GPDMA_IntGetStatus(GPDMA_STATUS_TYPE type, GPDMA_CHANNEL channel);
+IntStatus GPDMA_IntGetStatus(GPDMA_STATUS_TYPE type, GPDMA_CH channel);
 
 /**
  * @brief      Clears the pending interrupt flag for the specified GPDMA channel.
@@ -357,7 +422,7 @@ IntStatus GPDMA_IntGetStatus(GPDMA_STATUS_TYPE type, GPDMA_CHANNEL channel);
  * - Uses DMACIntTCClear or DMACIntErrClr registers to clear the flag.
  * - Useful for managing DMA transfer interrupts.
  */
-void GPDMA_ClearIntPending(GPDMA_CLEAR_INT type, GPDMA_CHANNEL channel);
+void GPDMA_ClearIntPending(GPDMA_CLEAR_INT type, GPDMA_CH channel);
 
 /**
  * @brief      Generates a software DMA request for the specified peripheral connection.
