@@ -18,7 +18,7 @@
  * use without further testing or modification.
  *
  * @par Refactor:
- * Date: 28/09/2025, Author: David Trujillo Medina
+ * Date: 28/02/2025, Author: David Trujillo Medina
  */
 
 /* ---------------------------- Peripheral group ---------------------------- */
@@ -191,7 +191,7 @@ const uint8_t GPDMA_LUTPerWid[] = {
  * @param[in] channelNum DMA channel to validate.
  * @return SUCCESS if available, ERROR if busy.
  */
-static Status GPDMA_ValidateChannel(GPDMA_CHANNEL channelNum);
+static Status GPDMA_ValidateChannel(GPDMA_CH channelNum);
 
 /**
  * @brief Resets the specified DMA channel control and configuration registers,
@@ -199,86 +199,70 @@ static Status GPDMA_ValidateChannel(GPDMA_CHANNEL channelNum);
  * @param[in] ch Pointer to the DMA channel registers.
  * @param[in] channelNum DMA channel number.
  */
-static void GPDMA_ResetChannel(LPC_GPDMACH_TypeDef* ch, GPDMA_CHANNEL channelNum);
+static void GPDMA_ResetChannel(LPC_GPDMACH_TypeDef* ch, GPDMA_CH channelNum);
 
 /**
  * @brief Configures DMA channel registers according to the configuration structure.
  * @param[in] ch Pointer to the DMA channel registers.
  * @param[in] cfg Pointer to the DMA channel configuration structure.
  */
-static void GPDMA_ConfigChannelRegisters(LPC_GPDMACH_TypeDef* ch, const GPDMA_Channel_CFG_Type* cfg);
+static void GPDMA_ConfigChannelRegisters(LPC_GPDMACH_TypeDef* ch, const GPDMA_Channel_CFG_T* cfg);
 
 /**
  * @brief Configures the DMAREQSEL register for peripheral connections.
  * @param[in] cfg Pointer to the DMA channel configuration structure.
  */
-static void GPDMA_ConfigDMAReqSel(const GPDMA_Channel_CFG_Type* cfg);
+static void GPDMA_ConfigDMAReqSel(const GPDMA_Channel_CFG_T* cfg);
 /* ------------------- End of Private Function Prototypes ------------------- */
 
 /* --------------------------- Private Functions ---------------------------- */
-static Status GPDMA_ValidateChannel(GPDMA_CHANNEL channelNum) {
+static Status GPDMA_ValidateChannel(GPDMA_CH channelNum) {
     if (LPC_GPDMA->DMACEnbldChns & GPDMA_ChannelBit(channelNum)) {
         return ERROR;
     }
     return SUCCESS;
 }
 
-static void GPDMA_ResetChannel(LPC_GPDMACH_TypeDef* ch, GPDMA_CHANNEL channelNum) {
+static void GPDMA_ResetChannel(LPC_GPDMACH_TypeDef* ch, GPDMA_CH channelNum) {
     LPC_GPDMA->DMACIntTCClear = GPDMA_ChannelBit(channelNum);
     LPC_GPDMA->DMACIntErrClr  = GPDMA_ChannelBit(channelNum);
     ch->DMACCControl          = 0;
     ch->DMACCConfig           = 0;
 }
 
-static void GPDMA_ConfigChannelRegisters(LPC_GPDMACH_TypeDef* ch, const GPDMA_Channel_CFG_Type* cfg) {
-    switch (cfg->transferType) {
-        case GPDMA_M2M:
-            ch->DMACCSrcAddr  = cfg->srcMemAddr;
-            ch->DMACCDestAddr = cfg->dstMemAddr;
-            ch->DMACCControl  = GPDMA_DMACCxControl_TransferSize(cfg->transferSize) |
-                               GPDMA_DMACCxControl_SBSize(GPDMA_BSIZE_32) | GPDMA_DMACCxControl_DBSize(GPDMA_BSIZE_32) |
-                               GPDMA_DMACCxControl_SWidth(cfg->transferWidth) |
-                               GPDMA_DMACCxControl_DWidth(cfg->transferWidth) | GPDMA_DMACCxControl_SI |
-                               GPDMA_DMACCxControl_DI | GPDMA_DMACCxControl_I;
-            break;
+static void GPDMA_ConfigChannelRegisters(LPC_GPDMACH_TypeDef* ch, const GPDMA_Channel_CFG_T* cfg) {
+    uint32_t ctrl = GPDMA_DMACCxControl_TransferSize(cfg->transferSize);
 
-        case GPDMA_M2P:
-            ch->DMACCSrcAddr  = cfg->srcMemAddr;
-            ch->DMACCDestAddr = GPDMA_LUTPerAddr[cfg->dstConn];
-            ch->DMACCControl  = GPDMA_DMACCxControl_TransferSize(cfg->transferSize) |
-                               GPDMA_DMACCxControl_SBSize(GPDMA_LUTPerBurst[cfg->dstConn]) |
-                               GPDMA_DMACCxControl_DBSize(GPDMA_LUTPerBurst[cfg->dstConn]) |
-                               GPDMA_DMACCxControl_SWidth(GPDMA_LUTPerWid[cfg->dstConn]) |
-                               GPDMA_DMACCxControl_DWidth(GPDMA_LUTPerWid[cfg->dstConn]) | GPDMA_DMACCxControl_SI |
-                               GPDMA_DMACCxControl_I;
-            break;
-
-        case GPDMA_P2M:
-            ch->DMACCSrcAddr  = GPDMA_LUTPerAddr[cfg->srcConn];
-            ch->DMACCDestAddr = cfg->dstMemAddr;
-            ch->DMACCControl  = GPDMA_DMACCxControl_TransferSize(cfg->transferSize) |
-                               GPDMA_DMACCxControl_SBSize(GPDMA_LUTPerBurst[cfg->srcConn]) |
-                               GPDMA_DMACCxControl_DBSize(GPDMA_LUTPerBurst[cfg->srcConn]) |
-                               GPDMA_DMACCxControl_SWidth(GPDMA_LUTPerWid[cfg->srcConn]) |
-                               GPDMA_DMACCxControl_DWidth(GPDMA_LUTPerWid[cfg->srcConn]) | GPDMA_DMACCxControl_DI |
-                               GPDMA_DMACCxControl_I;
-            break;
-
-        case GPDMA_P2P:
-            ch->DMACCSrcAddr  = GPDMA_LUTPerAddr[cfg->srcConn];
-            ch->DMACCDestAddr = GPDMA_LUTPerAddr[cfg->dstConn];
-            ch->DMACCControl  = GPDMA_DMACCxControl_TransferSize(cfg->transferSize) |
-                               GPDMA_DMACCxControl_SBSize(GPDMA_LUTPerBurst[cfg->srcConn]) |
-                               GPDMA_DMACCxControl_DBSize(GPDMA_LUTPerBurst[cfg->dstConn]) |
-                               GPDMA_DMACCxControl_SWidth(GPDMA_LUTPerWid[cfg->srcConn]) |
-                               GPDMA_DMACCxControl_DWidth(GPDMA_LUTPerWid[cfg->dstConn]) | GPDMA_DMACCxControl_I;
-            break;
-
-        default: break;
+    uint32_t srcAddr = cfg->srcMemAddr;
+    uint32_t dstAddr = cfg->dstMemAddr;
+    if (cfg->type == GPDMA_P2M || cfg->type == GPDMA_P2P) {
+        srcAddr = GPDMA_LUTPerAddr[cfg->srcConn];
     }
+    if (cfg->type == GPDMA_M2P || cfg->type == GPDMA_P2P) {
+        dstAddr = GPDMA_LUTPerAddr[cfg->dstConn];
+    }
+    ch->DMACCSrcAddr  = srcAddr;
+    ch->DMACCDestAddr = dstAddr;
+
+    const uint32_t sWidth = (cfg->src.width != GPDMA_WIDTH_AUTO) ? cfg->src.width : GPDMA_LUTPerWid[cfg->srcConn];
+    const uint32_t dWidth = (cfg->dst.width != GPDMA_WIDTH_AUTO) ? cfg->dst.width : GPDMA_LUTPerWid[cfg->dstConn];
+    ctrl |= GPDMA_DMACCxControl_SWidth(sWidth) | GPDMA_DMACCxControl_DWidth(dWidth);
+
+    const uint32_t sBurst = (cfg->src.burst != GPDMA_BURST_AUTO) ? cfg->src.burst : GPDMA_LUTPerBurst[cfg->srcConn];
+    const uint32_t dBurst = (cfg->dst.burst != GPDMA_BURST_AUTO) ? cfg->dst.burst : GPDMA_LUTPerBurst[cfg->dstConn];
+    ctrl |= GPDMA_DMACCxControl_SBSize(sBurst) | GPDMA_DMACCxControl_DBSize(dBurst);
+
+    if (cfg->src.increment == ENABLE) {
+        ctrl |= GPDMA_DMACCxControl_SI;
+    }
+    if (cfg->dst.increment == ENABLE) {
+        ctrl |= GPDMA_DMACCxControl_DI;
+    }
+
+    ch->DMACCControl = ctrl | (cfg->intTC ? GPDMA_DMACCxControl_I : 0);
 }
 
-static void GPDMA_ConfigDMAReqSel(const GPDMA_Channel_CFG_Type* cfg) {
+static void GPDMA_ConfigDMAReqSel(const GPDMA_Channel_CFG_T* cfg) {
     if (cfg->srcConn > 15) {
         LPC_SC->DMAREQSEL |= (1 << (cfg->srcConn - 16));
     } else {
@@ -310,17 +294,25 @@ void GPDMA_Init(void) {
     LPC_GPDMA->DMACIntErrClr  = GPDMA_DMACIntStat_ALL;
 
     LPC_GPDMA->DMACConfig = GPDMA_DMACConfig_E;
-    while (!(LPC_GPDMA->DMACConfig & GPDMA_DMACConfig_E))
-        ;
+    while (!(LPC_GPDMA->DMACConfig & GPDMA_DMACConfig_E)) {}
 }
 
-Status GPDMA_Setup(const GPDMA_Channel_CFG_Type* dmaCfg) {
+void GPDMA_DeInit(void) {
+    LPC_GPDMA->DMACConfig &= ~GPDMA_DMACConfig_E;
+    while (LPC_GPDMA->DMACConfig & GPDMA_DMACConfig_E) {}
+
+    CLKPWR_ConfigPPWR(CLKPWR_PCONP_PCGPDMA, DISABLE);
+}
+
+Status GPDMA_SetupChannel(const GPDMA_Channel_CFG_T* dmaCfg) {
     CHECK_PARAM(PARAM_GPDMA_CHANNEL(dmaCfg->channelNum));
     CHECK_PARAM(dmaCfg->transferSize > 0 && dmaCfg->transferSize <= 4095);
-    CHECK_PARAM(PARAM_GPDMA_TRANSFER_WIDTH(dmaCfg->transferWidth));
-    CHECK_PARAM(PARAM_GPDMA_TRANSFER_TYPE(dmaCfg->transferType));
+    CHECK_PARAM(PARAM_GPDMA_TRANSFER_WIDTH(dmaCfg->dst.width));
+    CHECK_PARAM(PARAM_GPDMA_TRANSFER_TYPE(dmaCfg->type));
     CHECK_PARAM(PARAM_GPDMA_CONNECTION(dmaCfg->srcConn));
     CHECK_PARAM(PARAM_GPDMA_CONNECTION(dmaCfg->dstConn));
+    CHECK_PARAM(PARAM_FUNCTIONALSTATE(dmaCfg->intTC));
+    CHECK_PARAM(PARAM_FUNCTIONALSTATE(dmaCfg->intErr));
 
     if (GPDMA_ValidateChannel(dmaCfg->channelNum) == ERROR) {
         return ERROR;
@@ -339,70 +331,62 @@ Status GPDMA_Setup(const GPDMA_Channel_CFG_Type* dmaCfg) {
     const uint32_t src = (dmaCfg->srcConn > 15) ? (dmaCfg->srcConn - 8) : dmaCfg->srcConn;
     const uint32_t dst = (dmaCfg->dstConn > 15) ? (dmaCfg->dstConn - 8) : dmaCfg->dstConn;
 
-    pDMAch->DMACCConfig = GPDMA_DMACCxConfig_IE | GPDMA_DMACCxConfig_ITC |
-                          GPDMA_DMACCxConfig_TransferType(dmaCfg->transferType) | GPDMA_DMACCxConfig_SrcPeripheral(src) |
+    pDMAch->DMACCConfig = (dmaCfg->intTC ? GPDMA_DMACCxConfig_ITC : 0) | (dmaCfg->intErr ? GPDMA_DMACCxConfig_IE : 0) |
+                          GPDMA_DMACCxConfig_TransferType(dmaCfg->type) | GPDMA_DMACCxConfig_SrcPeripheral(src) |
                           GPDMA_DMACCxConfig_DestPeripheral(dst);
 
     return SUCCESS;
 }
 
-void GPDMA_ChannelCmd(GPDMA_CHANNEL channel, FunctionalState newState) {
+void GPDMA_ChannelStart(GPDMA_CH channel) {
     CHECK_PARAM(PARAM_GPDMA_CHANNEL(channel));
-    CHECK_PARAM(PARAM_FUNCTIONALSTATE(newState));
-
-    LPC_GPDMACH_TypeDef* pDMAch = pGPDMACh[channel];
-
-    if (newState == ENABLE) {
-        pDMAch->DMACCConfig |= GPDMA_DMACCxConfig_E;
-    } else {
-        pDMAch->DMACCConfig &= ~GPDMA_DMACCxConfig_E;
-    }
+    pGPDMACh[channel]->DMACCConfig |= GPDMA_DMACCxConfig_E;
 }
 
-IntStatus GPDMA_IntGetStatus(GPDMA_STATUS_TYPE type, GPDMA_CHANNEL channel) {
+void GPDMA_ChannelStop(GPDMA_CH channel) {
+    CHECK_PARAM(PARAM_GPDMA_CHANNEL(channel));
+    pGPDMACh[channel]->DMACCConfig &= ~GPDMA_DMACCxConfig_E;
+}
+
+void GPDMA_ChannelGracefulStop(GPDMA_CH channel) {
+    CHECK_PARAM(PARAM_GPDMA_CHANNEL(channel));
+    LPC_GPDMACH_TypeDef* pDMAch = pGPDMACh[channel];
+    pDMAch->DMACCConfig |= GPDMA_DMACCxConfig_H;
+    while (pDMAch->DMACCConfig & GPDMA_DMACCxConfig_A) {}
+}
+
+void GPDMA_ChannelPause(GPDMA_CH channel) {
+    CHECK_PARAM(PARAM_GPDMA_CHANNEL(channel));
+    pGPDMACh[channel]->DMACCConfig |= GPDMA_DMACCxConfig_H;
+}
+
+void GPDMA_ChannelResume(GPDMA_CH channel) {
+    CHECK_PARAM(PARAM_GPDMA_CHANNEL(channel));
+    pGPDMACh[channel]->DMACCConfig &= ~GPDMA_DMACCxConfig_H;
+}
+
+IntStatus GPDMA_IntGetStatus(GPDMA_STATUS_TYPE type, GPDMA_CH channel) {
     CHECK_PARAM(PARAM_GPDMA_STAT(type));
     CHECK_PARAM(PARAM_GPDMA_CHANNEL(channel));
 
+    uint32_t status_reg = 0;
+
+    const uint32_t channel_mask = GPDMA_ChannelBit(channel);
+
     switch (type) {
-        case GPDMA_INT:
-            if (LPC_GPDMA->DMACIntStat & GPDMA_ChannelBit(channel)) {
-                return SET;
-            }
-            return RESET;
-
-        case GPDMA_INTTC:
-            if (LPC_GPDMA->DMACIntTCStat & GPDMA_ChannelBit(channel)) {
-                return SET;
-            }
-            return RESET;
-
-        case GPDMA_INTERR:
-            if (LPC_GPDMA->DMACIntErrStat & GPDMA_ChannelBit(channel)) {
-                return SET;
-            }
-            return RESET;
-
-        case GPDMA_RAW_INTTC:
-            if (LPC_GPDMA->DMACRawIntErrStat & GPDMA_ChannelBit(channel)) {
-                return SET;
-            }
-            return RESET;
-
-        case GPDMA_RAW_INTERR:
-            if (LPC_GPDMA->DMACRawIntTCStat & GPDMA_ChannelBit(channel)) {
-                return SET;
-            }
-            return RESET;
-
-        default:
-            if (LPC_GPDMA->DMACEnbldChns & GPDMA_ChannelBit(channel)) {
-                return SET;
-            }
-            return RESET;
+        case GPDMA_INT: status_reg = LPC_GPDMA->DMACIntStat; break;
+        case GPDMA_INTTC: status_reg = LPC_GPDMA->DMACIntTCStat; break;
+        case GPDMA_INTERR: status_reg = LPC_GPDMA->DMACIntErrStat; break;
+        case GPDMA_RAW_INTTC: status_reg = LPC_GPDMA->DMACRawIntTCStat; break;
+        case GPDMA_RAW_INTERR: status_reg = LPC_GPDMA->DMACRawIntErrStat; break;
+        case GPDMA_ENABLED_CH: status_reg = LPC_GPDMA->DMACEnbldChns; break;
+        default: return RESET;
     }
+
+    return (status_reg & channel_mask) ? SET : RESET;
 }
 
-void GPDMA_ClearIntPending(GPDMA_CLEAR_INT type, GPDMA_CHANNEL channel) {
+void GPDMA_ClearIntPending(GPDMA_CLEAR_INT type, GPDMA_CH channel) {
     CHECK_PARAM(PARAM_GPDMA_CLEAR_INT(type));
     CHECK_PARAM(PARAM_GPDMA_CHANNEL(channel));
 

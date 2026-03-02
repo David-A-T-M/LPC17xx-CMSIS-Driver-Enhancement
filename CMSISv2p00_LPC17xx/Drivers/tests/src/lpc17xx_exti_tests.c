@@ -66,7 +66,7 @@ uint8_t EXTI_ConfigTest(void) {
     EXTI_Setup();
     TEST_INIT();
 
-    const EXTI_CFG_Type cfg = {
+    const EXTI_CFG_T cfg = {
         .line = EXTI_EINT1,
         .mode = EXTI_EDGE_SENSITIVE,
         .polarity = EXTI_RISING_EDGE
@@ -84,7 +84,7 @@ uint8_t EXTI_ConfigEnableTest(void) {
     EXTI_Setup();
     TEST_INIT();
 
-    const EXTI_CFG_Type cfg = {
+    const EXTI_CFG_T cfg = {
         .line = EXTI_EINT3,
         .mode = EXTI_EDGE_SENSITIVE,
         .polarity = EXTI_RISING_EDGE
@@ -102,7 +102,7 @@ uint8_t EXTI_ClearFlagTest(void) {
     EXTI_Setup();
     TEST_INIT();
 
-    const EXTI_CFG_Type cfg = {
+    const EXTI_CFG_T cfg = {
         .line = EXTI_EINT3,
         .mode = EXTI_EDGE_SENSITIVE,
         .polarity = EXTI_RISING_EDGE
@@ -122,7 +122,7 @@ uint8_t EXTI_GetFlagTest(void) {
     EXTI_Setup();
     TEST_INIT();
 
-    const EXTI_CFG_Type cfg = {
+    const EXTI_CFG_T cfg = {
         .line = EXTI_EINT3,
         .mode = EXTI_EDGE_SENSITIVE,
         .polarity = EXTI_RISING_EDGE

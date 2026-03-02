@@ -18,7 +18,7 @@
  * use without further testing or modification.
  *
  * @par Refactor:
- * Date: 11/08/2025, Author: David Trujillo Medina
+ * Last update: 22/02/2025, Author: David Trujillo Medina
  */
 
 /* ---------------------------- Peripheral group ---------------------------- */
@@ -95,7 +95,7 @@ typedef struct {
     FunctionalState doubleBufferEnable; /**< ENABLE or DISABLE. */
     FunctionalState counterEnable;      /**< ENABLE or DISABLE. */
     FunctionalState dmaEnable;          /**< ENABLE or DISABLE. */
-} DAC_CONVERTER_CFG_Type;
+} DAC_CONVERTER_CFG_T;
 
 /**
  * @}
@@ -160,7 +160,7 @@ void DAC_SetBias(DAC_MAX_CURRENT maxCurr);
  * - Only the specified features are affected.
  * - Call this function after DAC initialization.
  */
-void DAC_ConfigDAConverterControl(const DAC_CONVERTER_CFG_Type* dacCfg);
+void DAC_ConfigDAConverterControl(const DAC_CONVERTER_CFG_T* dacCfg);
 
 /**
  * @brief      Sets the reload value for the DAC interrupt/DMA counter.
@@ -174,7 +174,7 @@ void DAC_ConfigDAConverterControl(const DAC_CONVERTER_CFG_Type* dacCfg);
  * - If timeOut is more than 16 bits, only the lower 16 bits are used.
  * - Only the counter value is updated.
  */
-void DAC_SetDMATimeOut(uint32_t timeOut);
+void DAC_SetDMATimeOut(uint16_t timeOut);
 
 /**
  * @}

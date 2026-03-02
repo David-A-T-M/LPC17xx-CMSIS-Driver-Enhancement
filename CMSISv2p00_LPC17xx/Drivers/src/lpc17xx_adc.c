@@ -17,7 +17,7 @@
  * use without further testing or modification.
  *
  * @par Refactor:
- * Date: 08/08/2025, Author: David Trujillo Medina
+ * Last update: 22/02/2025, Author: David Trujillo Medina
  */
 
 /* ---------------------------- Peripheral group ---------------------------- */
@@ -51,12 +51,14 @@ void ADC_Init(uint32_t rate) {
 
     CLKPWR_ConfigPPWR(CLKPWR_PCONP_PCAD, ENABLE);
 
-    uint32_t adc_ctrl = CLKPWR_GetPCLK(CLKPWR_PCLKSEL_ADC);
-    adc_ctrl          = (adc_ctrl / (rate * 65)) - 1;
-    adc_ctrl          = ADC_CR_CLKDIV(adc_ctrl & 0xFF);
-    adc_ctrl |= ADC_CR_PDN;
+    const uint32_t pclk    = CLKPWR_GetPCLK(CLKPWR_PCLKSEL_ADC);
+    const uint32_t divisor = rate * 65;
 
-    LPC_ADC->ADCR = adc_ctrl;
+    uint32_t clkdiv = (pclk + divisor / 2) / divisor - 1;
+
+    clkdiv = clkdiv > 255 ? 255 : clkdiv;
+
+    LPC_ADC->ADCR = ADC_CR_CLKDIV(clkdiv) | ADC_CR_PDN;
 }
 
 void ADC_DeInit(void) {
@@ -70,80 +72,62 @@ void ADC_PinConfig(ADC_CHANNEL channel) {
 
     switch (channel) {
         case ADC_CHANNEL_0:
-            LPC_PINCON->PINSEL1 &= ~(0x3 << 14);
-            LPC_PINCON->PINSEL1 |= (0x1 << 14);
-            LPC_PINCON->PINMODE1 &= ~(0x3 << 14);
-            LPC_PINCON->PINMODE1 |= (0x2 << 14);
+            LPC_PINCON->PINSEL1 = (LPC_PINCON->PINSEL1 & ~(0x3 << 14)) | (0x1 << 14);
+            LPC_PINCON->PINMODE1 = (LPC_PINCON->PINMODE1 & ~(0x3 << 14)) | (0x2 << 14);
             break;
 
         case ADC_CHANNEL_1:
-            LPC_PINCON->PINSEL1 &= ~(0x3 << 16);
-            LPC_PINCON->PINSEL1 |= (0x1 << 16);
-            LPC_PINCON->PINMODE1 &= ~(0x3 << 16);
-            LPC_PINCON->PINMODE1 |= (0x2 << 16);
+            LPC_PINCON->PINSEL1 = (LPC_PINCON->PINSEL1 & ~(0x3 << 16)) | (0x1 << 16);
+            LPC_PINCON->PINMODE1 = (LPC_PINCON->PINMODE1 & ~(0x3 << 16)) | (0x2 << 16);
             break;
 
         case ADC_CHANNEL_2:
-            LPC_PINCON->PINSEL1 &= ~(0x3 << 18);
-            LPC_PINCON->PINSEL1 |= (0x1 << 18);
-            LPC_PINCON->PINMODE1 &= ~(0x3 << 18);
-            LPC_PINCON->PINMODE1 |= (0x2 << 18);
+            LPC_PINCON->PINSEL1 = (LPC_PINCON->PINSEL1 & ~(0x3 << 18)) | (0x1 << 18);
+            LPC_PINCON->PINMODE1 = (LPC_PINCON->PINMODE1 & ~(0x3 << 18)) | (0x2 << 18);
             break;
 
         case ADC_CHANNEL_3:
-            LPC_PINCON->PINSEL1 &= ~(0x3 << 20);
-            LPC_PINCON->PINSEL1 |= (0x1 << 20);
-            LPC_PINCON->PINMODE1 &= ~(0x3 << 20);
-            LPC_PINCON->PINMODE1 |= (0x2 << 20);
+            LPC_PINCON->PINSEL1 = (LPC_PINCON->PINSEL1 & ~(0x3 << 20)) | (0x1 << 20);
+            LPC_PINCON->PINMODE1 = (LPC_PINCON->PINMODE1 & ~(0x3 << 20)) | (0x2 << 20);
             break;
 
         case ADC_CHANNEL_4:
-            LPC_PINCON->PINSEL3 |= (0x3 << 28);
-            LPC_PINCON->PINMODE3 &= ~(0x3 << 28);
-            LPC_PINCON->PINMODE3 |= (0x2 << 28);
+            LPC_PINCON->PINSEL3 = (LPC_PINCON->PINSEL3 & ~(0x3 << 28)) | (0x3 << 28);
+            LPC_PINCON->PINMODE3 = (LPC_PINCON->PINMODE3 & ~(0x3 << 28)) | (0x2 << 28);
             break;
 
         case ADC_CHANNEL_5:
-            LPC_PINCON->PINSEL3 |= (0x3 << 30);
-            LPC_PINCON->PINMODE3 &= ~(0x3 << 30);
-            LPC_PINCON->PINMODE3 |= (0x2 << 30);
+            LPC_PINCON->PINSEL3 = (LPC_PINCON->PINSEL3 & ~(0x3 << 30)) | (0x3 << 30);
+            LPC_PINCON->PINMODE3 = (LPC_PINCON->PINMODE3 & ~(0x3 << 30)) | (0x2 << 30);
             break;
 
         case ADC_CHANNEL_6:
-            LPC_PINCON->PINSEL0 &= ~(0x3 << 6);
-            LPC_PINCON->PINSEL0 |= (0x2 << 6);
-            LPC_PINCON->PINMODE0 &= ~(0x3 << 6);
-            LPC_PINCON->PINMODE0 |= (0x2 << 6);
+            LPC_PINCON->PINSEL0 = (LPC_PINCON->PINSEL0 & ~(0x3 << 6)) | (0x2 << 6);
+            LPC_PINCON->PINMODE0 = (LPC_PINCON->PINMODE0 & ~(0x3 << 6)) | (0x2 << 6);
             break;
 
         case ADC_CHANNEL_7:
-            LPC_PINCON->PINSEL0 &= ~(0x3 << 4);
-            LPC_PINCON->PINSEL0 |= (0x2 << 4);
-            LPC_PINCON->PINMODE0 &= ~(0x3 << 4);
-            LPC_PINCON->PINMODE0 |= (0x2 << 4);
+            LPC_PINCON->PINSEL0 = (LPC_PINCON->PINSEL0 & ~(0x3 << 4)) | (0x2 << 4);
+            LPC_PINCON->PINMODE0 = (LPC_PINCON->PINMODE0 & ~(0x3 << 4)) | (0x2 << 4);
             break;
 
         default: break;
     }
 }
 
-void ADC_BurstCmd(FunctionalState newState) {
-    CHECK_PARAM(PARAM_FUNCTIONALSTATE(newState));
+void ADC_BurstEnable(void) {
+    LPC_ADC->ADCR |= ADC_CR_BURST;
+}
 
-    if (newState) {
-        LPC_ADC->ADCR |= ADC_CR_BURST;
-        return;
-    }
+void ADC_BurstDisable(void) {
     LPC_ADC->ADCR &= ~ADC_CR_BURST;
 }
 
-void ADC_PowerdownCmd(FunctionalState newState) {
-    CHECK_PARAM(PARAM_FUNCTIONALSTATE(newState));
+void ADC_PowerUp(void) {
+    LPC_ADC->ADCR |= ADC_CR_PDN;
+}
 
-    if (newState) {
-        LPC_ADC->ADCR |= ADC_CR_PDN;
-        return;
-    }
+void ADC_PowerDown(void) {
     LPC_ADC->ADCR &= ~ADC_CR_PDN;
 }
 
@@ -154,14 +138,15 @@ void ADC_StartCmd(ADC_START_MODE mode) {
     LPC_ADC->ADCR |= ADC_CR_START_MODE_SEL((uint32_t)mode);
 }
 
-void ADC_ChannelCmd(ADC_CHANNEL channel, FunctionalState newState) {
+void ADC_ChannelEnable(ADC_CHANNEL channel) {
     CHECK_PARAM(PARAM_ADC_CHANNEL(channel));
-    CHECK_PARAM(PARAM_FUNCTIONALSTATE(newState));
 
-    if (newState) {
-        LPC_ADC->ADCR |= ADC_CR_CH_SEL(channel);
-        return;
-    }
+    LPC_ADC->ADCR |= ADC_CR_CH_SEL(channel);
+}
+
+void ADC_ChannelDisable(ADC_CHANNEL channel) {
+    CHECK_PARAM(PARAM_ADC_CHANNEL(channel));
+
     LPC_ADC->ADCR &= ~ADC_CR_CH_SEL(channel);
 }
 
@@ -175,15 +160,16 @@ void ADC_EdgeStartConfig(ADC_START_ON_EDGE edge) {
     LPC_ADC->ADCR &= ~ADC_CR_EDGE;
 }
 
-void ADC_IntConfig(ADC_CHANNEL channel, FunctionalState newState) {
-    CHECK_PARAM(PARAM_ADC_CHANNEL(channel));
-    CHECK_PARAM(PARAM_FUNCTIONALSTATE(newState));
+void ADC_IntEnable(ADC_INT_SOURCE source) {
+    CHECK_PARAM(PARAM_ADC_INT_SOURCE(source));
 
-    if (newState) {
-        LPC_ADC->ADINTEN |= ADC_INTEN_CH(channel);
-        return;
-    }
-    LPC_ADC->ADINTEN &= ~ADC_INTEN_CH(channel);
+    LPC_ADC->ADINTEN |= (1UL << source);
+}
+
+void ADC_IntDisable(ADC_INT_SOURCE source) {
+    CHECK_PARAM(PARAM_ADC_INT_SOURCE(source));
+
+    LPC_ADC->ADINTEN &= ~ADC_INTEN_CH(source);
 }
 
 FlagStatus ADC_GlobalGetStatus(ADC_DATA_STATUS type) {
@@ -223,14 +209,14 @@ FlagStatus ADC_ChannelGetStatus(ADC_CHANNEL channel, ADC_DATA_STATUS type) {
     return RESET;
 }
 
-uint32_t ADC_GlobalGetData() {
+uint16_t ADC_GlobalGetData() {
     return ADC_GDR_RESULT(LPC_ADC->ADGDR);
 }
 
 uint16_t ADC_ChannelGetData(ADC_CHANNEL channel) {
     CHECK_PARAM(PARAM_ADC_CHANNEL(channel));
 
-    const uint32_t adc_value = *(uint32_t*)((&LPC_ADC->ADDR0) + channel);
+    const uint32_t adc_value = *(&LPC_ADC->ADDR0 + channel);
     return ADC_DR_RESULT(adc_value);
 }
 

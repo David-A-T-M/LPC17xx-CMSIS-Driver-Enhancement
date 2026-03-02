@@ -50,8 +50,6 @@ void TIMER_RunTests(void) {
     RUN_TEST(TIM_DeInitTest);
     RUN_TEST(TIM_ClearIntPendingTest);
     RUN_TEST(TIM_GetIntStatusTest);
-    RUN_TEST(TIM_ConfigStructInitTimerTest);
-    RUN_TEST(TIM_ConfigStructInitCounterTest);
     RUN_TEST(TIM_ConfigMatchTest);
     RUN_TEST(TIM_UpdateMatchValueTest);
     RUN_TEST(TIM_SetMatchExtTest);
@@ -67,11 +65,11 @@ uint8_t TIM_InitTimerTest(void) {
     TIMER_Setup();
     TEST_INIT();
 
-    TIM_TIMERCFG_Type cfg = {0};
-    cfg.prescaleOption = TIM_USVAL;
+    TIM_TIMERCFG_T cfg = {0};
+    cfg.prescaleOpt = TIM_US;
     cfg.prescaleValue = 1000;
 
-    TIM_Init(LPC_TIM0, TIM_TIMER_MODE, &cfg);
+    TIM_InitTimer(LPC_TIM0, &cfg);
     EXPECT_EQUAL(LPC_TIM0->CTCR & TIM_CTCR_MODE_MASK, TIM_TIMER_MODE);
     EXPECT_EQUAL(LPC_TIM0->CTCR & TIM_CTCR_INPUT_MASK, 0x00);
     EXPECT_EQUAL(LPC_TIM0->PR, SystemCoreClock / 4 / 1000000 * cfg.prescaleValue - 1);
@@ -85,12 +83,13 @@ uint8_t TIM_InitCounterTest(void) {
     TIMER_Setup();
     TEST_INIT();
 
-    TIM_COUNTERCFG_Type cfg = {0};
-    cfg.countInputSelect = TIM_CAPTURE_CHANNEL_1;
+    TIM_COUNTERCFG_T cfg = {0};
+    cfg.input = TIM_CAPTURE_1;
+    cfg.edge = TIM_CTR_FALLING;
 
-    TIM_Init(LPC_TIM0, TIM_COUNTER_FALLING_MODE, &cfg);
-    EXPECT_EQUAL(LPC_TIM0->CTCR & TIM_CTCR_MODE_MASK, TIM_COUNTER_FALLING_MODE);
-    EXPECT_EQUAL(LPC_TIM0->CTCR & TIM_CTCR_INPUT_MASK, TIM_CAPTURE_CHANNEL_1 << 2);
+    TIM_InitCounter(LPC_TIM0, &cfg);
+    EXPECT_EQUAL(LPC_TIM0->CTCR & TIM_CTCR_MODE_MASK, TIM_CTR_FALLING);
+    EXPECT_EQUAL(LPC_TIM0->CTCR & TIM_CTCR_INPUT_MASK, TIM_CAPTURE_1 << 2);
     EXPECT_EQUAL(LPC_TIM0->PR, 0);
     EXPECT_EQUAL(LPC_TIM0->IR & 0x3F, 0x0);
     EXPECT_EQUAL(LPC_TIM0->TCR & TIM_ENABLE, 0x00);
@@ -102,11 +101,11 @@ uint8_t TIM_DeInitTest(void) {
     TIMER_Setup();
     TEST_INIT();
 
-    TIM_TIMERCFG_Type cfg = {0};
-    cfg.prescaleOption = TIM_TICKVAL;
+    TIM_TIMERCFG_T cfg = {0};
+    cfg.prescaleOpt = TIM_TICK;
     cfg.prescaleValue = 1;
 
-    TIM_Init(LPC_TIM0, TIM_TIMER_MODE, &cfg);
+    TIM_InitTimer(LPC_TIM0, &cfg);
     LPC_TIM0->TCR |= TIM_ENABLE;
     TIM_DeInit(LPC_TIM0);
     EXPECT_EQUAL((LPC_SC->PCONP & 0x2) >> 1, 0x00);
@@ -119,11 +118,11 @@ uint8_t TIM_ClearIntPendingTest(void) {
     TIMER_Setup();
     TEST_INIT();
 
-    TIM_TIMERCFG_Type cfg = {0};
-    cfg.prescaleOption = TIM_TICKVAL;
+    TIM_TIMERCFG_T cfg = {0};
+    cfg.prescaleOpt = TIM_TICK;
     cfg.prescaleValue = 1;
 
-    TIM_Init(LPC_TIM0, TIM_TIMER_MODE, &cfg);
+    TIM_InitTimer(LPC_TIM0, &cfg);
     LPC_TIM0->MR0 = 0x10;
     LPC_TIM0->MCR |= TIM_INT_ON_MATCH(0) | TIM_STOP_ON_MATCH(0);
     LPC_TIM0->TCR |= TIM_ENABLE;
@@ -143,11 +142,11 @@ uint8_t TIM_GetIntStatusTest(void) {
     TIMER_Setup();
     TEST_INIT();
 
-    TIM_TIMERCFG_Type cfg = {0};
-    cfg.prescaleOption = TIM_TICKVAL;
+    TIM_TIMERCFG_T cfg = {0};
+    cfg.prescaleOpt = TIM_TICK;
     cfg.prescaleValue = 1;
 
-    TIM_Init(LPC_TIM0, TIM_TIMER_MODE, &cfg);
+    TIM_InitTimer(LPC_TIM0, &cfg);
     LPC_TIM0->MR0 = 0x10;
     LPC_TIM0->MCR |= TIM_INT_ON_MATCH(0) | TIM_STOP_ON_MATCH(0);
     LPC_TIM0->TCR |= TIM_ENABLE;
@@ -161,41 +160,16 @@ uint8_t TIM_GetIntStatusTest(void) {
     ASSERT_TEST();
 }
 
-uint8_t TIM_ConfigStructInitTimerTest(void) {
-    TIMER_Setup();
-    TEST_INIT();
-
-    TIM_TIMERCFG_Type cfg;
-
-    TIM_ConfigStructInit(TIM_TIMER_MODE, &cfg);
-    EXPECT_EQUAL(cfg.prescaleOption, TIM_USVAL);
-    EXPECT_EQUAL(cfg.prescaleValue, 1);
-
-    ASSERT_TEST();
-}
-
-uint8_t TIM_ConfigStructInitCounterTest(void) {
-    TIMER_Setup();
-    TEST_INIT();
-
-    TIM_COUNTERCFG_Type cfg;
-
-    TIM_ConfigStructInit(TIM_COUNTER_ANY_MODE, &cfg);
-    EXPECT_EQUAL(cfg.countInputSelect, TIM_CAPTURE_CHANNEL_0);
-
-    ASSERT_TEST();
-}
-
 uint8_t TIM_ConfigMatchTest(void) {
     TIMER_Setup();
     TEST_INIT();
 
-    TIM_MATCHCFG_Type matchCfg = {0};
-    matchCfg.matchChannel = 0;
-    matchCfg.intOnMatch = ENABLE;
-    matchCfg.resetOnMatch = DISABLE;
-    matchCfg.stopOnMatch = ENABLE;
-    matchCfg.extMatchOutputType = TIM_TOGGLE;
+    TIM_MATCHCFG_T matchCfg = {0};
+    matchCfg.channel = 0;
+    matchCfg.intEn = ENABLE;
+    matchCfg.resetEn = DISABLE;
+    matchCfg.stopEn = ENABLE;
+    matchCfg.extOpt = TIM_TOGGLE;
     matchCfg.matchValue = 0xFF;
     TIM_ConfigMatch(LPC_TIM0, &matchCfg);
 
@@ -230,7 +204,7 @@ uint8_t TIM_ConfigCaptureTest(void) {
     TIMER_Setup();
     TEST_INIT();
 
-    TIM_CAPTURECFG_Type capCfg = {0, 1, 0, 1};
+    TIM_CAPTURECFG_T capCfg = {0, 1, 0, 1};
     TIM_ConfigCapture(LPC_TIM0, &capCfg);
 
     EXPECT_EQUAL(LPC_TIM0->CCR & TIM_CCR_CHANNEL_MASKBIT(0), TIM_CAP_RISING(0) | TIM_INT_ON_CAP(0));
@@ -242,9 +216,9 @@ uint8_t TIM_CmdTest(void) {
     TIMER_Setup();
     TEST_INIT();
 
-    TIM_Cmd(LPC_TIM0, ENABLE);
+    TIM_Enable(LPC_TIM0);
     EXPECT_EQUAL(LPC_TIM0->TCR & TIM_ENABLE, TIM_ENABLE);
-    TIM_Cmd(LPC_TIM0, DISABLE);
+    TIM_Disable(LPC_TIM0);
     EXPECT_EQUAL(LPC_TIM0->TCR & TIM_ENABLE, 0x00);
 
     ASSERT_TEST();
@@ -264,7 +238,7 @@ uint8_t TIM_GetCaptureValueTest(void) {
         ASSERT_TEST();
     }
 
-    TIM_Cmd(LPC_TIM0, ENABLE);
+    TIM_Enable(LPC_TIM0);
     EDGE_INT_P1_HIGH(26);
     EXPECT_TRUE(LPC_TIM0->CR0 != 0x00);
 

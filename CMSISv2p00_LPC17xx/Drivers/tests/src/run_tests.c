@@ -8,7 +8,10 @@ void run_all_tests(void) {
     SYSTICK_RunTests();
     EXTI_RunTests();
     TIMER_RunTests();
+    PWM_RunTests();
     ADC_RunTests();
+    DAC_RunTests();
+    GPDMA_RunTests();
 }
 
 #endif //UNIT_TESTING_ENABLED

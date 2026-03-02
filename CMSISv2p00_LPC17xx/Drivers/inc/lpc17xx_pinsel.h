@@ -18,7 +18,7 @@
  * use without further testing or modification.
  *
  * @par Refactor:
- * Date: 07/07/2025, Author: David Trujillo Medina
+ * Last update: 20/02/2025, Author: David Trujillo Medina
  */
 
 /* ---------------------------- Peripheral group ---------------------------- */
@@ -32,6 +32,7 @@
 
 /* -------------------------------- Includes -------------------------------- */
 #include "lpc17xx.h"
+#include "lpc17xx_common.h"
 #include "lpc_types.h"
 
 #ifdef __cplusplus
@@ -44,8 +45,10 @@ extern "C" {
  */
 
 /* ------------------------ MACROS MASKS DEFINITIONS ------------------------ */
-#define PINSEL_FUNC_MASK ((0x3UL)) /**< Function selection mask. */
-#define PINSEL_PIN_MASK  ((0x1UL)) /** Pin selection mask. */
+#define PINSEL_FUNC_MASK     ((0x3UL)) /**< Function selection mask. */
+#define PINSEL_RES_MODE_MASK ((0x3UL)) /**< Resistor mode selection mask. */
+#define PINSEL_PIN_MASK      ((0x1UL)) /** Pin selection mask. */
+#define PINSEL_OD_MASK       ((0x1UL)) /**< Open-drain mode selection mask. */
 
 /* ------------------------- MACROS BIT DEFINITIONS ------------------------- */
 #define PINSEL_TRACE_POS ((0x3UL)) /**< Trace pin position. */
@@ -67,69 +70,16 @@ extern "C" {
  */
 
 /**
- * @brief Port selection for PINSEL.
- */
-typedef enum {
-    PINSEL_PORT_0 = 0,
-    PINSEL_PORT_1,
-    PINSEL_PORT_2,
-    PINSEL_PORT_3,
-    PINSEL_PORT_4
-} PINSEL_PORT;
-/** Check PINSEL port option parameter. */
-#define PARAM_PINSEL_PORT(PORT) ((PORT) >= PINSEL_PORT_0 && (PORT) <= PINSEL_PORT_4)
-
-/**
- * @brief Pin selection for PINSEL (0-31).
- */
-typedef enum {
-    PINSEL_PIN_0 = 0,
-    PINSEL_PIN_1,
-    PINSEL_PIN_2,
-    PINSEL_PIN_3,
-    PINSEL_PIN_4,
-    PINSEL_PIN_5,
-    PINSEL_PIN_6,
-    PINSEL_PIN_7,
-    PINSEL_PIN_8,
-    PINSEL_PIN_9,
-    PINSEL_PIN_10,
-    PINSEL_PIN_11,
-    PINSEL_PIN_12,
-    PINSEL_PIN_13,
-    PINSEL_PIN_14,
-    PINSEL_PIN_15,
-    PINSEL_PIN_16,
-    PINSEL_PIN_17,
-    PINSEL_PIN_18,
-    PINSEL_PIN_19,
-    PINSEL_PIN_20,
-    PINSEL_PIN_21,
-    PINSEL_PIN_22,
-    PINSEL_PIN_23,
-    PINSEL_PIN_24,
-    PINSEL_PIN_25,
-    PINSEL_PIN_26,
-    PINSEL_PIN_27,
-    PINSEL_PIN_28,
-    PINSEL_PIN_29,
-    PINSEL_PIN_30,
-    PINSEL_PIN_31
-} PINSEL_PIN;
-/** Check PINSEL pin option parameter. */
-#define PARAM_PINSEL_PIN(PIN) ((PIN) >= PINSEL_PIN_0 && (PIN) <= PINSEL_PIN_31)
-
-/**
  * @brief Pin function selection for PINSEL.
  */
 typedef enum {
-    PINSEL_FUNC_0 = 0,
-    PINSEL_FUNC_1,
-    PINSEL_FUNC_2,
-    PINSEL_FUNC_3
+    PINSEL_FUNC_00 = 0,
+    PINSEL_FUNC_01 = 1,
+    PINSEL_FUNC_10 = 2,
+    PINSEL_FUNC_11 = 3
 } PINSEL_FUNC;
 /** Check PINSEL function option parameter. */
-#define PARAM_PINSEL_FUNC(FUNC) ((FUNC) >= PINSEL_FUNC_0 && (FUNC) <= PINSEL_FUNC_3)
+#define PARAM_PINSEL_FUNC(FUNC) ((FUNC) >= PINSEL_FUNC_00 && (FUNC) <= PINSEL_FUNC_11)
 
 /**
  * @brief Pin mode selection for PINSEL.
@@ -139,19 +89,9 @@ typedef enum {
     PINSEL_REPEATER,
     PINSEL_TRISTATE,
     PINSEL_PULLDOWN
-} PINSEL_PINMODE;
+} PINSEL_MODE;
 /** Check PINSEL pin mode option parameter. */
-#define PARAM_PINSEL_PINMODE(MODE) ((MODE) >= PINSEL_PULLUP && (MODE) <= PINSEL_PULLDOWN)
-
-/**
- * @brief Open drain mode selection for PINSEL.
- */
-typedef enum {
-    PINSEL_OD_NORMAL = 0,
-    PINSEL_OD_OPENDRAIN
-} PINSEL_OD;
-/** Check PINSEL open drain mode option parameter. */
-#define PARAM_PINSEL_OD(OD) ((OD) == PINSEL_OD_NORMAL || (OD) == PINSEL_OD_OPENDRAIN)
+#define PARAM_PINSEL_MODE(MODE) ((MODE) >= PINSEL_PULLUP && (MODE) <= PINSEL_PULLDOWN)
 
 /**
  * @brief I2C drive mode selection for PINSEL.
@@ -167,18 +107,18 @@ typedef enum {
  * @brief Pin configuration structure.
  */
 typedef struct {
-    PINSEL_PORT portNum;    /**< PINSEL_PORT_x [0...4]. */
-    PINSEL_PIN pinNum;      /**< PINSEL_PIN_x [0...31]. */
-    PINSEL_FUNC funcNum;    /**< PINSEL_FUNC_x [0...3]. */
-    PINSEL_PINMODE pinMode; /**< Should be:
-                            - PINSEL_PULLUP : Internal pull-up resistor.
-                            - PINSEL_REPEATER : Repeater mode.
-                            - PINSEL_TRISTATE : Tri-state.
-                            - PINSEL_PULLDOWN : Internal pull-down resistor. */
-    PINSEL_OD openDrain;    /**< Should be:
-                            - PINSEL_OD_NORMAL : Pin is in the normal (not open drain) mode.
-                            - PINSEL_OD_OPENDRAIN : Pin is in the open drain mode. */
-} PINSEL_CFG_Type;
+    LPC_PORT port;             /**< PORT_x [0...4]. */
+    LPC_PIN pin;               /**< PIN_x [0...31]. */
+    PINSEL_FUNC func;          /**< PINSEL_FUNC_x [00...11]. */
+    PINSEL_MODE mode;          /**< Should be:
+                               - PINSEL_PULLUP : Internal pull-up resistor.
+                               - PINSEL_REPEATER : Repeater mode.
+                               - PINSEL_TRISTATE : Tri-state.
+                               - PINSEL_PULLDOWN : Internal pull-down resistor. */
+    FunctionalState openDrain; /**< Should be:
+                               - ENABLE : Open-drain mode enabled.
+                               - DISABLE : Open-drain mode disabled (normal mode). */
+} PINSEL_CFG_T;
 
 /**
  * @}
@@ -192,25 +132,24 @@ typedef struct {
 /**
  * @brief       Configures the pin according to the parameters in pinCfg.
  *
- * @param[in]   pinCfg  Pointer to a PINSEL_CFG_Type structure that contains
+ * @param[in]   pinCfg  Pointer to a PINSEL_CFG_T structure that contains
  *                      the configuration information for the specified pin.
  */
-void PINSEL_ConfigPin(const PINSEL_CFG_Type* pinCfg);
+void PINSEL_ConfigPin(const PINSEL_CFG_T* pinCfg);
 
 /**
  * @brief       Configures multiple pins according to the parameters in
  *              pinCfg and the pins mask.
  *
- * @param[in]   pinCfg  Pointer to a PINSEL_CFG_Type structure containing
+ * @param[in]   pinCfg  Pointer to a PINSEL_CFG_T structure containing
  *                      the base configuration for the pins.
- * @param[in]   pins    32-bit value where each bit set to 1 indicates that
- *                      the corresponding pin (0-31) will be configured.
+ * @param[in]   pinMask 32-bit value where each bit corresponds to a pin (0-31).
  *
  * @note        For each bit set in pins, the corresponding pin is configured
  *              using the parameters from pinCfg, except that the pinNum field in
  *              the original pinCfg is ignored and set automatically for each pin.
  */
-void PINSEL_ConfigMultiplePins(const PINSEL_CFG_Type* pinCfg, uint32_t pins);
+void PINSEL_ConfigMultiplePins(const PINSEL_CFG_T* pinCfg, uint32_t pinMask);
 
 /**
  * @brief       Configures the trace function.

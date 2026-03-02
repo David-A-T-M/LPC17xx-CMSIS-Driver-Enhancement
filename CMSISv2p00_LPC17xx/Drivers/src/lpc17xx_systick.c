@@ -67,29 +67,35 @@ static void SYSTICK_PinConfig(void) {
  */
 
 void SYSTICK_InternalInit(uint32_t time) {
-    const float maxtime = (float)(ST_MAX_LOAD) * 1000 / (float)SystemCoreClock;
+    const uint32_t ticksPerMs = SystemCoreClock / 1000;
 
-    SysTick->CTRL |= ST_CTRL_CLKSOURCE;
-
-    if ((float)time > maxtime) {
+    if (time > (ST_MAX_LOAD / ticksPerMs)) {
         SysTick->LOAD = ST_MAX_LOAD;
     } else {
-        SysTick->LOAD = (SystemCoreClock / 1000) * time - 1;
+        SysTick->LOAD = (ticksPerMs * time) - 1;
     }
+
+    SysTick->VAL = 0;
+    SysTick->CTRL |= ST_CTRL_CLKSOURCE;
 }
 
 void SYSTICK_ExternalInit(uint32_t extFreq, uint32_t time) {
-    const float maxtime = (float)(ST_MAX_LOAD) * 1000 / (float)extFreq;
-
     SYSTICK_PinConfig();
 
-    SysTick->CTRL &= ~ST_CTRL_CLKSOURCE;
+    const uint32_t ticksPerMs = extFreq / 1000;
 
-    if ((float)time > maxtime) {
+    if (ticksPerMs == 0) {
+        return;  // Avoid division by zero if extFreq is less than 1000 Hz
+    }
+
+    if (time > (ST_MAX_LOAD / ticksPerMs)) {
         SysTick->LOAD = ST_MAX_LOAD;
     } else {
-        SysTick->LOAD = (extFreq / 1000) * time - 1;
+        SysTick->LOAD = (ticksPerMs * time) - 1;
     }
+
+    SysTick->VAL = 0;
+    SysTick->CTRL &= ~ST_CTRL_CLKSOURCE;
 }
 
 void SYSTICK_Cmd(FunctionalState newState) {
