@@ -11,6 +11,7 @@ void run_all_tests(void) {
     PWM_RunTests();
     ADC_RunTests();
     DAC_RunTests();
+    GPDMA_RunTests();
 }
 
 #endif //UNIT_TESTING_ENABLED
