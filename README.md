@@ -45,7 +45,7 @@ robust, production-ready foundation for embedded development on the LPC17xx plat
 | `PWM`     | ✅ Completed | ✅ Completed | ✅ Completed |
 | `ADC`     | ✅ Completed | ✅ Completed | ✅ Completed |
 | `DAC`     | ✅ Completed | ✅ Completed | ✅ Completed |
-| `GPDMA`   | 🔲 Planned  | 🔲 Planned  | 🔲 Planned  |
+| `GPDMA`   | ✅ Completed | ✅ Completed | ✅ Completed |
 | `UART_X`  | 🔲 Planned  | 🔲 Planned  | 🔲 Planned  |
 | `UART_1`  | 🔲 Planned  | 🔲 Planned  | 🔲 Planned  |
 
