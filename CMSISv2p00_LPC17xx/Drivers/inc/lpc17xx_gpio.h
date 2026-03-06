@@ -6,19 +6,16 @@
  * @date        18. June. 2010
  * @author      NXP MCU SW Application Team
  *
- * Software that is described herein is for illustrative purposes only
- * which provides customers with programming information regarding the
- * products. This software is supplied "AS IS" without any warranties.
- * NXP Semiconductors assumes no responsibility or liability for the
- * use of the software, conveys no license or title under any patent,
- * copyright, or mask work right to the product. NXP Semiconductors
- * reserves the right to make changes in the software without
- * notification. NXP Semiconductors also make no representation or
- * warranty that such application will be suitable for the specified
- * use without further testing or modification.
+ * Software that is described herein is for illustrative purposes only which provides customers with
+ * programming information regarding the products. This software is supplied "AS IS" without any
+ * warranties. NXP Semiconductors assumes no responsibility or liability for the use of the
+ * software, conveys no license or title under any patent, copyright, or mask work right to the
+ * product. NXP Semiconductors reserves the right to make changes in the software without
+ * notification. NXP Semiconductors also make no representation or warranty that such application
+ * will be suitable for the specified use without further testing or modification.
  *
  * @par Refactor:
- * Last update: 20/02/2025, Author: David Trujillo Medina
+ * Last update: 20/02/2026, Author: David Trujillo Medina
  */
 
 /* ---------------------------- Peripheral group ---------------------------- */
@@ -46,7 +43,7 @@ extern "C" {
 
 /* ------------------------ MACROS MASKS DEFINITIONS ------------------------ */
 /** Fast GPIO pin mask definition. */
-#define GPIO_PIN_MASK  ((0x1UL))
+#define GPIO_PIN_MASK ((0x1UL))
 
 /* -------------------- MACROS BYTE POINTER DEFINITIONS --------------------- */
 /** Fast GPIO port 0 byte accessible definition. */
@@ -166,179 +163,164 @@ typedef struct {
 
 /* ------------------------------- GPIO style ------------------------------- */
 /**
- * @brief        Sets the direction for the specified GPIO port pins.
+ * @brief Sets the direction for a group of pins on a specific port.
  *
- * @param[in]    port       PORT_x [0...4].
- * @param[in]    pinMask    Bitmask of pins to configure (0x0 to 0xFFFFFFFF).
- *                          Example: value 0x5 to set direction for bit 0 and bit 2.
- * @param[in]    dir        Pin direction: GPIO_INPUT or GPIO_OUTPUT.
+ * Configures the FIODIR register. Sets bits to 1 for output and clears bits to 0 for input based on
+ * the provided pinMask. Only the pins specified in pinMask are modified; other pins remain
+ * unchanged.
  *
- * @note:
- * - Pins not selected in pinMask are not affected.
+ * @param port    The GPIO port (PORT_x [0...4]).
+ * @param pinMask A 32-bit mask representing the pins to modify.
+ * @param dir     The direction (GPIO_INPUT or GPIO_OUTPUT).
  */
 void GPIO_SetDir(LPC_PORT port, uint32_t pinMask, GPIO_DIR dir);
 
 /**
- * @brief       Sets the specified output pins to high on a given GPIO port.
+ * @brief Sets specific pins to a high logic level.
  *
- * @param[in]   port    PORT_x [0...4].
- * @param[in]   pinMask Bitmask specifying which pins to set high (1 = set).
- *                      Example: 0x5 sets pins 0 and 2.
+ * Uses the FIOSET register to drive the selected pins high. Bits in the mask set to 0 are not
+ * affected. Only pins configured as output are affected; input pins remain unchanged. Pins masked
+ * in the FIOMASK register will not be modified.
  *
- * @note:
- * - Only pins configured as output are affected; input pins are not changed.
- * - Pins not selected in pinMask remain unchanged.
- * - Pins masked in the FIOMASK register will not be affected by this operation.
+ * @param port    The GPIO port (PORT_x [0...4]).
+ * @param pinMask A 32-bit mask of the pins to set.
  */
 void GPIO_SetPins(LPC_PORT port, uint32_t pinMask);
 
 /**
- * @brief       Clears the specified output pins to low on a given GPIO port.
+ * @brief Clears specific pins to a low logic level.
  *
- * @param[in]   port    PORT_x [0...4].
- * @param[in]   pinMask Bitmask specifying which pins to set low (1 = clear).
- *                      Example: 0x5 clears pins 0 and 2.
+ * Uses the FIOCLR register to drive the selected pins low. Bits in the mask set to 0 are not
+ * affected. Only pins configured as output are affected; input pins remain unchanged. Pins masked
+ * in the FIOMASK register will not be modified.
  *
- * @note:
- * - Only pins configured as output are affected; input pins are not changed.
- * - Pins not selected in pinMask remain unchanged.
- * - Pins masked in the FIOMASK register will not be affected by this operation.
+ * @param port    The GPIO port (PORT_x [0...4]).
+ * @param pinMask A 32-bit mask of the pins to clear.
  */
 void GPIO_ClearPins(LPC_PORT port, uint32_t pinMask);
 
 /**
- * @brief       Sets or clears the state of a specific GPIO pin.
+ * @brief Sets the logic state of a single pin.
  *
- * @param[in]   port        PORT_x [0...4].
- * @param[in]   pin         PIN_x [0...31].
- * @param[in]   newState    New state for the pin: SET to drive high, CLEAR to drive low.
+ * Calculates the mask for a specific pin and uses either the FIOSET or FIOCLR registers to update
+ * its state. Only pins configured as output are affected; input pins remain unchanged. Pins masked
+ * in the FIOMASK register will not be modified.
  *
- * @note:
- * - Only pins configured as output are affected; input pins are not changed.
- * - Pins masked in the FIOMASK register will not be affected by this operation.
+ * @param port     The GPIO port (PORT_x [0...4]).
+ * @param pin      The pin number (PIN_x [0...31]).
+ * @param newState The desired state (SET for High, RESET for Low).
  */
 void GPIO_SetPinState(LPC_PORT port, LPC_PIN pin, SetState newState);
 
 /**
- * @brief       Writes a value to all pins of the specified GPIO port.
+ * @brief Writes a 32-bit value to the entire port.
  *
- * @param[in]   port        PORT_x [0...4].
- * @param[in]   newValue    Value to be written to the FIOPIN register.
+ * Updates all pins on the port by clearing and setting pins according to newValue. Only pins
+ * configured as output are affected; input pins remain unchanged. Pins masked in the FIOMASK
+ * register will not be modified.
  *
- * @note:
- * - Only pins configured as output are affected; input pins are not changed.
- * - Pins masked in the FIOMASK register will not be affected by this operation.
+ * @param port     The GPIO port (PORT_x [0...4]).
+ * @param newValue The 32-bit value to write to the port.
  */
 void GPIO_WriteValue(LPC_PORT port, uint32_t newValue);
 
 /**
- * @brief       Reads the current state of all pins on the specified GPIO port.
+ * @brief Reads the current logic levels of all pins on a port.
  *
- * @param[in]   port    PORT_x [0...4].
+ * Returns the raw 32-bit value from the FIOPIN register, representing the actual state of the
+ * physical pins regardless of their direction. Pins masked in the FIOMASK register will not be
+ * modified.
  *
- * @note:
- * - The returned value contains the logic state of each pin (bit) on the port,
- *   regardless of whether the pin is configured as input or output.
- * - Pins masked in the FIOMASK register will return 0 in the corresponding bits.
- *
- * @return      32-bit value representing the current state of all port pins.
+ * @param port The GPIO port to read (PORT_x [0...4]).
+ * @return A 32-bit value representing the state of all pins on the port.
  */
 uint32_t GPIO_ReadValue(LPC_PORT port);
 
 /**
- * @brief       Toggles the state of specified pins on the given GPIO port.
+ * @brief Toggles the logic state of specific pins.
  *
- * @param[in]   port    PORT_x [0...4].
- * @param[in]   pinMask Bitmask specifying which pins to toggle (1 = toggle).
- *                      Example: 0x5 toggles pins 0 and 2.
+ * Reads the current state of the port and applies a bitwise inversion to the pins defined in the
+ * mask using atomic set/clear operations. Only pins configured as output are affected; input pins
+ * remain unchanged. Pins masked in the FIOMASK register will not be modified.
  *
- * @note:
- * - Only pins configured as output are affected; input pins are not changed.
- * - Pins not selected in pinMask remain unchanged.
- * - Pins masked in the FIOMASK register will not be affected by this operation.
+ * @param port    The GPIO port (PORT_x [0...4]).
+ * @param pinMask A 32-bit mask of the pins to toggle.
  */
 void GPIO_TogglePins(LPC_PORT port, uint32_t pinMask);
 
 /**
- * @brief       Sets or clears the mask for specified pins on the given GPIO port.
+ * @brief Configures the mask register for a port.
  *
- * @param[in]   port        GPIO_PORT_x [0...4].
- * @param[in]   pinMask     Bitmask specifying which pins to mask or unmask (1 = select).
- *                          Example: 0x5 selects pins 0 and 2.
- * @param[in]   newState    FunctionalState value:
- *                          - ENABLE: Mask the selected pins (access disabled).
- *                          - DISABLE: Unmask the selected pins (access enabled).
+ * Sets the FIOMASK register. Bits set to 1 in the mask will prevent write operations to the
+ * corresponding physical pins through the other FIO registers. Any masked bit will read as 0.
  *
- * @note:
- * - Only the pins selected in pinMask are affected.
- * - After masking, write/read operations to masked pins will have no effect.
+ * @param port     The GPIO port (PORT_x [0...4]).
+ * @param pinMask  A 32-bit mask.
+ * @param newState ENABLE to mask pins, DISABLE to unmask them.
  */
 void GPIO_SetMask(LPC_PORT port, uint32_t pinMask, FunctionalState newState);
 
 /**
- * @brief       Sets the interrupt enable mask for GPIO pins on the given port.
+ * @brief Configures the interrupt mask for an entire GPIO port.
  *
- * @param[in]   port        PORT_x [0 or 2].
- * @param[in]   newValue    Bitmask written directly to the interrupt enable register.
- *                          Each bit: 1 = enable interrupt, 0 = disable interrupt.
- *                          Example: 0x5 enables interrupt for pins 0 and 2, disables others.
- * @param[in]   edgeState   Interrupt edge: GPIO_INT_RISING or GPIO_INT_FALLING.
+ * Writes a 32-bit value to the rising or falling edge interrupt enable registers (IOxIntEnR or
+ * IOxIntEnF).
  *
- * @note:
- * - The entire interrupt enable register is overwritten; all pins not set in
- *   newValue will have their interrupts disabled.
- * - Only pins P0.0-P0.11, P0.15-P0.30, and P2.0-P2.13 support interrupts.
+ * @param port      The GPIO port (Only PORT_0 and PORT_2 are supported).
+ * @param newValue  A 32-bit mask where each '1' enables the interrupt for that pin.
+ * @param edgeState The edge to detect (GPIO_INT_RISING or GPIO_INT_FALLING).
  */
 void GPIO_IntConfigPort(LPC_PORT port, uint32_t newValue, GPIO_INT_EDGE edgeState);
 
 /**
- * @brief       Configures the interrupt for a specific GPIO pin.
+ * @brief Enables or disables the interrupt for a specific GPIO pin and edge.
  *
- * @param[in]   port        PORT_x [0 or 2].
- * @param[in]   pin         PIN_x [0...31].
- * @param[in]   edgeState   Interrupt edge: GPIO_INT_RISING or GPIO_INT_FALLING.
- * @param[in]   newState    New state: ENABLE to activate, DISABLE to deactivate.
+ * Modifies the Rising Edge (EnR) or Falling Edge (EnF) interrupt enable registers for Port 0 or
+ * Port 2. This allows for fine-grained control over which specific pins and transitions trigger an
+ * interrupt request.
  *
- * @note:
- * - Only the specified pin's interrupt is affected; other pins remain unchanged.
- * - Only pins P0.0-P0.11, P0.15-P0.30, and P2.0-P2.13 support interrupts.
+ * @param port      The GPIO port (Only PORT_0 and PORT_2 are supported).
+ * @param pin       The pin number (PIN_x [0...31]).
+ * @param edgeState The edge to detect (GPIO_INT_RISING or GPIO_INT_FALLING).
+ * @param newState  ENABLE to activate the interrupt, DISABLE to deactivate it.
  */
-void GPIO_IntConfigPin(LPC_PORT port, LPC_PIN pin, GPIO_INT_EDGE edgeState, FunctionalState newState);
+void GPIO_IntConfigPin(LPC_PORT port, LPC_PIN pin, GPIO_INT_EDGE edgeState,
+                       FunctionalState newState);
 
 /**
- * @brief       Gets the interrupt status for the entire GPIO port.
+ * @brief Retrieves the global interrupt status for a specific GPIO port.
  *
- * @param[in]   port    PORT_x [0 or 2].
+ * Reads the IntStatus register to check if any pin on Port 0 or Port 2 currently has a pending
+ * interrupt. This is typically used at the beginning of the EINT3 ISR to determine which port
+ * caused the trigger.
  *
- * @note:
- * - Only port 0 and port 2 support interrupts.
- *
- * @return      SET if any interrupt is pending on the selected port, RESET otherwise.
+ * @param port The GPIO port to check (Only PORT_0 and PORT_2 are supported).
+ * @return SET if the port has a pending interrupt, RESET otherwise.
  */
 SetState GPIO_GetPortIntStatus(LPC_PORT port);
 
 /**
- * @brief       Gets the interrupt status for a specific GPIO pin and edge.
+ * @brief Checks the interrupt status of a specific pin and edge.
  *
- * @param[in]   port        PORT_x [0 or 2].
- * @param[in]   pin         PIN_x to check for interrupt status.
- * @param[in]   edgeState   Interrupt edge: GPIO_INT_RISING or GPIO_INT_FALLING.
+ * Reads the IOxIntStatR or IOxIntStatF registers to verify if a specific pin triggered an interrupt
+ * on the selected edge.
  *
- * @note    Only pins P0.0-P0.11, P0.15-P0.30, and P2.0-P2.13 support interrupts.
- *
- * @return  SET if an interrupt has been generated for the selected pin and edge, RESET otherwise.
+ * @param port      The GPIO port (Only PORT_0 and PORT_2 are supported).
+ * @param pin       The pin number (PIN_x [0...31]).
+ * @param edgeState The edge status to verify (GPIO_INT_RISING or GPIO_INT_FALLING).
+ * @return SET if the specific pin/edge interrupt is pending, RESET otherwise.
  */
 SetState GPIO_GetPinIntStatus(LPC_PORT port, uint32_t pin, GPIO_INT_EDGE edgeState);
 
 /**
- * @brief       Clears the interrupt status for selected GPIO pins.
+ * @brief Clears the pending interrupt status for specific pins.
  *
- * @param[in]   port    PORT_x [0, 2].
- * @param[in]   pinMask Bitmask specifying which pins to clear interrupt status.
- *                      Example: 0x5 clears interrupt for pins 0 and 2.
+ * Writes to the IOxIntClr register to acknowledge and clear the interrupt request. This must be
+ * performed within the ISR to allow for future interrupt triggers.
  *
- * @note - Only pins P0.0-P0.11, P0.15-P0.30, and P2.0-P2.13 support interrupts.
-*/
+ * @param port     The GPIO port (Only PORT_0 and PORT_2 are supported).
+ * @param pinMask  A 32-bit mask of the pins to clear.
+ */
 void GPIO_ClearInt(LPC_PORT port, uint32_t pinMask);
 
 /* ---------------------- FIO (word-accessible) style ----------------------- */
@@ -390,7 +372,8 @@ void FIO_IntConfigPort(LPC_PORT port, uint32_t newValue, GPIO_INT_EDGE edgeState
 /**
  * @brief The same with GPIO_IntConfigPin().
  */
-void FIO_IntConfigPin(LPC_PORT port, LPC_PIN pin, GPIO_INT_EDGE edgeState, FunctionalState newState);
+void FIO_IntConfigPin(LPC_PORT port, LPC_PIN pin, GPIO_INT_EDGE edgeState,
+                      FunctionalState newState);
 
 /**
  * @brief The same with GPIO_GetPortIntStatus().
@@ -409,43 +392,40 @@ void FIO_ClearInt(LPC_PORT port, uint32_t pinMask);
 
 /* -------------------- FIO (halfword-accessible) style --------------------- */
 /**
- * @brief        Sets the direction of specified pins for a FIO port in halfword-accessible mode.
+ * @brief Sets the direction for a group of pins on a specific port in halfword-accessible mode.
  *
- * @param[in]    port       PORT_x [0...4].
- * @param[in]    halfword   GPIO_HALFWORD_LOW (bits 0-15) or GPIO_HALFWORD_HIGH (bits 16-31).
- * @param[in]    pinMask    Bitmask indicating which pins to configure (0x0 to 0xFFFF).
- *                          Example: 0x0005 configures bits 0 and 2.
- * @param[in]    dir        Pin direction: GPIO_INPUT or GPIO_OUTPUT.
+ * Configures the FIODIR register. Sets bits to 1 for output and clears bits to 0 for input based on
+ * the provided pinMask. Only the pins specified in pinMask are modified; other pins remain
+ * unchanged.
  *
- * @note - Pins not selected in pinMask are not affected.
+ * @param port      The GPIO port (PORT_x [0...4]).
+ * @param halfword  GPIO_HALFWORD_LOW (bits 0-15) or GPIO_HALFWORD_HIGH (bits 16-31).
+ * @param pinMask   A 32-bit mask representing the pins to modify.
+ * @param dir       The direction (GPIO_INPUT or GPIO_OUTPUT).
  */
 void FIO_HalfWordSetDir(LPC_PORT port, GPIO_HALFWORD halfword, uint16_t pinMask, GPIO_DIR dir);
 
 /**
- * @brief        Sets the specified output pins to high for a FIO port in halfword-accessible mode.
+ * @brief Sets specific pins to a high logic level in halfword-accessible mode.
  *
- * @param[in]    port       PORT_x [0...4].
- * @param[in]    halfword   GPIO_HALFWORD_LOW (bits 0-15) or GPIO_HALFWORD_HIGH (bits 16-31).
- * @param[in]    pinMask    Bitmask indicating which pins to set high (0x0 to 0xFFFF).
- *                          Example: 0x0005 sets pins 0 and 2.
+ * Uses the FIOSET register to drive the selected pins high. Bits in the mask set to 0 are not
+ * affected. Only pins configured as output are affected; input pins remain unchanged. Pins masked
+ * in the FIOMASK register will not be modified.
  *
- * @note:
- * - Only pins configured as output are affected; input pins are not changed.
- * - Pins not selected in pinMask remain unchanged.
+ * @param port    The GPIO port (PORT_x [0...4]).
+ * @param pinMask A 32-bit mask of the pins to set.
  */
 void FIO_HalfWordSetPins(LPC_PORT port, GPIO_HALFWORD halfword, uint16_t pinMask);
 
 /**
- * @brief        Clears the specified output pins to low for a FIO port in halfword-accessible mode.
+ * @brief Clears specific pins to a low logic level in halfword-accessible mode.
  *
- * @param[in]    port       PORT_x [0...4].
- * @param[in]    halfword   GPIO_HALFWORD_LOW (bits 0-15) or GPIO_HALFWORD_HIGH (bits 16-31).
- * @param[in]    pinMask    Bitmask indicating which pins to set low (0x0 to 0xFFFF).
- *                          Example: 0x0005 clears pins 0 and 2.
+ * Uses the FIOCLR register to drive the selected pins low. Bits in the mask set to 0 are not
+ * affected. Only pins configured as output are affected; input pins remain unchanged. Pins masked
+ * in the FIOMASK register will not be modified.
  *
- * @note:
- * - Only pins configured as output are affected; input pins are not changed.
- * - Pins not selected in pinMask remain unchanged.
+ * @param port    The GPIO port (PORT_x [0...4]).
+ * @param pinMask A 32-bit mask of the pins to clear.
  */
 void FIO_HalfWordClearPins(LPC_PORT port, GPIO_HALFWORD halfword, uint16_t pinMask);
 
@@ -505,8 +485,9 @@ void FIO_HalfWordTogglePins(LPC_PORT port, GPIO_HALFWORD halfword, uint16_t pinM
  * @note:
  * - Only the bits selected in pinMask are affected.
  * - After masking, read/write operations to masked bits will have no effect or return 0.
-*/
-void FIO_HalfWordSetMask(LPC_PORT port, GPIO_HALFWORD halfword, uint16_t pinMask, FunctionalState newState);
+ */
+void FIO_HalfWordSetMask(LPC_PORT port, GPIO_HALFWORD halfword, uint16_t pinMask,
+                         FunctionalState newState);
 
 /* ---------------------- FIO (byte-accessible) style ----------------------- */
 /**

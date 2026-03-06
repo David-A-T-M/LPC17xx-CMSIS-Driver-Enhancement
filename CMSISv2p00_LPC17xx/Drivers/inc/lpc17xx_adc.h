@@ -1,24 +1,21 @@
 /**
  * @file        lpc17xx_adc.h
- * @brief       Contains all macro definitions and function prototypes
- *              support for ADC firmware library on LPC17xx
+ * @brief       Contains all macro definitions and function prototypes support for ADC firmware
+ *              library on LPC17xx
  * @version     3.0
  * @date        18. June. 2010
  * @author      NXP MCU SW Application Team
  *
- * Software that is described herein is for illustrative purposes only
- * which provides customers with programming information regarding the
- * products. This software is supplied "AS IS" without any warranties.
- * NXP Semiconductors assumes no responsibility or liability for the
- * use of the software, conveys no license or title under any patent,
- * copyright, or mask work right to the product. NXP Semiconductors
- * reserves the right to make changes in the software without
- * notification. NXP Semiconductors also make no representation or
- * warranty that such application will be suitable for the specified
- * use without further testing or modification.
+ * Software that is described herein is for illustrative purposes only which provides customers with
+ * programming information regarding the products. This software is supplied "AS IS" without any
+ * warranties. NXP Semiconductors assumes no responsibility or liability for the use of the
+ * software, conveys no license or title under any patent, copyright, or mask work right to the
+ * product. NXP Semiconductors reserves the right to make changes in the software without
+ * notification. NXP Semiconductors also make no representation or warranty that such application
+ * will be suitable for the specified use without further testing or modification.
  *
  * @par Refactor:
- * Last update: 22/02/2025, Author: David Trujillo Medina
+ * Last update: 22/02/2026, Author: David Trujillo Medina
  */
 
 /* ---------------------------- Peripheral group ---------------------------- */
@@ -83,11 +80,12 @@ extern "C" {
 /** This bit is set to 1 when an A/D conversion completes */
 #define ADC_GDR_DONE_FLAG    ((1UL << 31))
 
-/** This bits is used to mask for Channel */
+/** These bits are used to mask the channel selection bits in the GDR register */
 #define ADC_GDR_CH_MASK ((7UL << 24))
 
 /* ---------------------- ADINTEN REGISTER DEFINITIONS ---------------------- */
-/** These bits allow control over which A/D channels generate interrupts for conversion completion */
+/** These bits allow control over which A/D channels generate interrupts for conversion completion
+ */
 #define ADC_INTEN_CH(n)  ((1UL << n))
 /** When 1, enables the global DONE flag in ADDR to generate an interrupt */
 #define ADC_INTEN_GLOBAL ((1UL << 8))
@@ -189,7 +187,8 @@ typedef enum {
     ADC_START_ON_FALLING
 } ADC_START_ON_EDGE;
 /** Check ADC state parameter */
-#define PARAM_ADC_START_ON_EDGE(EDGE) ((EDGE == ADC_START_ON_RISING) || (EDGE == ADC_START_ON_FALLING))
+#define PARAM_ADC_START_ON_EDGE(EDGE) \
+    ((EDGE == ADC_START_ON_RISING) || (EDGE == ADC_START_ON_FALLING))
 
 /**
  * @brief ADC data status.
@@ -211,50 +210,43 @@ typedef enum {
  */
 
 /**
- * @brief      Initializes the ADC peripheral with the specified conversion rate.
+ * @brief  Initializes the ADC peripheral with a specific sampling rate.
  *
- * This function enables power and clock for the ADC, configures the conversion rate,
- * and powers up the ADC. Conversions do not start until explicitly triggered.
+ * This function enables the ADC clock in the PCONP register, calculates the required clock divider
+ * based on the peripheral clock (PCLK) to achieve the target rate, and powers up the converter.
  *
- * @param[in]  rate  ADC conversion rate (Hz), must be less than or equal to 200 [kHz].
+ * @note   A full conversion requires 65 ADC clock cycles. The maximum supported conversion rate for
+ * the LPC176x is 200 kHz.
  *
- * @note:
- * - The function sets the ADC clock divider and powers up the ADC.
- * - The ADC must be initialized before use.
+ * @param  rate  Desired sampling rate in Hz (e.g., 100000 for 100kHz).
  */
 void ADC_Init(uint32_t rate);
 
 /**
- * @brief      De-initializes the ADC peripheral.
+ * @brief  De-initializes the ADC peripheral.
  *
- * This function powers down the ADC and disables its clock.
- * Call this to safely release ADC resources and save power.
- *
- * @note:
- * - The ADC is powered down and disabled.
- * - The ADC must be re-initialized before reuse.
+ * Powers down the ADC by clearing the PDN bit in the ADCR register and disables the peripheral
+ * clock to minimize power consumption.
  */
 void ADC_DeInit(void);
 
 /**
- * @brief      Configures the pin function for a specific ADC channel.
+ * @brief  Configures the physical pin associated with an ADC channel.
  *
- * This function sets the appropriate pin function for the selected ADC channel
- * and configures the pin mode to tristate (floating), disabling all pull-up and
- * pull-down resistors as required for analog operation.
+ * Sets the corresponding PINSEL register to enable the analog input function for the selected
+ * channel and configures the PINMODE register to "Neither pull-up nor pull-down" (Tristate) to
+ * prevent measurement interference.
  *
- * @param[in]  channel  ADC_CHANNEL_x [0...7].
- *
- * @note
- * - Only the pin function and mode are configured; the ADC peripheral itself is not enabled.
- * - All ADC pins are set to floating (tristate) mode for proper analog input operation.
+ * @param  channel  ADC channel to be configured (ADC_CHANNEL_x [0...7]).
  */
 void ADC_PinConfig(ADC_CHANNEL channel);
 
 /**
- * @brief      Enables burst mode for ADC conversions.
+ * @brief  Enables the ADC Burst conversion mode.
  *
- * This function sets the burst mode bit in the ADC control register, starting continuous conversions.
+ * In Burst mode, the ADC performs repeated conversions on all selected channels. It is highly
+ * recommended for applications requiring continuous monitoring of multiple analog signals without
+ * manual software triggering.
  *
  * @note:
  * - START bits must be 000 before enabling burst mode.
@@ -264,9 +256,10 @@ void ADC_PinConfig(ADC_CHANNEL channel);
 void ADC_BurstEnable(void);
 
 /**
- * @brief      Disables burst mode for ADC conversions.
+ * @brief  Disables the ADC Burst conversion mode.
  *
- * This function clears the burst mode bit in the ADC control register, stopping continuous conversions.
+ * Switches the ADC back to software-controlled mode. Conversions will only occur when explicitly
+ * triggered via a start command or external trigger.
  *
  * @note:
  * - Disabling burst mode stops conversions.
@@ -274,9 +267,10 @@ void ADC_BurstEnable(void);
 void ADC_BurstDisable(void);
 
 /**
- * @brief      Powers up the ADC.
+ * @brief  Powers up the ADC converter.
  *
- * This function sets the power-down bit in the ADC control register to power up the ADC.
+ * Sets the PDN bit in the ADCR register, bringing the ADC out of power-down mode to its operational
+ * state.
  *
  * @note:
  * - Enable only after enabling the ADC clock.
@@ -285,9 +279,9 @@ void ADC_BurstDisable(void);
 void ADC_PowerUp(void);
 
 /**
- * @brief      Powers down the ADC.
+ * @brief  Powers down the ADC converter.
  *
- * This function clears the power-down bit in the ADC control register to power down the ADC.
+ * Clears the PDN bit in the ADCR register. This reduces the power consumption of the peripheral.
  *
  * @note:
  * - Disable before disabling the ADC clock.
@@ -296,134 +290,129 @@ void ADC_PowerUp(void);
 void ADC_PowerDown(void);
 
 /**
- * @brief      Starts ADC conversion in the specified mode.
+ * @brief  Configures the start mode or trigger for the ADC conversion.
  *
- * This function sets the start mode bits in the ADC control register.
+ * This function clears the previous start bits and sets the new trigger mode. It supports starting
+ * the conversion immediately (Software Start) or  synchronizing it with external hardware signals
+ * such as EINT0, CAP, or MAT.
  *
- * @param[in]  mode     ADC start mode selection:
- *                      - ADC_START_CONTINUOUS (burst mode)
- *                      - ADC_START_NOW (manual start)
- *                      - ADC_START_ON_EINT0
- *                      - ADC_START_ON_CAP01
- *                      - ADC_START_ON_MAT01
- *                      - ADC_START_ON_MAT03
- *                      - ADC_START_ON_MAT10
- *                      - ADC_START_ON_MAT11
+ * @param  mode  Selected trigger source:
+ *               - ADC_START_CONTINUOUS (burst mode)
+ *               - ADC_START_NOW (manual start)
+ *               - ADC_START_ON_EINT0
+ *               - ADC_START_ON_CAP01
+ *               - ADC_START_ON_MAT01
+ *               - ADC_START_ON_MAT03
+ *               - ADC_START_ON_MAT10
+ *               - ADC_START_ON_MAT11
  */
 void ADC_StartCmd(ADC_START_MODE mode);
 
 /**
- * @brief      Enables the specified ADC channel for conversion.
+ * @brief  Selects an ADC channel for the next conversion sequence.
  *
- * This function sets the channel select bit in the ADC control register to enable the channel for conversion.
+ * Adds the specified channel to the bitmask of active channels in the ADCR register. Multiple
+ * channels can be enabled simultaneously, especially useful in Burst mode.
  *
- * @param[in]  channel  ADC channel to enable:
- *                      - ADC_CHANNEL_x [0...7]
+ * @param  channel  The ADC channel to enable (ADC_CHANNEL_x [0...7]).
  */
 void ADC_ChannelEnable(ADC_CHANNEL channel);
 
 /**
- * @brief      Disables the specified ADC channel for conversion.
+ * @brief  De-selects an ADC channel from the conversion sequence.
  *
- * This function clears the channel select bit in the ADC control register to disable the channel for conversion.
+ * Removes the specified channel from the active bitmask. If no channels remain selected, the ADC
+ * will select the first channel (AD0.0) by default.
  *
- * @param[in]  channel  ADC channel to disable:
- *                      - ADC_CHANNEL_x [0...7]
+ * @param  channel  The ADC channel to disable (ADC_CHANNEL_x [0...7]).
  */
 void ADC_ChannelDisable(ADC_CHANNEL channel);
 
 /**
- * @brief      Configures the edge for ADC start on external signal.
+ * @brief  Configures the trigger edge for external hardware starts.
  *
- * This function sets the edge select bit in the ADC control register.
+ * Determines whether the ADC conversion starts on the rising or falling edge of the selected
+ * hardware trigger (e.g., CAP or MAT signals). This setting is only relevant when the start mode is
+ * not set to "Now".
  *
- * @param[in]  edge     ADC edge selection:
- *                      - ADC_START_ON_RISING
- *                      - ADC_START_ON_FALLING
+ * @param  edge  The desired edge (ADC_START_ON_RISING or ADC_START_ON_FALLING).
+ *
  * @note:
  * - This option is only effective when the start bits are set to [010...111]
  */
 void ADC_EdgeStartConfig(ADC_START_ON_EDGE edge);
 
 /**
- * @brief      Enables ADC interrupt for the specified channel.
+ * @brief  Enables an interrupt source for the ADC.
  *
- * This function sets the interrupt enable bit for the given channel or global interrupt.
+ * Configures the ADINTEN register to generate an interrupt when a specific channel completes its
+ * conversion or when the global DONE flag is set.
  *
- * @param[in]  source   ADC channel:
- *                      - ADC_INT_CHx [0...7]
- *                      - ADC_ADGINTEN
+ * @param  source  The interrupt source to enable (ADC_INT_CHx [0...7] or ADC_INT_GLOBAL).
+ *
  * @note:
- * - If ADC_ADGINTEN is selected, only the global DONE flag is enabled to generate an interrupt.
- * - Do not enable ADC_ADGINTEN if burst mode is enabled.
+ * - If ADC_INT_GLOBAL is selected, only the global DONE flag is enabled to generate an interrupt.
+ * - Do not enable ADC_INT_GLOBAL if burst mode is enabled.
  */
 void ADC_IntEnable(ADC_INT_SOURCE source);
 
 /**
- * @brief      Disables ADC interrupt for the specified channel.
+ * @brief  Disables an interrupt source for the ADC.
  *
- * This function clears the interrupt enable bit for the given channel or global interrupt.
+ * Clears the corresponding bit in the ADINTEN register, preventing the peripheral from generating
+ * interrupt requests for the specified source.
  *
- * @param[in]  source   ADC channel:
- *                      - ADC_INT_CHx [0...7]
- *                      - ADC_ADGINTEN
+ * @param  source  The interrupt source to disable (ADC_INT_CHx [0...7] or ADC_INT_GLOBAL).
  */
 void ADC_IntDisable(ADC_INT_SOURCE source);
 
 /**
- * @brief      Gets the global ADC status flag.
+ * @brief  Reads the global status of the most recent ADC conversion.
  *
- * This function checks the global ADC status register for DONE or OVERRUN flags.
+ * Checks the Global Data Register (ADGDR) to determine if a conversion is complete or if an overrun
+ * condition has occurred across any channel.
  *
- * @param[in]  type     ADC data status:
- *                      - ADC_DATA_OVERRUN
- *                      - ADC_DATA_DONE
- *
- * @return     FlagStatus
- *             - SET   : Status flag is set.
- *             - RESET : Status flag is not set.
+ * @param  type  Status type to check (ADC_DATA_DONE or ADC_DATA_OVERRUN).
+ * @return SET if the flag is active, RESET otherwise.
  */
 FlagStatus ADC_GlobalGetStatus(ADC_DATA_STATUS type);
 
 /**
- * @brief      Gets the status flag for the specified ADC channel.
+ * @brief  Reads the status of a specific ADC channel.
  *
- * This function checks the status register for DONE or OVERRUN flags for the given channel.
+ * Accesses the individual channel data register (ADDR0-ADDR7) to check the completion or overrun
+ * status for that specific input.
  *
- * @param[in]  channel  ADC channel to check:
- *                      - ADC_CHANNEL_x [0...7]
- * @param[in]  type     ADC data status:
- *                      - ADC_DATA_OVERRUN
- *                      - ADC_DATA_DONE
- *
- * @return     FlagStatus
- *             - SET   : Status flag is set.
- *             - RESET : Status flag is not set.
+ * @param  channel  The ADC channel to check (ADC_CHANNEL_x [0...7]).
+ * @param  type     Status type (DONE or OVERRUN).
+ * @return SET if the flag is active, RESET otherwise.
  */
 FlagStatus ADC_ChannelGetStatus(ADC_CHANNEL channel, ADC_DATA_STATUS type);
 
 /**
- * @brief      Gets the global ADC conversion result.
+ * @brief  Retrieves the result of the last conversion from any channel.
  *
- * This function returns the result value from the global ADC data register.
+ * Returns the 12-bit digital value stored in the Global Data Register.
  *
- * @return     12-bit ADC conversion result.
+ * @return The 12-bit conversion result (0 to 4095).
+ *
  * @note:
  * - The returned value is right-aligned to bits [11:0].
+ * - Reading this register automatically clears the DONE flag for that specific channel.
  */
 uint16_t ADC_GlobalGetData(void);
 
 /**
- * @brief      Gets the conversion result for the specified ADC channel.
+ * @brief  Retrieves the conversion result for a specific ADC channel.
  *
- * This function returns the result value from the data register for the given channel.
+ * Returns the 12-bit digital value from the dedicated register of the selected channel.
  *
- * @param[in]  channel  ADC channel to read:
- *                      - ADC_CHANNEL_x [0...7]
+ * @param  channel  The ADC channel to read (ADC_CHANNEL_x [0...7]).
+ * @return The 12-bit conversion result (0 to 4095).
  *
- * @return     12-bit ADC conversion result for the channel.
  * @note:
  * - The returned value is right-aligned to bits [11:0].
+ * - Reading this register automatically clears the DONE flag for that specific channel.
  */
 uint16_t ADC_ChannelGetData(ADC_CHANNEL channel);
 

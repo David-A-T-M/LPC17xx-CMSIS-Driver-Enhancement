@@ -6,19 +6,16 @@
  * @date    21. May. 2010
  * @author  NXP MCU SW Application Team
  *
- * Software that is described herein is for illustrative purposes only
- * which provides customers with programming information regarding the
- * products. This software is supplied "AS IS" without any warranties.
- * NXP Semiconductors assumes no responsibility or liability for the
- * use of the software, conveys no license or title under any patent,
- * copyright, or mask work right to the product. NXP Semiconductors
- * reserves the right to make changes in the software without
- * notification. NXP Semiconductors also make no representation or
- * warranty that such application will be suitable for the specified
- * use without further testing or modification.
+ * Software that is described herein is for illustrative purposes only which provides customers with
+ * programming information regarding the products. This software is supplied "AS IS" without any
+ * warranties. NXP Semiconductors assumes no responsibility or liability for the use of the
+ * software, conveys no license or title under any patent, copyright, or mask work right to the
+ * product. NXP Semiconductors reserves the right to make changes in the software without
+ * notification. NXP Semiconductors also make no representation or warranty that such application
+ * will be suitable for the specified use without further testing or modification.
  *
  * @par Refactor:
- * Date: 28/02/2025, Author: David Trujillo Medina
+ * Date: 28/02/2026, Author: David Trujillo Medina
  */
 
 /* ---------------------------- Peripheral group ---------------------------- */
@@ -48,8 +45,7 @@
  */
 
 /**
- * @brief Lookup Table of Connection Type matched with
- * Peripheral Data (FIFO) register base address
+ * @brief Lookup Table of Connection Type matched with Peripheral Data (FIFO) register base address
  */
 #ifdef __IAR_SYSTEMS_ICC__
 volatile const void* GPDMA_LUTPerAddr[] = {
@@ -107,8 +103,7 @@ const uint32_t GPDMA_LUTPerAddr[] = {
 };
 #endif
 /**
- * @brief Lookup Table of GPDMA Channel Number matched with
- * GPDMA channel pointer
+ * @brief Lookup Table of GPDMA Channel Number matched with GPDMA channel pointer
  */
 LPC_GPDMACH_TypeDef* pGPDMACh[8] = {
     LPC_GPDMACH0,  // GPDMA Channel 0
@@ -244,12 +239,16 @@ static void GPDMA_ConfigChannelRegisters(LPC_GPDMACH_TypeDef* ch, const GPDMA_Ch
     ch->DMACCSrcAddr  = srcAddr;
     ch->DMACCDestAddr = dstAddr;
 
-    const uint32_t sWidth = (cfg->src.width != GPDMA_WIDTH_AUTO) ? cfg->src.width : GPDMA_LUTPerWid[cfg->srcConn];
-    const uint32_t dWidth = (cfg->dst.width != GPDMA_WIDTH_AUTO) ? cfg->dst.width : GPDMA_LUTPerWid[cfg->dstConn];
+    const uint32_t sWidth =
+        (cfg->src.width != GPDMA_WIDTH_AUTO) ? cfg->src.width : GPDMA_LUTPerWid[cfg->srcConn];
+    const uint32_t dWidth =
+        (cfg->dst.width != GPDMA_WIDTH_AUTO) ? cfg->dst.width : GPDMA_LUTPerWid[cfg->dstConn];
     ctrl |= GPDMA_DMACCxControl_SWidth(sWidth) | GPDMA_DMACCxControl_DWidth(dWidth);
 
-    const uint32_t sBurst = (cfg->src.burst != GPDMA_BURST_AUTO) ? cfg->src.burst : GPDMA_LUTPerBurst[cfg->srcConn];
-    const uint32_t dBurst = (cfg->dst.burst != GPDMA_BURST_AUTO) ? cfg->dst.burst : GPDMA_LUTPerBurst[cfg->dstConn];
+    const uint32_t sBurst =
+        (cfg->src.burst != GPDMA_BURST_AUTO) ? cfg->src.burst : GPDMA_LUTPerBurst[cfg->srcConn];
+    const uint32_t dBurst =
+        (cfg->dst.burst != GPDMA_BURST_AUTO) ? cfg->dst.burst : GPDMA_LUTPerBurst[cfg->dstConn];
     ctrl |= GPDMA_DMACCxControl_SBSize(sBurst) | GPDMA_DMACCxControl_DBSize(dBurst);
 
     if (cfg->src.increment == ENABLE) {
@@ -331,8 +330,10 @@ Status GPDMA_SetupChannel(const GPDMA_Channel_CFG_T* dmaCfg) {
     const uint32_t src = (dmaCfg->srcConn > 15) ? (dmaCfg->srcConn - 8) : dmaCfg->srcConn;
     const uint32_t dst = (dmaCfg->dstConn > 15) ? (dmaCfg->dstConn - 8) : dmaCfg->dstConn;
 
-    pDMAch->DMACCConfig = (dmaCfg->intTC ? GPDMA_DMACCxConfig_ITC : 0) | (dmaCfg->intErr ? GPDMA_DMACCxConfig_IE : 0) |
-                          GPDMA_DMACCxConfig_TransferType(dmaCfg->type) | GPDMA_DMACCxConfig_SrcPeripheral(src) |
+    pDMAch->DMACCConfig = (dmaCfg->intTC ? GPDMA_DMACCxConfig_ITC : 0) |
+                          (dmaCfg->intErr ? GPDMA_DMACCxConfig_IE : 0) |
+                          GPDMA_DMACCxConfig_TransferType(dmaCfg->type) |
+                          GPDMA_DMACCxConfig_SrcPeripheral(src) |
                           GPDMA_DMACCxConfig_DestPeripheral(dst);
 
     return SUCCESS;

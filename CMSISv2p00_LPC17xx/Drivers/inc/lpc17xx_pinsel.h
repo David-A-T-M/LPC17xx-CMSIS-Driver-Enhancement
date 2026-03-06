@@ -6,19 +6,16 @@
  * @date        21. May. 2010
  * @author      NXP MCU SW Application Team
  *
- * Software that is described herein is for illustrative purposes only
- * which provides customers with programming information regarding the
- * products. This software is supplied "AS IS" without any warranties.
- * NXP Semiconductors assumes no responsibility or liability for the
- * use of the software, conveys no license or title under any patent,
- * copyright, or mask work right to the product. NXP Semiconductors
- * reserves the right to make changes in the software without
- * notification. NXP Semiconductors also make no representation or
- * warranty that such application will be suitable for the specified
- * use without further testing or modification.
+ * Software that is described herein is for illustrative purposes only which provides customers with
+ * programming information regarding the products. This software is supplied "AS IS" without any
+ * warranties. NXP Semiconductors assumes no responsibility or liability for the use of the
+ * software, conveys no license or title under any patent, copyright, or mask work right to the
+ * product. NXP Semiconductors reserves the right to make changes in the software without
+ * notification. NXP Semiconductors also make no representation or warranty that such application
+ * will be suitable for the specified use without further testing or modification.
  *
  * @par Refactor:
- * Last update: 20/02/2025, Author: David Trujillo Medina
+ * Last update: 20/02/2026, Author: David Trujillo Medina
  */
 
 /* ---------------------------- Peripheral group ---------------------------- */
@@ -130,50 +127,42 @@ typedef struct {
  */
 
 /**
- * @brief       Configures the pin according to the parameters in pinCfg.
+ * @brief Configures the function, resistor mode, and open-drain setting for a single pin.
  *
- * @param[in]   pinCfg  Pointer to a PINSEL_CFG_T structure that contains
- *                      the configuration information for the specified pin.
+ * Sets the PINSEL register to select the peripheral function, the PINMODE register
+ * to define the internal pull-up/pull-down state, and the PINMODE_OD register
+ * to enable or disable open-drain mode.
+ *
+ * @param pinCfg Pointer to a PINSEL_CFG_T structure containing the pin configuration.
  */
 void PINSEL_ConfigPin(const PINSEL_CFG_T* pinCfg);
 
 /**
- * @brief       Configures multiple pins according to the parameters in
- *              pinCfg and the pins mask.
+ * @brief Configures multiple pins on the same port with identical settings.
  *
- * @param[in]   pinCfg  Pointer to a PINSEL_CFG_T structure containing
- *                      the base configuration for the pins.
- * @param[in]   pinMask 32-bit value where each bit corresponds to a pin (0-31).
+ * Iterates through a 32-bit mask and applies the specified function, resistor mode, and open-drain settings to every pin identified in the mask.
  *
- * @note        For each bit set in pins, the corresponding pin is configured
- *              using the parameters from pinCfg, except that the pinNum field in
- *              the original pinCfg is ignored and set automatically for each pin.
+ * @param pinCfg  Pointer to a PINSEL_CFG_T configuration structure (pin field is ignored).
+ * @param pinMask A 32-bit mask representing the pins to be configured.
  */
 void PINSEL_ConfigMultiplePins(const PINSEL_CFG_T* pinCfg, uint32_t pinMask);
 
 /**
- * @brief       Configures the trace function.
+ * @brief Enables or disables the ETM Trace port function.
  *
- * @param[in]   newState Must be:
- *                       - ENABLE : Enable Trace Function.
- *                       - DISABLE : Disable Trace Function.
+ * Modifies the PINSEL10 register to enable or disable the hardware trace functionality. When enabled, specific pins are dedicated to the trace port for debugging and instruction tracking.
+ *
+ * @param newState ENABLE to activate trace, DISABLE to return pins to default GPIO.
  */
 void PINSEL_ConfigTraceFunc(FunctionalState newState);
 
 /**
- * @brief       Configures the I2C pins according to the specified parameters.
+ * @brief Configures the hardware characteristics for I2C pins.
  *
- * @param[in]   driveMode Should be one of the following:
- *                        - PINSEL_I2C_NORMAL : Standard drive mode.
- *                        - PINSEL_I2C_FAST   : Fast Mode Plus drive mode.
+ * Updates the I2CPADCFG register to control the drive mode (Standard/Fast) and the glitch filter/slew rate for the dedicated I2C pins (P0.27 and P0.28).
  *
- * @param[in]   filterSlewRate Should be:
- *                             - ENABLE  : Enables filter and slew rate control.
- *                             - DISABLE : Disables filter and slew rate control.
- *
- * @note        If filterSlewRate is DISABLE, the driveMode parameter
- *              is ignored and both pins are configured as standard drive mode
- *              (PINSEL_I2C_NORMAL) with filter and slew rate control disabled.
+ * @param driveMode      Sets the pad drive strength (PINSEL_I2C_NORMAL or PINSEL_I2C_FAST).
+ * @param filterSlewRate ENABLE or DISABLE the glitch filter and slew rate control.
  */
 void PINSEL_SetI2CPins(PINSEL_I2C_MODE driveMode, FunctionalState filterSlewRate);
 

@@ -6,19 +6,16 @@
  * @date        18. June. 2010
  * @author      NXP MCU SW Application Team
  *
- * Software that is described herein is for illustrative purposes only
- * which provides customers with programming information regarding the
- * products. This software is supplied "AS IS" without any warranties.
- * NXP Semiconductors assumes no responsibility or liability for the
- * use of the software, conveys no license or title under any patent,
- * copyright, or mask work right to the product. NXP Semiconductors
- * reserves the right to make changes in the software without
- * notification. NXP Semiconductors also make no representation or
- * warranty that such application will be suitable for the specified
- * use without further testing or modification.
+ * Software that is described herein is for illustrative purposes only which provides customers with
+ * programming information regarding the products. This software is supplied "AS IS" without any
+ * warranties. NXP Semiconductors assumes no responsibility or liability for the use of the
+ * software, conveys no license or title under any patent, copyright, or mask work right to the
+ * product. NXP Semiconductors reserves the right to make changes in the software without
+ * notification. NXP Semiconductors also make no representation or warranty that such application
+ * will be suitable for the specified use without further testing or modification.
  *
  * @par Refactor:
- * Last update: 22/02/2025, Author: David Trujillo Medina
+ * Last update: 22/02/2026, Author: David Trujillo Medina
  */
 
 /* ---------------------------- Peripheral group ---------------------------- */
@@ -92,9 +89,9 @@ typedef enum {
  * Used to configure double buffering, timeout counter, and DMA access for the DAC.
  */
 typedef struct {
-    FunctionalState doubleBufferEnable; /**< ENABLE or DISABLE. */
-    FunctionalState counterEnable;      /**< ENABLE or DISABLE. */
-    FunctionalState dmaEnable;          /**< ENABLE or DISABLE. */
+    FunctionalState doubleBuffer; /**< ENABLE or DISABLE. */
+    FunctionalState dmaCounter;   /**< ENABLE or DISABLE. */
+    FunctionalState dmaRequest;   /**< ENABLE or DISABLE. */
 } DAC_CONVERTER_CFG_T;
 
 /**
@@ -102,14 +99,12 @@ typedef struct {
  */
 
 /* ---------------------------- Public Functions ---------------------------- */
-/** @defgroup DAC_Public_Functions DAC Public Functions
- * @{
- */
 /**
- * @brief      Initializes the DAC peripheral and the DAC pin.
+ * @brief  Initializes the DAC peripheral and its associated pin.
  *
- * This function configures the DAC pin, sets the peripheral clock divider,
- * and initializes the DAC with maximum current (700 uA) and output value 0.
+ * Configures P0.26 as AOUT (Function 10) and sets the pin mode to "Neither pull-up nor pull-down".
+ * It establishes the peripheral clock (PCLK) at CCLK/4 and sets the initial settling time to the
+ * 700 uA (1 MHz) mode and output value to 0.
  *
  * @note:
  * - The DAC pin is configured for analog output.
@@ -119,60 +114,47 @@ typedef struct {
 void DAC_Init(void);
 
 /**
- * @brief      Updates the output value of the DAC.
+ * @brief  Updates the analog output value.
  *
- * This function sets the 10-bit value to be converted to analog output
- * on the DAC pin. Only the value bits are updated; other bits remain unchanged.
+ * Writes a 10-bit value to the VALUE field (bits 6 to 15) of the DACR register. The output voltage
+ * is calculated as: Vout = (VALUE / 1024) * VREFP.
  *
- * @param[in]  newValue  10-bit value to be converted (0-1023).
- *
- * @note:
- * - The output voltage is calculated as VALUE * (Vrefp - Vrefn) / 1024 + Vrefn.
- * - Call this function to change the DAC output.
+ * @param  newValue  10-bit digital value (0 to 1023).
  */
 void DAC_UpdateValue(uint32_t newValue);
 
 /**
- * @brief      Sets the bias (maximum current) for the DAC.
+ * @brief  Sets the maximum update rate and settling time.
  *
- * This function configures the DAC bias to select the settling time and
- * maximum output current.
+ * Controls the BIAS bit in the DACR register to switch between two power modes:
+ * - DAC_700uA: Maximum update rate of 1 MHz (Settling time < 1 us).
+ * - DAC_350uA: Maximum update rate of 400 kHz (Settling time < 2.5 us).
  *
- * @param[in]  maxCurr  DAC current option:
- *                      - DAC_700uA : 1 us settling, 700 uA max current.
- *                      - DAC_350uA : 2.5 us settling, 350 uA max current.
- *
- * @note:
- * - Use this function to optimize power or speed.
- * - Only the bias bit is affected.
+ * @param  maxCurr  Power mode selection (DAC_700uA or DAC_350uA).
  */
 void DAC_SetBias(DAC_MAX_CURRENT maxCurr);
 
 /**
- * @brief      Configures the DAC converter control features.
+ * @brief  Configures the DAC control register for advanced features.
  *
- * This function enables or disables double buffering, timeout counter,
- * and DMA access for the DAC peripheral.
+ * Sets the operational modes for the DAC converter, including double buffering, timeout counter
+ * activation, and DMA request generation.
  *
- * @param[in]  dacCfg   Pointer to a DAC_CONVERTER_CFG_Type structure.
- *
- * @note:
- * - Only the specified features are affected.
- * - Call this function after DAC initialization.
+ * @param  dacCfg  Pointer to a DAC_CONVERTER_CFG_T structure containing the settings.
  */
 void DAC_ConfigDAConverterControl(const DAC_CONVERTER_CFG_T* dacCfg);
 
 /**
- * @brief      Sets the reload value for the DAC interrupt/DMA counter.
+ * @brief  Sets the reload value for the DAC timeout counter.
  *
- * This function sets the timeout value for the DAC DMA or interrupt counter.
+ * Configures the 16-bit DACCNTVAL register. This value determines the time interval between DMA
+ * requests or hardware updates when the counter is enabled in the control register.
  *
- * @param[in]  timeOut  Timeout value to reload (16-bit).
+ * @param  timeOut  16-bit timeout value in PCLK cycles.
  *
  * @note:
  * - Use this function to configure DMA or interrupt timing.
  * - If timeOut is more than 16 bits, only the lower 16 bits are used.
- * - Only the counter value is updated.
  */
 void DAC_SetDMATimeOut(uint16_t timeOut);
 

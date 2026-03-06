@@ -5,19 +5,16 @@
  * @date        21. May. 2010
  * @author      NXP MCU SW Application Team
  *
- * Software that is described herein is for illustrative purposes only
- * which provides customers with programming information regarding the
- * products. This software is supplied "AS IS" without any warranties.
- * NXP Semiconductors assumes no responsibility or liability for the
- * use of the software, conveys no license or title under any patent,
- * copyright, or mask work right to the product. NXP Semiconductors
- * reserves the right to make changes in the software without
- * notification. NXP Semiconductors also make no representation or
- * warranty that such application will be suitable for the specified
- * use without further testing or modification.
+ * Software that is described herein is for illustrative purposes only which provides customers with
+ * programming information regarding the products. This software is supplied "AS IS" without any
+ * warranties. NXP Semiconductors assumes no responsibility or liability for the use of the
+ * software, conveys no license or title under any patent, copyright, or mask work right to the
+ * product. NXP Semiconductors reserves the right to make changes in the software without
+ * notification. NXP Semiconductors also make no representation or warranty that such application
+ * will be suitable for the specified use without further testing or modification.
  *
  * @par Refactor:
- * Last update: 21/02/2025, Author: David Trujillo Medina
+ * Last update: 21/02/2026, Author: David Trujillo Medina
  */
 
 /* ---------------------------- Peripheral group ---------------------------- */
@@ -258,7 +255,8 @@ typedef struct {
     TIM_CTR_EDGE edge;    /**< Should be:
                             - TIM_CTR_RISING  : Count rising edges on the selected capture input.
                             - TIM_CTR_FALLING : Count falling edges on the selected capture input.
-                            - TIM_CTR_ANY     : Count both rising and falling edges on the selected capture input. */
+                            - TIM_CTR_ANY     : Count both rising and falling edges on the selected
+                            capture input. */
 } TIM_COUNTERCFG_T;
 
 /**
@@ -309,274 +307,178 @@ typedef struct {
  */
 
 /**
- * @brief      Initializes the specified Timer/Counter peripheral in TIMER mode.
+ * @brief Initializes the timer in Timer Mode.
  *
- * This function configures the given timer peripheral to operate in TIMER mode
- * with the specified prescale options. It sets up the timer to increment on
- * every tick or microsecond based on the configuration structure.
+ * Powers up the selected timer (TIM0-TIM3) and configures the Prescale Register (PR). It supports
+ * setting the prescaler in raw clock ticks or calculating the equivalent value for a specific
+ * microsecond interval based on the peripheral clock.
  *
- * @param[in]  TIMx      Pointer to the timer peripheral (LPC_TIMx [0...3]).
- * @param[in]  timerCfg  Pointer to a TIM_TIMERCFG_Type structure containing
- *                        the desired TIMER mode configuration.
- *
- * @note:
- * - The function enables power and clock for the selected timer peripheral.
- * - The function configures the prescaler according to the provided options.
- * - Call this function before configuring match or capture behavior.
- * - The timer is left in a disabled state after initialization; call TIM_Enable to start it.
+ * @param TIMx     Pointer to the timer peripheral (LPC_TIMx [0...3]).
+ * @param timerCfg Pointer to a TIM_TIMERCFG_T structure with prescale settings.
  */
 void TIM_InitTimer(LPC_TIM_TypeDef* TIMx, const TIM_TIMERCFG_T* timerCfg);
 
 /**
- * @brief      Initializes the specified Timer/Counter peripheral in COUNTER mode.
+ * @brief Initializes the timer in Counter Mode.
  *
- * This function configures the given timer peripheral to operate in COUNTER mode
- * by selecting the input capture channel and edge detection options. The timer
- * will increment based on the selected capture input and edge conditions.
+ * Configures the Count Control Register (CTCR) to increment the Timer Counter (TC) based on
+ * transitions on an external capture input pin instead of the internal peripheral clock.
  *
- * @param[in]  TIMx      Pointer to the timer peripheral (LPC_TIMx [0...3]).
- * @param[in]  counterCfg Pointer to a TIM_COUNTERCFG_Type structure containing
- *                         the desired COUNTER mode configuration.
- *
- * @note:
- * - The function enables power and clock for the selected timer peripheral.
- * - The function configures the counter input and edge detection according to the provided options.
- * - Call this function before configuring match or capture behavior.
- * - The timer is left in a disabled state after initialization; call TIM_Enable to start it.
+ * @param TIMx       Pointer to the timer peripheral (LPC_TIMx [0...3]).
+ * @param counterCfg Pointer to a TIM_COUNTERCFG_T structure specifying the input channel and edge
+ * type.
  */
 void TIM_InitCounter(LPC_TIM_TypeDef* TIMx, const TIM_COUNTERCFG_T* counterCfg);
 
 /**
- * @brief      De-initializes the specified Timer/Counter peripheral.
+ * @brief De-initializes the timer peripheral.
  *
- * This function disables the timer, and removes power from
- * the selected timer peripheral. It should be called to safely
- * power down the timer and release its resources.
+ * Stops the timer by clearing the TCR register and disables the peripheral clock in the PCONP
+ * register to minimize power consumption.
  *
- * @param[in]  TIMx  Pointer to the timer peripheral (LPC_TIMx [0...3]).
- *
- * @note:
- * - The function disables the timer.
- * - It disables the peripheral clock and powers down the timer.
- * - After calling this function, the timer must be re-initialized before use.
+ * @param TIMx Pointer to the timer peripheral to disable (LPC_TIMx [0...3]).
  */
 void TIM_DeInit(LPC_TIM_TypeDef* TIMx);
 
 /**
- * @brief      Enables the specified Timer/Counter peripheral.
+ * @brief Starts the timer counter.
  *
- * This function sets the enable bit in the TCR register of the given timer
- * peripheral, allowing it to start counting based on its configuration.
+ * Sets the Counter Enable bit in the Timer Control Register (TCR). The Timer Counter (TC) will
+ * begin incrementing on every PCLK or external edge, depending on the initialized mode.
  *
- * @param[in]  TIMx  Pointer to the timer peripheral (LPC_TIMx [0...3]).
- *
- * @note:
- * - Call this function after initializing the timer to start it.
- * - The timer will run according to its configured mode and prescaler settings.
+ * @param TIMx Pointer to the timer peripheral (LPC_TIMx [0...3]).
  */
 void TIM_Enable(LPC_TIM_TypeDef* TIMx);
 
 /**
- * @brief      Disables the specified Timer/Counter peripheral.
+ * @brief Stops the timer counter.
  *
- * This function clears the enable bit in the TCR register of the given timer
- * peripheral, stopping it from counting. The timer's current count value is
- * retained and can be resumed by calling TIM_Enable again.
+ * Clears the Counter Enable bit in the TCR register. The Timer Counter (TC) will hold its current
+ * value until enabled again or reset.
  *
- * @param[in]  TIMx  Pointer to the timer peripheral (LPC_TIMx [0...3]).
- *
- * @note:
- * - Call this function to stop the timer without resetting its count value.
- * - The timer can be restarted with TIM_Enable, and it will continue from its current count.
+ * @param TIMx Pointer to the timer peripheral (LPC_TIMx [0...3]).
  */
 void TIM_Disable(LPC_TIM_TypeDef* TIMx);
 
 /**
- * @brief      Reads the current value of the timer counter.
+ * @brief Retrieves the current value of the Timer Counter (TC).
  *
- * This function returns the current count value from the Timer Counter (TC) register
- * of the specified timer peripheral.
+ * Reads the 32-bit TC register of the specified timer peripheral, which contains the current count
+ * value.
  *
- * @param[in]  TIMx  Pointer to the timer peripheral (LPC_TIMx [0...3]).
- *
- * @return     Current value of the timer counter.
- *
- * @note:
- * - Use this function to obtain the current count for timing or measurement purposes.
- * - The timer must be enabled and running to get meaningful values from this function.
+ * @param TIMx Pointer to the timer peripheral (LPC_TIMx [0...3]).
+ * @return Current 32-bit counter value.
  */
 uint32_t TIM_ReadTimer(LPC_TIM_TypeDef* TIMx);
 
 /**
- * @brief      Reads the current value of the prescale counter.
+ * @brief Retrieves the current value of the Prescale Counter (PC).
  *
- * This function returns the current count value from the Prescale Counter (PC) register
- * of the specified timer peripheral. The prescale counter increments based on the
- * configured prescale option and is used to generate timer ticks.
+ * Reads the 32-bit PC register of the specified timer peripheral, which contains the current value
+ * of the prescale counter.
  *
- * @param[in]  TIMx  Pointer to the timer peripheral (LPC_TIMx [0...3]).
- *
- * @return     Current value of the prescale counter.
- *
- * @note:
- * - Use this function to monitor the prescale counter for timing adjustments or debugging.
+ * @param TIMx Pointer to the timer peripheral (LPC_TIMx [0...3]).
+ * @return Current 32-bit prescale counter value.
  */
 uint32_t TIM_ReadPrescale(LPC_TIM_TypeDef* TIMx);
 
 /**
- * @brief      Resets the Timer/Counter peripheral.
+ * @brief Resets the Timer Counter and Prescale Counter.
  *
- * This function synchronously resets the Timer Counter (TC) and Prescale Counter (PC)
- * of the specified timer by setting and then clearing the reset bit in the TCR register.
+ * Toggles the Reset bit in the Timer Control Register (TCR). This synchronously clears both the TC
+ * and PC to zero on the next positive edge of PCLK.
  *
- * @param[in]  TIMx  Pointer to the timer peripheral (LPC_TIMx [0...3]).
- *
- * @note:
- * - Use this function to reset the timer counters to zero.
+ * @param TIMx Pointer to the timer peripheral (LPC_TIMx [0...3]).
  */
 void TIM_ResetCounter(LPC_TIM_TypeDef* TIMx);
 
 /**
- * @brief      Configures the match channel for the specified Timer/Counter peripheral.
+ * @brief Configures the match logic and external output for a timer channel.
  *
- * This function sets up the match value, interrupt, reset, stop, and external match output
- * for the selected match channel. It also clears the corresponding interrupt flag before
- * configuration to avoid spurious interrupts.
+ * Sets the Match Control Register (MCR) to define hardware actions (Interrupt, Reset, or Stop) upon
+ * a match event. It also updates the match value and configures the External Match Register (EMR)
+ * to control physical MATn.x pins.
  *
- * @param[in]  TIMx         Pointer to the timer peripheral (LPC_TIMx [0...3]).
- * @param[in]  matchCfg     Pointer to a TIM_MATCHCFG_Type structure.
- *
- * @note:
- * - The interrupt flag for the selected channel is cleared before configuration.
- * - The function updates MRx, MCR, and EMR registers according to the configuration.
- * - Call this function after initializing the timer to set up match behavior.
+ * @param TIMx     Pointer to the timer peripheral (LPC_TIMx [0...3]).
+ * @param matchCfg Pointer to a TIM_MATCHCFG_T structure with match settings.
  */
 void TIM_ConfigMatch(LPC_TIM_TypeDef* TIMx, const TIM_MATCHCFG_T* matchCfg);
 
 /**
- * @brief      Updates the match value for the specified Timer/Counter channel.
+ * @brief Updates the value of a specific Match Register.
  *
- * This function sets the match register (MR0-MR3) of the given timer peripheral
- * to the provided value for the selected match channel. It does not modify any
- * match control or interrupt settings.
+ * Writes a new 32-bit value to the selected Match Register (MR0-MR3). It also clears the
+ * corresponding interrupt flag to prevent immediate triggering if the new value is equal to the
+ * current counter.
  *
- * @param[in]  TIMx         Pointer to the timer peripheral (LPC_TIMx [0...3]).
- * @param[in]  channel      Match channel to update (TIM_MATCH_x [0..3]).
- * @param[in]  matchValue   New value to set in the match register.
- *
- * @note:
- * - Only the match value is updated; match behavior must be configured separately.
- * - Call this function to change the match value during runtime.
+ * @param TIMx       Pointer to the timer peripheral (LPC_TIMx [0...3]).
+ * @param channel    The match channel (TIM_MATCH_x [0...3]).
+ * @param matchValue The new 32-bit match value.
  */
 void TIM_UpdateMatchValue(LPC_TIM_TypeDef* TIMx, TIM_MATCH_CH channel, uint32_t matchValue);
 
 /**
- * @brief      Sets the external match output type for a specific match channel.
+ * @brief Configures the behavior of the external match pins (MATn.x).
  *
- * This function configures the external match output behavior for the selected match channel
- * (MAT0...MAT3) of the specified Timer/Counter peripheral. It updates the EMR register to set
- * the output type for the given channel.
+ * Sets the External Match Register (EMR) to define how the physical pin reacts when a match occurs.
+ * Options include Do Nothing, Clear, Set, or Toggle the pin.
  *
- * @param[in]  TIMx     Pointer to the timer peripheral (LPC_TIMx [0...3]).
- * @param[in]  channel  Match channel to configure (TIM_MATCH_x [0..3]).
- * @param[in]  type     External match output type:
- *                      - TIM_NOTHING
- *                      - TIM_LOW
- *                      - TIM_HIGH
- *                      - TIM_TOGGLE
- *
- * @note:
- * - Only the specified channel is affected.
- * - Call this function after initializing the timer and before starting it.
+ * @param TIMx    Pointer to the timer peripheral (LPC_TIMx [0...3]).
+ * @param channel The match channel associated with the MAT pin (TIM_MATCH_x [0...3]).
+ * @param type    The external match operation (TIM_NOTHING, TIM_LOW, TIM_HIGH, TIM_TOGGLE).
  */
 void TIM_SetMatchExt(LPC_TIM_TypeDef* TIMx, TIM_MATCH_CH channel, TIM_EXTMATCH_OPT type);
 
 /**
- * @brief      Configures the capture channel for the specified Timer/Counter peripheral.
+ * @brief Configures the capture logic for external signal timing.
  *
- * This function sets up the capture behavior for the selected channel, including
- * edge detection (rising, falling), interrupt generation, and channel selection.
- * It updates the CCR register according to the configuration structure.
+ * Sets the Capture Control Register (CCR) to define which edges (Rising, Falling, or Both) on a
+ * CAPn.x input will cause the Timer Counter (TC) to be loaded into a Capture Register (CRx).
  *
- * @param[in]  TIMx     Pointer to the timer peripheral (LPC_TIMx [0...3]).
- * @param[in]  capCfg   Pointer to a TIM_CAPTURECFG_Type.
- *
- * @note:
- * - Only the specified channel is affected.
- * - Call this function after initializing the timer to set up capture behavior.
+ * @param TIMx   Pointer to the timer peripheral (LPC_TIMx [0...3]).
+ * @param capCfg Pointer to a TIM_CAPTURECFG_T structure with capture settings.
  */
 void TIM_ConfigCapture(LPC_TIM_TypeDef* TIMx, const TIM_CAPTURECFG_T* capCfg);
 
 /**
- * @brief      Reads the value of the capture register for the specified channel.
+ * @brief Retrieves the last value stored in a Capture Register.
  *
- * This function returns the value stored in the capture register (CR0 or CR1)
- * of the given timer peripheral, depending on the selected capture channel.
+ * Returns the 32-bit value latched in CR0 or CR1 during the last valid edge transition on the
+ * associated capture pin.
  *
- * @param[in]  TIMx     Pointer to the timer/counter peripheral (LPC_TIMx [0...3]).
- * @param[in]  channel  Capture channel to read:
- *                      - TIM_CAPTURE_0 : CAPn.0 input pin for TIMERn
- *                      - TIM_CAPTURE_1 : CAPn.1 input pin for TIMERn
- *
- * @return     Value of the selected capture register.
- *
- * @note:
- * - Use this function to obtain the timestamp captured on the specified input.
- * - The timer must be configured for capture mode before using this function.
+ * @param TIMx    Pointer to the timer peripheral (LPC_TIMx [0...3]).
+ * @param channel The capture channel to read (TIM_CAPTURE_0 or TIM_CAPTURE_1).
+ * @return The 32-bit captured Timer Counter value.
  */
 uint32_t TIM_GetCaptureValue(LPC_TIM_TypeDef* TIMx, TIM_CAPTURE_CH channel);
 
 /**
- * @brief      Clears the specified Timer/Counter interrupt pending flag.
+ * @brief Clears a pending interrupt flag for a timer event.
  *
- * This function clears the interrupt pending flag for the given match or capture
- * channel in the timer's interrupt register (IR). It can be used for both match
- * and capture interrupts.
+ * Writes a '1' to the corresponding bit in the Interrupt Register (IR). This acknowledges match or
+ * capture events within the ISR.
  *
- * @param[in]  TIMx     Pointer to the timer peripheral (LPC_TIMx [0...3]).
- * @param[in]  intFlag  Interrupt type to clear:
- *                      - TIM_MR0_INT: Match channel 0
- *                      - TIM_MR1_INT: Match channel 1
- *                      - TIM_MR2_INT: Match channel 2
- *                      - TIM_MR3_INT: Match channel 3
- *                      - TIM_CR0_INT: Capture channel 0
- *                      - TIM_CR1_INT: Capture channel 1
+ * @param TIMx    Pointer to the timer peripheral (LPC_TIMx [0...3]).
+ * @param intFlag The interrupt source to clear (TIM_xxx_INT).
  */
 void TIM_ClearIntPending(LPC_TIM_TypeDef* TIMx, TIM_INT intFlag);
 
 /**
- * @brief      Gets the interrupt status for the specified Timer/Counter channel.
+ * @brief Retrieves the status of a specific timer interrupt flag.
  *
- * This function checks if the interrupt flag for the given match or capture channel
- * is set in the timer's interrupt register (IR). It can be used for both match and
- * capture interrupts.
- *
- * @param[in]  TIMx     Pointer to the timer peripheral (LPC_TIMx [0...3]).
- * @param[in]  intFlag  Interrupt type to check:
- *                      - TIM_MR0_INT: Match channel 0
- *                      - TIM_MR1_INT: Match channel 1
- *                      - TIM_MR2_INT: Match channel 2
- *                      - TIM_MR3_INT: Match channel 3
- *                      - TIM_CR0_INT: Capture channel 0
- *                      - TIM_CR1_INT: Capture channel 1
- *
- * @return     FlagStatus
- *             - SET   : Interrupt is pending
- *             - RESET : No interrupt pending
+ * @param TIMx    Pointer to the timer peripheral (LPC_TIMx [0...3]).
+ * @param intFlag The interrupt source to check (TIM_xxx_INT).
+ * @return SET if the interrupt is pending, RESET otherwise.
  */
 FlagStatus TIM_GetIntStatus(LPC_TIM_TypeDef* TIMx, TIM_INT intFlag);
 
 /**
- * @brief      Configures the pin function for a specific timer/counter channel.
+ * @brief Configures the physical pin for a specific Timer function.
  *
- * This function sets the appropriate pin function for the selected timer/counter
- * capture or match channel, enabling its use for timer operations (capture or match).
+ * Maps a Timer function (Capture or Match) to a physical pin on the MCU using a lookup table of the
+ * available hardware mappings.
  *
- * @param[in]  option  Timer pin selection option (see TIM_PIN_OPTION).
- *
- * @note:
- * - All resistor modes for timer pins are set to tristate (floating) by default.
- * - Call this function before using the timer channel for capture or external match operations.
+ * @param option Selection from the available TIM_PIN_OPTION values.
  */
 void TIM_PinConfig(TIM_PIN_OPTION option);
 
