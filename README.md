@@ -46,8 +46,7 @@ robust, production-ready foundation for embedded development on the LPC17xx plat
 | `ADC`     | ✅ Completed | ✅ Completed | ✅ Completed |
 | `DAC`     | ✅ Completed | ✅ Completed | ✅ Completed |
 | `GPDMA`   | ✅ Completed | ✅ Completed | ✅ Completed |
-| `UART_X`  | 🔲 Planned  | 🔲 Planned  | 🔲 Planned  |
-| `UART_1`  | 🔲 Planned  | 🔲 Planned  | 🔲 Planned  |
+| `UART`    | ✅ Completed | ✅ Completed | ✅ Completed |
 
 _This table is continuously updated as development progresses._
 
