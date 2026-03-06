@@ -9,5 +9,5 @@
 
 void GPIO_RunTests(void);
 
-#endif //UNIT_TESTING_ENABLED
-#endif //LPC17XX_GPIO_TESTS_H
+#endif  // UNIT_TESTING_ENABLED
+#endif  // LPC17XX_GPIO_TESTS_H

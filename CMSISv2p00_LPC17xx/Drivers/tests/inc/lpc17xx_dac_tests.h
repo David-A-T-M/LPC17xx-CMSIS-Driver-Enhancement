@@ -9,5 +9,5 @@
 
 void DAC_RunTests(void);
 
-#endif // UNIT_TESTING_ENABLED
-#endif //LPC17XX_DAC_TESTS_H
+#endif  // UNIT_TESTING_ENABLED
+#endif  // LPC17XX_DAC_TESTS_H

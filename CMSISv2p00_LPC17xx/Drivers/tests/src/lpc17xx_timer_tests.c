@@ -23,24 +23,21 @@ uint8_t TIM_CmdTest(void);
 uint8_t TIM_GetCaptureValueTest(void);
 uint8_t TIM_ResetCounterTest(void);
 
-
 void TIMER_Setup(void) {
     LPC_TIM0->TCR = 0;
     LPC_TIM0->TCR = (1 << 1);
     LPC_TIM0->TCR = 0;
     LPC_TIM0->IR |= 0x3F;
     LPC_TIM0->CTCR = 0;
-    LPC_TIM0->PR = 0;
-    LPC_TIM0->MCR = 0;
-    LPC_TIM0->EMR = 0;
-    LPC_TIM0->CCR = 0;
-    LPC_TIM0->MR0 = 0;
-    LPC_TIM0->MR1 = 0;
+    LPC_TIM0->PR   = 0;
+    LPC_TIM0->MCR  = 0;
+    LPC_TIM0->EMR  = 0;
+    LPC_TIM0->CCR  = 0;
+    LPC_TIM0->MR0  = 0;
+    LPC_TIM0->MR1  = 0;
 }
 
-void TIMER_TearDown(void) {
-
-}
+void TIMER_TearDown(void) {}
 
 void TIMER_RunTests(void) {
     RUN_TESTS_INIT();
@@ -66,8 +63,8 @@ uint8_t TIM_InitTimerTest(void) {
     TEST_INIT();
 
     TIM_TIMERCFG_T cfg = {0};
-    cfg.prescaleOpt = TIM_US;
-    cfg.prescaleValue = 1000;
+    cfg.prescaleOpt    = TIM_US;
+    cfg.prescaleValue  = 1000;
 
     TIM_InitTimer(LPC_TIM0, &cfg);
     EXPECT_EQUAL(LPC_TIM0->CTCR & TIM_CTCR_MODE_MASK, TIM_TIMER_MODE);
@@ -84,8 +81,8 @@ uint8_t TIM_InitCounterTest(void) {
     TEST_INIT();
 
     TIM_COUNTERCFG_T cfg = {0};
-    cfg.input = TIM_CAPTURE_1;
-    cfg.edge = TIM_CTR_FALLING;
+    cfg.input            = TIM_CAPTURE_1;
+    cfg.edge             = TIM_CTR_FALLING;
 
     TIM_InitCounter(LPC_TIM0, &cfg);
     EXPECT_EQUAL(LPC_TIM0->CTCR & TIM_CTCR_MODE_MASK, TIM_CTR_FALLING);
@@ -102,8 +99,8 @@ uint8_t TIM_DeInitTest(void) {
     TEST_INIT();
 
     TIM_TIMERCFG_T cfg = {0};
-    cfg.prescaleOpt = TIM_TICK;
-    cfg.prescaleValue = 1;
+    cfg.prescaleOpt    = TIM_TICK;
+    cfg.prescaleValue  = 1;
 
     TIM_InitTimer(LPC_TIM0, &cfg);
     LPC_TIM0->TCR |= TIM_ENABLE;
@@ -119,8 +116,8 @@ uint8_t TIM_ClearIntPendingTest(void) {
     TEST_INIT();
 
     TIM_TIMERCFG_T cfg = {0};
-    cfg.prescaleOpt = TIM_TICK;
-    cfg.prescaleValue = 1;
+    cfg.prescaleOpt    = TIM_TICK;
+    cfg.prescaleValue  = 1;
 
     TIM_InitTimer(LPC_TIM0, &cfg);
     LPC_TIM0->MR0 = 0x10;
@@ -143,8 +140,8 @@ uint8_t TIM_GetIntStatusTest(void) {
     TEST_INIT();
 
     TIM_TIMERCFG_T cfg = {0};
-    cfg.prescaleOpt = TIM_TICK;
-    cfg.prescaleValue = 1;
+    cfg.prescaleOpt    = TIM_TICK;
+    cfg.prescaleValue  = 1;
 
     TIM_InitTimer(LPC_TIM0, &cfg);
     LPC_TIM0->MR0 = 0x10;
@@ -165,16 +162,17 @@ uint8_t TIM_ConfigMatchTest(void) {
     TEST_INIT();
 
     TIM_MATCHCFG_T matchCfg = {0};
-    matchCfg.channel = 0;
-    matchCfg.intEn = ENABLE;
-    matchCfg.resetEn = DISABLE;
-    matchCfg.stopEn = ENABLE;
-    matchCfg.extOpt = TIM_TOGGLE;
-    matchCfg.matchValue = 0xFF;
+    matchCfg.channel        = 0;
+    matchCfg.intEn          = ENABLE;
+    matchCfg.resetEn        = DISABLE;
+    matchCfg.stopEn         = ENABLE;
+    matchCfg.extOpt         = TIM_TOGGLE;
+    matchCfg.matchValue     = 0xFF;
     TIM_ConfigMatch(LPC_TIM0, &matchCfg);
 
     EXPECT_EQUAL(LPC_TIM0->MR0, 0xFF);
-    EXPECT_EQUAL(LPC_TIM0->MCR & TIM_MCR_CHANNEL_MASKBIT(0), TIM_INT_ON_MATCH(0) | TIM_STOP_ON_MATCH(0));
+    EXPECT_EQUAL(LPC_TIM0->MCR & TIM_MCR_CHANNEL_MASKBIT(0),
+                 TIM_INT_ON_MATCH(0) | TIM_STOP_ON_MATCH(0));
     EXPECT_EQUAL(LPC_TIM0->EMR & TIM_EMR_MASK(0), TIM_EM_SET(0, TIM_TOGGLE));
 
     ASSERT_TEST();
@@ -233,7 +231,8 @@ uint8_t TIM_GetCaptureValueTest(void) {
     if (LPC_TIM0->CR0 == 0x00) {
         EXPECT_EQUAL(LPC_TIM0->CR0, 0x00);
     } else {
-        printf("[⚠️ Warning] TIM_GetCaptureValueTest requires a full board reset before re-running.\n");
+        printf(
+            "[⚠️ Warning] TIM_GetCaptureValueTest requires a full board reset before re-running.\n");
         __test_passed = 0;
         ASSERT_TEST();
     }
@@ -262,4 +261,4 @@ uint8_t TIM_ResetCounterTest(void) {
     ASSERT_TEST();
 }
 
-#endif //UNIT_TESTING_ENABLED
+#endif  // UNIT_TESTING_ENABLED

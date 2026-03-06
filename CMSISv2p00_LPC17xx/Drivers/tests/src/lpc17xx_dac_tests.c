@@ -79,18 +79,18 @@ static uint8_t DAC_ConfigDAConverterControlTest(void) {
     DAC_Init();
 
     DAC_CONVERTER_CFG_T cfg = {0};
-    cfg.doubleBufferEnable = ENABLE;
-    cfg.counterEnable = DISABLE;
-    cfg.dmaEnable = ENABLE;
+    cfg.doubleBuffer        = ENABLE;
+    cfg.dmaCounter          = DISABLE;
+    cfg.dmaRequest          = ENABLE;
 
     DAC_ConfigDAConverterControl(&cfg);
     EXPECT_EQUAL(LPC_DAC->DACCTRL & DAC_DBLBUF_ENA, DAC_DBLBUF_ENA);
     EXPECT_EQUAL(LPC_DAC->DACCTRL & DAC_CNT_ENA, 0);
     EXPECT_EQUAL(LPC_DAC->DACCTRL & DAC_DMA_ENA, DAC_DMA_ENA);
 
-    cfg.doubleBufferEnable = DISABLE;
-    cfg.counterEnable = ENABLE;
-    cfg.dmaEnable = DISABLE;
+    cfg.doubleBuffer = DISABLE;
+    cfg.dmaCounter   = ENABLE;
+    cfg.dmaRequest   = DISABLE;
 
     DAC_ConfigDAConverterControl(&cfg);
     EXPECT_EQUAL(LPC_DAC->DACCTRL & DAC_DBLBUF_ENA, 0);

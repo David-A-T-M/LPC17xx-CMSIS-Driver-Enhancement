@@ -22,14 +22,12 @@ void EXTI_Setup(void) {
     NVIC_DisableIRQ(EINT2_IRQn);
     NVIC_DisableIRQ(EINT3_IRQn);
 
-    LPC_SC->EXTMODE = 0x0;
+    LPC_SC->EXTMODE  = 0x0;
     LPC_SC->EXTPOLAR = 0x0;
     LPC_SC->EXTINT |= 0xF;
 }
 
-void EXTI_TearDown(void) {
-
-}
+void EXTI_TearDown(void) {}
 
 void EXTI_RunTests(void) {
     RUN_TESTS_INIT();
@@ -52,7 +50,7 @@ void EXTI_RunTests(void) {
 uint8_t EXTI_InitTest(void) {
     TEST_INIT();
 
-    LPC_SC->EXTMODE = 0xF;
+    LPC_SC->EXTMODE  = 0xF;
     LPC_SC->EXTPOLAR = 0xF;
 
     EXTI_Init();
@@ -67,10 +65,7 @@ uint8_t EXTI_ConfigTest(void) {
     TEST_INIT();
 
     const EXTI_CFG_T cfg = {
-        .line = EXTI_EINT1,
-        .mode = EXTI_EDGE_SENSITIVE,
-        .polarity = EXTI_RISING_EDGE
-    };
+        .line = EXTI_EINT1, .mode = EXTI_EDGE_SENSITIVE, .polarity = EXTI_RISING_EDGE};
 
     EXTI_Config(&cfg);
 
@@ -85,10 +80,7 @@ uint8_t EXTI_ConfigEnableTest(void) {
     TEST_INIT();
 
     const EXTI_CFG_T cfg = {
-        .line = EXTI_EINT3,
-        .mode = EXTI_EDGE_SENSITIVE,
-        .polarity = EXTI_RISING_EDGE
-    };
+        .line = EXTI_EINT3, .mode = EXTI_EDGE_SENSITIVE, .polarity = EXTI_RISING_EDGE};
 
     EXTI_Config(&cfg);
 
@@ -103,10 +95,7 @@ uint8_t EXTI_ClearFlagTest(void) {
     TEST_INIT();
 
     const EXTI_CFG_T cfg = {
-        .line = EXTI_EINT3,
-        .mode = EXTI_EDGE_SENSITIVE,
-        .polarity = EXTI_RISING_EDGE
-    };
+        .line = EXTI_EINT3, .mode = EXTI_EDGE_SENSITIVE, .polarity = EXTI_RISING_EDGE};
     EXTI_Config(&cfg);
 
     EDGE_INT_P2_LOW(13);
@@ -123,10 +112,7 @@ uint8_t EXTI_GetFlagTest(void) {
     TEST_INIT();
 
     const EXTI_CFG_T cfg = {
-        .line = EXTI_EINT3,
-        .mode = EXTI_EDGE_SENSITIVE,
-        .polarity = EXTI_RISING_EDGE
-    };
+        .line = EXTI_EINT3, .mode = EXTI_EDGE_SENSITIVE, .polarity = EXTI_RISING_EDGE};
     EXTI_Config(&cfg);
     EXTI_ClearFlag(EXTI_EINT1);
     EXTI_ClearFlag(EXTI_EINT3);
@@ -152,4 +138,4 @@ uint8_t EXTI_EnableIRQTest(void) {
     ASSERT_TEST();
 }
 
-#endif // UNIT_TESTING_ENABLED
+#endif  // UNIT_TESTING_ENABLED
