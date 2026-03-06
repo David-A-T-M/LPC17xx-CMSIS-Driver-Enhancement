@@ -9,5 +9,5 @@
 
 void TIMER_RunTests(void);
 
-#endif // UNIT_TESTING_ENABLED
-#endif //LPC17XX_TIMER_TESTS_H
+#endif  // UNIT_TESTING_ENABLED
+#endif  // LPC17XX_TIMER_TESTS_H

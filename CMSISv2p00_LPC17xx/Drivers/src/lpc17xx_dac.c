@@ -5,19 +5,16 @@
  * @date        21. May. 2010
  * @author      NXP MCU SW Application Team
  *
- * Software that is described herein is for illustrative purposes only
- * which provides customers with programming information regarding the
- * products. This software is supplied "AS IS" without any warranties.
- * NXP Semiconductors assumes no responsibility or liability for the
- * use of the software, conveys no license or title under any patent,
- * copyright, or mask work right to the product. NXP Semiconductors
- * reserves the right to make changes in the software without
- * notification. NXP Semiconductors also make no representation or
- * warranty that such application will be suitable for the specified
- * use without further testing or modification.
+ * Software that is described herein is for illustrative purposes only which provides customers with
+ * programming information regarding the products. This software is supplied "AS IS" without any
+ * warranties. NXP Semiconductors assumes no responsibility or liability for the use of the
+ * software, conveys no license or title under any patent, copyright, or mask work right to the
+ * product. NXP Semiconductors reserves the right to make changes in the software without
+ * notification. NXP Semiconductors also make no representation or warranty that such application
+ * will be suitable for the specified use without further testing or modification.
  *
  * @par Refactor:
- * Last update: 22/02/2025, Author: David Trujillo Medina
+ * Last update: 22/02/2026, Author: David Trujillo Medina
  */
 
 /* ---------------------------- Peripheral group ---------------------------- */
@@ -66,12 +63,13 @@ void DAC_SetBias(DAC_MAX_CURRENT maxCurr) {
 }
 
 void DAC_ConfigDAConverterControl(const DAC_CONVERTER_CFG_T* dacCfg) {
-    CHECK_PARAM(PARAM_FUNCTIONALSTATE(dacCfg->doubleBufferEnable));
-    CHECK_PARAM(PARAM_FUNCTIONALSTATE(dacCfg->counterEnable));
-    CHECK_PARAM(PARAM_FUNCTIONALSTATE(dacCfg->dmaEnable));
+    CHECK_PARAM(PARAM_FUNCTIONALSTATE(dacCfg->doubleBuffer));
+    CHECK_PARAM(PARAM_FUNCTIONALSTATE(dacCfg->dmaCounter));
+    CHECK_PARAM(PARAM_FUNCTIONALSTATE(dacCfg->dmaRequest));
 
-    const uint32_t ctrl = (dacCfg->doubleBufferEnable ? DAC_DBLBUF_ENA : 0) |
-                          (dacCfg->counterEnable ? DAC_CNT_ENA : 0) | (dacCfg->dmaEnable ? DAC_DMA_ENA : 0);
+    const uint32_t ctrl = (dacCfg->doubleBuffer ? DAC_DBLBUF_ENA : 0) |
+                          (dacCfg->dmaCounter ? DAC_CNT_ENA : 0) |
+                          (dacCfg->dmaRequest ? DAC_DMA_ENA : 0);
     LPC_DAC->DACCTRL = ctrl;
 }
 

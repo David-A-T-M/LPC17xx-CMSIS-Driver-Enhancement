@@ -5,19 +5,16 @@
  * @date        18. June. 2010
  * @author      NXP MCU SW Application Team
  *
- * Software that is described herein is for illustrative purposes only
- * which provides customers with programming information regarding the
- * products. This software is supplied "AS IS" without any warranties.
- * NXP Semiconductors assumes no responsibility or liability for the
- * use of the software, conveys no license or title under any patent,
- * copyright, or mask work right to the product. NXP Semiconductors
- * reserves the right to make changes in the software without
- * notification. NXP Semiconductors also make no representation or
- * warranty that such application will be suitable for the specified
- * use without further testing or modification.
+ * Software that is described herein is for illustrative purposes only which provides customers with
+ * programming information regarding the products. This software is supplied "AS IS" without any
+ * warranties. NXP Semiconductors assumes no responsibility or liability for the use of the
+ * software, conveys no license or title under any patent, copyright, or mask work right to the
+ * product. NXP Semiconductors reserves the right to make changes in the software without
+ * notification. NXP Semiconductors also make no representation or warranty that such application
+ * will be suitable for the specified use without further testing or modification.
  *
  * @par Refactor:
- * Last update: 22/02/2025, Author: David Trujillo Medina
+ * Last update: 22/02/2026, Author: David Trujillo Medina
  */
 
 /* ---------------------------- Peripheral group ---------------------------- */
@@ -72,42 +69,42 @@ void ADC_PinConfig(ADC_CHANNEL channel) {
 
     switch (channel) {
         case ADC_CHANNEL_0:
-            LPC_PINCON->PINSEL1 = (LPC_PINCON->PINSEL1 & ~(0x3 << 14)) | (0x1 << 14);
+            LPC_PINCON->PINSEL1  = (LPC_PINCON->PINSEL1 & ~(0x3 << 14)) | (0x1 << 14);
             LPC_PINCON->PINMODE1 = (LPC_PINCON->PINMODE1 & ~(0x3 << 14)) | (0x2 << 14);
             break;
 
         case ADC_CHANNEL_1:
-            LPC_PINCON->PINSEL1 = (LPC_PINCON->PINSEL1 & ~(0x3 << 16)) | (0x1 << 16);
+            LPC_PINCON->PINSEL1  = (LPC_PINCON->PINSEL1 & ~(0x3 << 16)) | (0x1 << 16);
             LPC_PINCON->PINMODE1 = (LPC_PINCON->PINMODE1 & ~(0x3 << 16)) | (0x2 << 16);
             break;
 
         case ADC_CHANNEL_2:
-            LPC_PINCON->PINSEL1 = (LPC_PINCON->PINSEL1 & ~(0x3 << 18)) | (0x1 << 18);
+            LPC_PINCON->PINSEL1  = (LPC_PINCON->PINSEL1 & ~(0x3 << 18)) | (0x1 << 18);
             LPC_PINCON->PINMODE1 = (LPC_PINCON->PINMODE1 & ~(0x3 << 18)) | (0x2 << 18);
             break;
 
         case ADC_CHANNEL_3:
-            LPC_PINCON->PINSEL1 = (LPC_PINCON->PINSEL1 & ~(0x3 << 20)) | (0x1 << 20);
+            LPC_PINCON->PINSEL1  = (LPC_PINCON->PINSEL1 & ~(0x3 << 20)) | (0x1 << 20);
             LPC_PINCON->PINMODE1 = (LPC_PINCON->PINMODE1 & ~(0x3 << 20)) | (0x2 << 20);
             break;
 
         case ADC_CHANNEL_4:
-            LPC_PINCON->PINSEL3 = (LPC_PINCON->PINSEL3 & ~(0x3 << 28)) | (0x3 << 28);
+            LPC_PINCON->PINSEL3  = (LPC_PINCON->PINSEL3 & ~(0x3 << 28)) | (0x3 << 28);
             LPC_PINCON->PINMODE3 = (LPC_PINCON->PINMODE3 & ~(0x3 << 28)) | (0x2 << 28);
             break;
 
         case ADC_CHANNEL_5:
-            LPC_PINCON->PINSEL3 = (LPC_PINCON->PINSEL3 & ~(0x3 << 30)) | (0x3 << 30);
+            LPC_PINCON->PINSEL3  = (LPC_PINCON->PINSEL3 & ~(0x3 << 30)) | (0x3 << 30);
             LPC_PINCON->PINMODE3 = (LPC_PINCON->PINMODE3 & ~(0x3 << 30)) | (0x2 << 30);
             break;
 
         case ADC_CHANNEL_6:
-            LPC_PINCON->PINSEL0 = (LPC_PINCON->PINSEL0 & ~(0x3 << 6)) | (0x2 << 6);
+            LPC_PINCON->PINSEL0  = (LPC_PINCON->PINSEL0 & ~(0x3 << 6)) | (0x2 << 6);
             LPC_PINCON->PINMODE0 = (LPC_PINCON->PINMODE0 & ~(0x3 << 6)) | (0x2 << 6);
             break;
 
         case ADC_CHANNEL_7:
-            LPC_PINCON->PINSEL0 = (LPC_PINCON->PINSEL0 & ~(0x3 << 4)) | (0x2 << 4);
+            LPC_PINCON->PINSEL0  = (LPC_PINCON->PINSEL0 & ~(0x3 << 4)) | (0x2 << 4);
             LPC_PINCON->PINMODE0 = (LPC_PINCON->PINMODE0 & ~(0x3 << 4)) | (0x2 << 4);
             break;
 

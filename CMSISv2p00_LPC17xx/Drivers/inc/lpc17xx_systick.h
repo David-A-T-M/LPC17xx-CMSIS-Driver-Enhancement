@@ -6,16 +6,13 @@
  * @date        21. May. 2010
  * @author      NXP MCU SW Application Team
  *
- * Software that is described herein is for illustrative purposes only
- * which provides customers with programming information regarding the
- * products. This software is supplied "AS IS" without any warranties.
- * NXP Semiconductors assumes no responsibility or liability for the
- * use of the software, conveys no license or title under any patent,
- * copyright, or mask work right to the product. NXP Semiconductors
- * reserves the right to make changes in the software without
- * notification. NXP Semiconductors also make no representation or
- * warranty that such application will be suitable for the specified
- * use without further testing or modification.
+ * Software that is described herein is for illustrative purposes only which provides customers with
+ * programming information regarding the products. This software is supplied "AS IS" without any
+ * warranties. NXP Semiconductors assumes no responsibility or liability for the use of the
+ * software, conveys no license or title under any patent, copyright, or mask work right to the
+ * product. NXP Semiconductors reserves the right to make changes in the software without
+ * notification. NXP Semiconductors also make no representation or warranty that such application
+ * will be suitable for the specified use without further testing or modification.
  *
  * @par Refactor:
  * Date: 09/07/2025, Author: David Trujillo Medina
@@ -66,9 +63,13 @@ extern "C" {
  */
 
 /**
- * @brief       Initializes the System Tick timer using the internal CPU clock source.
+ * @brief Initializes the SysTick timer using the internal processor clock.
  *
- * @param[in]   time    Time interval in milliseconds.
+ * Calculates the required number of ticks based on the SystemCoreClock to
+ * achieve a specific millisecond interval. It configures the LOAD register,
+ * resets the current value, and selects the internal clock as the source.
+ *
+ * @param time Desired interval in milliseconds.
  *
  * @note        If the requested time exceeds the maximum possible interval for the SysTick timer,
  *              the LOAD register is set to its maximum value ST_MAX_LOAD, resulting in the
@@ -77,90 +78,102 @@ extern "C" {
 void SYSTICK_InternalInit(uint32_t time);
 
 /**
- * @brief       Initializes the System Tick timer using an external clock source.
+ * @brief Initializes the SysTick timer using an external clock source.
  *
- * This function configures the pin for external SysTick clock input, and initializes the
- * SysTick timer to use the external clock source. If the requested time exceeds the maximum
- * possible interval for the SysTick timer with the given external frequency, the LOAD register
- * is set to its maximum value ST_MAX_LOAD, resulting in the longest possible timer interval.
+ * Configures the STCLK pin via PINSEL and calculates the LOAD value based on the provided external
+ * frequency. This mode is used when a precise external reference is required or to save power by
+ * bypassing the internal PLL.
  *
- * @param[in]   extFreq External clock frequency in Hz.
- * @param[in]   time    Time interval in milliseconds.
- *
- * @note        If the requested time exceeds the maximum possible interval for the SysTick timer
- *              with the given external frequency, the LOAD register is set to its maximum value
- *              ST_MAX_LOAD, resulting in the longest possible timer interval.
+ * @param extFreq Frequency of the external clock source in Hz.
+ * @param time    Desired interval in milliseconds.
  */
 void SYSTICK_ExternalInit(uint32_t extFreq, uint32_t time);
 
 /**
- * @brief       Enable or disable the System Tick counter.
+ * @brief Enables or disables the SysTick counter.
  *
- * @param[in]   newState    System Tick counter status, should be:
- *                          - ENABLE
- *                          - DISABLE
+ * Controls the ENABLE bit in the SysTick Control and Status Register (STCSR). When enabled, the
+ * counter starts decrementing from the LOAD value.
+ *
+ * @param newState ENABLE to start the counter, DISABLE to stop it.
  */
 void SYSTICK_Cmd(FunctionalState newState);
 
 /**
- * @brief       Enable or disable the System Tick interrupt.
+ * @brief Enables or disables the SysTick exception request.
  *
- * @param[in]   newState    System Tick interrupt status, should be:
- *                          - ENABLE
- *                          - DISABLE
+ * Controls the TICKINT bit in the STCSR register. If enabled, the SysTick exception is generated
+ * when the counter reaches zero.
+ *
+ * @param newState ENABLE to activate interrupts, DISABLE to deactivate them.
  */
 void SYSTICK_IntCmd(FunctionalState newState);
 
 /**
- * @brief       Get the current value of the System Tick counter.
+ * @brief Retrieves the current value of the SysTick counter.
  *
- * @return      Current value of the System Tick counter.
-*/
+ * Reads the VAL register, which contains the current count of the
+ * 24-bit down-counter.
+ *
+ * @return Current value of the 24-bit counter.
+ */
 static __INLINE uint32_t SYSTICK_GetCurrentValue(void) {
     return (SysTick->VAL);
 }
 
 /**
- * @brief       Clear the System Tick counter flag.
-*/
+ * @brief Clears the SysTick Count Flag.
+ *
+ * Performs a dummy read of the CTRL register. According to the ARM Cortex-M3 architecture, reading
+ * the SysTick Control and Status Register clears the COUNTFLAG bit to 0.
+ */
 static __INLINE void SYSTICK_ClearCounterFlag(void) {
     (void)SysTick->CTRL;
 }
 
 /**
- * @brief       Get the current reload value of the System Tick timer.
+ * @brief Retrieves the current reload (LOAD) value.
  *
- * @return      Current reload value.
+ * Returns the 24-bit value currently programmed in the LOAD register, masked to ensure only valid
+ * bits are returned.
+ *
+ * @return The 24-bit reload value.
  */
 static __INLINE uint32_t SYSTICK_GetReloadValue(void) {
     return (SysTick->LOAD & ST_MAX_LOAD);
 }
 
 /**
- * @brief       Set a new reload value for the System Tick timer.
+ * @brief Sets a new reload value for the counter.
  *
- * @param[in]   reloadTicks Reload value to set, in SysTick timer ticks.
+ * Updates the LOAD register with a new 24-bit value. The new value takes effect the next time the
+ * counter reaches zero or if the VAL register is manually cleared.
  *
- * @note        If reloadValue exceeds 24 bits, only the least significant 24 bits are used.
-*/
+ * @param reloadTicks The new 24-bit reload value (Max 0xFFFFFF).
+ */
 static __INLINE void SYSTICK_SetReloadValue(uint32_t reloadTicks) {
     SysTick->LOAD = (reloadTicks & ST_MAX_LOAD);
 }
 
 /**
- * @brief       Check if the System Tick timer is currently enabled.
+ * @brief Checks if the SysTick counter is currently enabled.
  *
- * @return      SET if enabled, RESET otherwise.
+ * Verifies the status of the ENABLE bit in the CTRL register.
+ *
+ * @return SET if the counter is enabled, RESET otherwise.
  */
 static __INLINE FlagStatus SYSTICK_IsActive(void) {
     return (SysTick->CTRL & ST_CTRL_ENABLE) ? SET : RESET;
 }
 
 /**
- * @brief       Check if the System Tick COUNTFLAG is set (timer has fired).
+ * @brief Checks if the SysTick timer has counted to zero since the last read.
  *
- * @return      1 if COUNTFLAG is set, 0 otherwise.
-*/
+ * Reads the COUNTFLAG bit in the CTRL register. This bit is set to 1 when the counter transitions
+ * from 1 to 0.
+ *
+ * @return SET if the timer has fired, RESET otherwise.
+ */
 static __INLINE FlagStatus SYSTICK_HasFired(void) {
     return (SysTick->CTRL & ST_CTRL_COUNTFLAG) ? SET : RESET;
 }

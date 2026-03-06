@@ -114,11 +114,13 @@ uint8_t PWM_DeInitTest(void) {
     cfg.prescaleValue  = 1;
 
     PWM_InitTimer(&cfg);
-    // counter enable and PWM enable bits are set to check if they are cleared after de-initialization
+    // counter enable and PWM enable bits are set to check if they are cleared after
+    // de-initialization
     LPC_PWM1->TCR |= PWM_TCR_COUNTER_ENABLE | PWM_TCR_PWM_ENABLE;
 
     PWM_DeInit();
-    // Power for PWM1 should be disabled after de-initialization, so bit 6 in PCONP should be cleared
+    // Power for PWM1 should be disabled after de-initialization, so bit 6 in PCONP should be
+    // cleared
     EXPECT_EQUAL((LPC_SC->PCONP & 1UL << 6) >> 1, 0x00);
     LPC_SC->PCONP |= 1UL << 6;  // Re-enable power for PWM1 for other tests
 
@@ -323,7 +325,8 @@ uint8_t PWM_ConfigCaptureTest(void) {
     const PWM_CAPTURECFG_T capCfg = {0, 1, 0, 1};
     PWM_ConfigCapture(&capCfg);
 
-    EXPECT_EQUAL(LPC_PWM1->CCR & PWM_CCR_CHANNEL_MASKBIT(0), PWM_CCR_CAP_RISING(0) | PWM_CCR_INT_ON_CAP(0));
+    EXPECT_EQUAL(LPC_PWM1->CCR & PWM_CCR_CHANNEL_MASKBIT(0),
+                 PWM_CCR_CAP_RISING(0) | PWM_CCR_INT_ON_CAP(0));
 
     ASSERT_TEST();
 }
@@ -338,7 +341,8 @@ uint8_t PWM_GetCaptureValueTest(void) {
     if (LPC_PWM1->CR0 == 0x00) {
         EXPECT_EQUAL(PWM_GetCaptureValue(PWM_CAPTURE_0), 0x00);
     } else {
-        printf("[⚠️ Warning] PWM_GetCaptureValueTest requires a full board reset before re-running.\n");
+        printf(
+            "[⚠️ Warning] PWM_GetCaptureValueTest requires a full board reset before re-running.\n");
         __test_passed = 0;
         ASSERT_TEST();
     }
@@ -350,4 +354,4 @@ uint8_t PWM_GetCaptureValueTest(void) {
     ASSERT_TEST();
 }
 
-#endif  //UNIT_TESTING_ENABLED
+#endif  // UNIT_TESTING_ENABLED

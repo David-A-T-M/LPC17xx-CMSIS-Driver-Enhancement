@@ -1,23 +1,20 @@
 /**
  * @file        lpc17xx_gpio.c
- * @brief        Contains all functions support for GPIO firmware library on LPC17xx
- * @version        2.0
+ * @brief       Contains all functions support for GPIO firmware library on LPC17xx
+ * @version     2.0
  * @date        21. May. 2010
- * @author        NXP MCU SW Application Team
+ * @author      NXP MCU SW Application Team
  *
- * Software that is described herein is for illustrative purposes only
- * which provides customers with programming information regarding the
- * products. This software is supplied "AS IS" without any warranties.
- * NXP Semiconductors assumes no responsibility or liability for the
- * use of the software, conveys no license or title under any patent,
- * copyright, or mask work right to the product. NXP Semiconductors
- * reserves the right to make changes in the software without
- * notification. NXP Semiconductors also make no representation or
- * warranty that such application will be suitable for the specified
- * use without further testing or modification.
+ * Software that is described herein is for illustrative purposes only which provides customers with
+ * programming information regarding the products. This software is supplied "AS IS" without any
+ * warranties. NXP Semiconductors assumes no responsibility or liability for the use of the
+ * software, conveys no license or title under any patent, copyright, or mask work right to the
+ * product. NXP Semiconductors reserves the right to make changes in the software without
+ * notification. NXP Semiconductors also make no representation or warranty that such application
+ * will be suitable for the specified use without further testing or modification.
  *
  * @par Refactor:
- * Last update: 20/02/2025, Author: David Trujillo Medina
+ * Last update: 20/02/2026, Author: David Trujillo Medina
  */
 
 /* ---------------------------- Peripheral group ---------------------------- */
@@ -187,7 +184,8 @@ void GPIO_IntConfigPort(LPC_PORT port, uint32_t newValue, GPIO_INT_EDGE edgeStat
     *pIntReg = newValue;
 }
 
-void GPIO_IntConfigPin(LPC_PORT port, LPC_PIN pin, GPIO_INT_EDGE edgeState, FunctionalState newState) {
+void GPIO_IntConfigPin(LPC_PORT port, LPC_PIN pin, GPIO_INT_EDGE edgeState,
+                       FunctionalState newState) {
     CHECK_PARAM(PARAM_GPIO_INT_PORT(port));
     CHECK_PARAM(PARAM_LPC_PIN(pin));
     CHECK_PARAM(PARAM_GPIO_INT_EDGE(edgeState));
@@ -228,9 +226,11 @@ SetState GPIO_GetPinIntStatus(LPC_PORT port, uint32_t pin, GPIO_INT_EDGE edgeSta
     const uint32_t pinMask    = GPIO_PIN_MASK << pin;
 
     if (port == PORT_0) {
-        pIntStatReg = edgeState == GPIO_INT_RISING ? &LPC_GPIOINT->IO0IntStatR : &LPC_GPIOINT->IO0IntStatF;
+        pIntStatReg =
+            edgeState == GPIO_INT_RISING ? &LPC_GPIOINT->IO0IntStatR : &LPC_GPIOINT->IO0IntStatF;
     } else {
-        pIntStatReg = edgeState == GPIO_INT_RISING ? &LPC_GPIOINT->IO2IntStatR : &LPC_GPIOINT->IO2IntStatF;
+        pIntStatReg =
+            edgeState == GPIO_INT_RISING ? &LPC_GPIOINT->IO2IntStatR : &LPC_GPIOINT->IO2IntStatF;
     }
 
     if ((*pIntStatReg & pinMask) != 0U) {
@@ -286,7 +286,8 @@ void FIO_IntConfigPort(LPC_PORT port, uint32_t newValue, GPIO_INT_EDGE edgeState
     GPIO_IntConfigPort(port, newValue, edgeState);
 }
 
-void FIO_IntConfigPin(LPC_PORT port, LPC_PIN pin, GPIO_INT_EDGE edgeState, FunctionalState newState) {
+void FIO_IntConfigPin(LPC_PORT port, LPC_PIN pin, GPIO_INT_EDGE edgeState,
+                      FunctionalState newState) {
     GPIO_IntConfigPin(port, pin, edgeState, newState);
 }
 
@@ -398,7 +399,8 @@ void FIO_HalfWordTogglePins(LPC_PORT port, GPIO_HALFWORD halfword, uint16_t pinM
     }
 }
 
-void FIO_HalfWordSetMask(LPC_PORT port, GPIO_HALFWORD halfword, uint16_t pinMask, FunctionalState newState) {
+void FIO_HalfWordSetMask(LPC_PORT port, GPIO_HALFWORD halfword, uint16_t pinMask,
+                         FunctionalState newState) {
     CHECK_PARAM(PARAM_LPC_PORT(port));
     CHECK_PARAM(PARAM_GPIO_HALFWORD(halfword));
     CHECK_PARAM(PARAM_FUNCTIONALSTATE(newState));

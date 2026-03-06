@@ -12,6 +12,7 @@ void run_all_tests(void) {
     ADC_RunTests();
     DAC_RunTests();
     GPDMA_RunTests();
+    UART_RunTests();
 }
 
-#endif //UNIT_TESTING_ENABLED
+#endif  // UNIT_TESTING_ENABLED

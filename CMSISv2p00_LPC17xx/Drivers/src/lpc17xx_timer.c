@@ -5,19 +5,16 @@
  * @date        18. June. 2010
  * @author      NXP MCU SW Application Team
  *
- * Software that is described herein is for illustrative purposes only
- * which provides customers with programming information regarding the
- * products. This software is supplied "AS IS" without any warranties.
- * NXP Semiconductors assumes no responsibility or liability for the
- * use of the software, conveys no license or title under any patent,
- * copyright, or mask work right to the product. NXP Semiconductors
- * reserves the right to make changes in the software without
- * notification. NXP Semiconductors also make no representation or
- * warranty that such application will be suitable for the specified
- * use without further testing or modification.
+ * Software that is described herein is for illustrative purposes only which provides customers with
+ * programming information regarding the products. This software is supplied "AS IS" without any
+ * warranties. NXP Semiconductors assumes no responsibility or liability for the use of the
+ * software, conveys no license or title under any patent, copyright, or mask work right to the
+ * product. NXP Semiconductors reserves the right to make changes in the software without
+ * notification. NXP Semiconductors also make no representation or warranty that such application
+ * will be suitable for the specified use without further testing or modification.
  *
  * @par Refactor:
- * Last update: 21/02/2025, Author: David Trujillo Medina
+ * Last update: 21/02/2026, Author: David Trujillo Medina
  */
 
 /* ---------------------------- Peripheral group ---------------------------- */
@@ -96,8 +93,8 @@ static void TIM_Init(LPC_TIM_TypeDef* TIMx);
 
 /* --------------------------- Private Functions ---------------------------- */
 static uint32_t getPClock(uint32_t timerNum) {
-    static const uint32_t clk_selectors[] = {CLKPWR_PCLKSEL_TIMER0, CLKPWR_PCLKSEL_TIMER1, CLKPWR_PCLKSEL_TIMER2,
-                                             CLKPWR_PCLKSEL_TIMER3};
+    static const uint32_t clk_selectors[] = {CLKPWR_PCLKSEL_TIMER0, CLKPWR_PCLKSEL_TIMER1,
+                                             CLKPWR_PCLKSEL_TIMER2, CLKPWR_PCLKSEL_TIMER3};
     if (timerNum > 3) {
         return 0;
     }
@@ -300,18 +297,28 @@ FlagStatus TIM_GetIntStatus(LPC_TIM_TypeDef* TIMx, TIM_INT intFlag) {
 void TIM_PinConfig(TIM_PIN_OPTION option) {
     CHECK_PARAM(PARAM_TIM_PIN_OPTION(option));
 
-    static const PINSEL_CFG_T PinCfg[22] = {
-        {PORT_1, PIN_26, PINSEL_FUNC_11, PINSEL_TRISTATE}, {PORT_1, PIN_27, PINSEL_FUNC_11, PINSEL_TRISTATE},
-        {PORT_1, PIN_28, PINSEL_FUNC_11, PINSEL_TRISTATE}, {PORT_3, PIN_25, PINSEL_FUNC_10, PINSEL_TRISTATE},
-        {PORT_1, PIN_29, PINSEL_FUNC_11, PINSEL_TRISTATE}, {PORT_3, PIN_26, PINSEL_FUNC_10, PINSEL_TRISTATE},
-        {PORT_1, PIN_18, PINSEL_FUNC_11, PINSEL_TRISTATE}, {PORT_1, PIN_19, PINSEL_FUNC_11, PINSEL_TRISTATE},
-        {PORT_1, PIN_22, PINSEL_FUNC_11, PINSEL_TRISTATE}, {PORT_1, PIN_25, PINSEL_FUNC_11, PINSEL_TRISTATE},
-        {PORT_0, PIN_4, PINSEL_FUNC_11, PINSEL_TRISTATE},  {PORT_0, PIN_5, PINSEL_FUNC_11, PINSEL_TRISTATE},
-        {PORT_0, PIN_6, PINSEL_FUNC_11, PINSEL_TRISTATE},  {PORT_4, PIN_28, PINSEL_FUNC_10, PINSEL_TRISTATE},
-        {PORT_0, PIN_7, PINSEL_FUNC_11, PINSEL_TRISTATE},  {PORT_4, PIN_29, PINSEL_FUNC_10, PINSEL_TRISTATE},
-        {PORT_0, PIN_8, PINSEL_FUNC_11, PINSEL_TRISTATE},  {PORT_0, PIN_9, PINSEL_FUNC_11, PINSEL_TRISTATE},
-        {PORT_0, PIN_23, PINSEL_FUNC_11, PINSEL_TRISTATE}, {PORT_0, PIN_24, PINSEL_FUNC_11, PINSEL_TRISTATE},
-        {PORT_0, PIN_10, PINSEL_FUNC_11, PINSEL_TRISTATE}, {PORT_0, PIN_11, PINSEL_FUNC_11, PINSEL_TRISTATE}};
+    static const PINSEL_CFG_T PinCfg[22] = {{PORT_1, PIN_26, PINSEL_FUNC_11, PINSEL_TRISTATE},
+                                            {PORT_1, PIN_27, PINSEL_FUNC_11, PINSEL_TRISTATE},
+                                            {PORT_1, PIN_28, PINSEL_FUNC_11, PINSEL_TRISTATE},
+                                            {PORT_3, PIN_25, PINSEL_FUNC_10, PINSEL_TRISTATE},
+                                            {PORT_1, PIN_29, PINSEL_FUNC_11, PINSEL_TRISTATE},
+                                            {PORT_3, PIN_26, PINSEL_FUNC_10, PINSEL_TRISTATE},
+                                            {PORT_1, PIN_18, PINSEL_FUNC_11, PINSEL_TRISTATE},
+                                            {PORT_1, PIN_19, PINSEL_FUNC_11, PINSEL_TRISTATE},
+                                            {PORT_1, PIN_22, PINSEL_FUNC_11, PINSEL_TRISTATE},
+                                            {PORT_1, PIN_25, PINSEL_FUNC_11, PINSEL_TRISTATE},
+                                            {PORT_0, PIN_4, PINSEL_FUNC_11, PINSEL_TRISTATE},
+                                            {PORT_0, PIN_5, PINSEL_FUNC_11, PINSEL_TRISTATE},
+                                            {PORT_0, PIN_6, PINSEL_FUNC_11, PINSEL_TRISTATE},
+                                            {PORT_4, PIN_28, PINSEL_FUNC_10, PINSEL_TRISTATE},
+                                            {PORT_0, PIN_7, PINSEL_FUNC_11, PINSEL_TRISTATE},
+                                            {PORT_4, PIN_29, PINSEL_FUNC_10, PINSEL_TRISTATE},
+                                            {PORT_0, PIN_8, PINSEL_FUNC_11, PINSEL_TRISTATE},
+                                            {PORT_0, PIN_9, PINSEL_FUNC_11, PINSEL_TRISTATE},
+                                            {PORT_0, PIN_23, PINSEL_FUNC_11, PINSEL_TRISTATE},
+                                            {PORT_0, PIN_24, PINSEL_FUNC_11, PINSEL_TRISTATE},
+                                            {PORT_0, PIN_10, PINSEL_FUNC_11, PINSEL_TRISTATE},
+                                            {PORT_0, PIN_11, PINSEL_FUNC_11, PINSEL_TRISTATE}};
 
     PINSEL_ConfigPin(&PinCfg[option]);
 }

@@ -5,19 +5,16 @@
  * @date        18. June. 2010
  * @author      NXP MCU SW Application Team
  *
- * Software that is described herein is for illustrative purposes only
- * which provides customers with programming information regarding the
- * products. This software is supplied "AS IS" without any warranties.
- * NXP Semiconductors assumes no responsibility or liability for the
- * use of the software, conveys no license or title under any patent,
- * copyright, or mask work right to the product. NXP Semiconductors
- * reserves the right to make changes in the software without
- * notification. NXP Semiconductors also make no representation or
- * warranty that such application will be suitable for the specified
- * use without further testing or modification.
+ * Software that is described herein is for illustrative purposes only which provides customers with
+ * programming information regarding the products. This software is supplied "AS IS" without any
+ * warranties. NXP Semiconductors assumes no responsibility or liability for the use of the
+ * software, conveys no license or title under any patent, copyright, or mask work right to the
+ * product. NXP Semiconductors reserves the right to make changes in the software without
+ * notification. NXP Semiconductors also make no representation or warranty that such application
+ * will be suitable for the specified use without further testing or modification.
  *
  * @par Refactor:
- * Last update: 20/02/2025, Author: David Trujillo Medina
+ * Last update: 20/02/2026, Author: David Trujillo Medina
  */
 
 /* ---------------------------- Peripheral group ---------------------------- */
@@ -60,7 +57,7 @@ static void EXTI_SetMode(EXTI_LINE line, EXTI_MODE mode);
  *                          - EXTI_LOW_ACTIVE or EXTI_FALLING_EDGE (equivalent)
  *                          - EXTI_HIGH_ACTIVE or EXTI_RISING_EDGE (equivalent)
  * @note        If the polarity value is invalid, the function does nothing.
-*/
+ */
 static void EXTI_SetPolarity(EXTI_LINE line, EXTI_POLARITY polarity);
 /* ------------------- End of Private Function Prototypes ------------------- */
 
@@ -104,7 +101,7 @@ void EXTI_PinConfig(EXTI_LINE line, EXTI_RESISTOR resMode) {
     const uint8_t bitPos = (uint8_t)(EINT_PIN_BASE_OFFSET + (line * 2));
 
     LPC_PINCON->PINSEL4 &= ~(0x03UL << bitPos);
-    LPC_PINCON->PINSEL4 |=  (0x01UL << bitPos);
+    LPC_PINCON->PINSEL4 |= (0x01UL << bitPos);
 
     LPC_PINCON->PINMODE4 &= ~(0x03UL << bitPos);
 

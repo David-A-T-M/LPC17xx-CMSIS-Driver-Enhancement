@@ -6,19 +6,16 @@
  * @date        21. May. 2010
  * @author      NXP MCU SW Application Team
  *
- * Software that is described herein is for illustrative purposes only
- * which provides customers with programming information regarding the
- * products. This software is supplied "AS IS" without any warranties.
- * NXP Semiconductors assumes no responsibility or liability for the
- * use of the software, conveys no license or title under any patent,
- * copyright, or mask work right to the product. NXP Semiconductors
- * reserves the right to make changes in the software without
- * notification. NXP Semiconductors also make no representation or
- * warranty that such application will be suitable for the specified
- * use without further testing or modification.
+ * Software that is described herein is for illustrative purposes only which provides customers with
+ * programming information regarding the products. This software is supplied "AS IS" without any
+ * warranties. NXP Semiconductors assumes no responsibility or liability for the use of the
+ * software, conveys no license or title under any patent, copyright, or mask work right to the
+ * product. NXP Semiconductors reserves the right to make changes in the software without
+ * notification. NXP Semiconductors also make no representation or warranty that such application
+ * will be suitable for the specified use without further testing or modification.
  *
  * @par Refactor:
- * Last update: 20/02/2025, Author: David Trujillo Medina
+ * Last update: 20/02/2026, Author: David Trujillo Medina
  */
 
 /* ---------------------------- Peripheral group ---------------------------- */
@@ -126,79 +123,72 @@ typedef struct {
  */
 
 /**
- * @brief       Initializes the External Interrupt (EXTI) controller.
+ * @brief Initializes the External Interrupt peripheral to a default state.
  *
- * This function disables all external IRQs (EINT0 to EINT3) in the NVIC and sets the EXTMODE
- * and EXTPOLAR registers to their default values (level-sensitive mode, low polarity).
- *
- * @note        It is safe to call this function during system initialization or before configuring
- *              individual external interrupt lines. To clear pending flags, use EXTI_ClearEXTIFlag
- *              or EINT_EnableIRQ as appropriate.
+ * Disables all four external interrupt lines (EINT0-EINT3) in the NVIC and resets the EXTMODE and
+ * EXTPOLAR registers to their default Level-Sensitive and Active-Low configurations.
  */
 void EXTI_Init(void);
 
 /**
- * @brief       Configures the pin function and resistor mode for a specific EXTI line.
+ * @brief Configures the physical pin and resistor mode for an EINT line.
  *
- * This function sets the pin function for the selected EXTI line (EINT0-EINT3) on P2.10-P2.13,
- * and configures the internal resistor mode as pull-up, pull-down, or no-pull.
+ * Assigns the EINT function to the corresponding hardware pin and establishes the electrical state
+ * (Pull-up, Pull-down, or None) to ensure signal stability.
  *
- * @param[in]   line     EXTI line to configure (EXTI_EINT0 to EXTI_EINT3).
- * @param[in]   resMode  Resistor mode:
- *                       - EXTI_PULLUP:   Enable pull-up
- *                       - EXTI_PULLDOWN: Enable pull-down
- *                       - EXTI_NOPULL:   No pull
- *
- * @note        This function does not enable the interrupt; it only configures the pin.
+ * @param line    The external interrupt line (EXTI_EINTx [0...3]).
+ * @param resMode The resistor configuration (EXTI_PULLUP, EXTI_PULLDOWN, or EXTI_NOPULL).
  */
 void EXTI_PinConfig(EXTI_LINE line, EXTI_RESISTOR resMode);
 
 /**
- * @brief       Configures a specific External Interrupt (EXTI) line.
+ * @brief Configures the trigger mode and polarity for an external interrupt.
  *
- * This function disables the corresponding external IRQ in the NVIC before making any changes,
- * sets the mode and polarity for the selected EXTI line.
+ * Sets the EXTMODE (Level vs Edge) and EXTPOLAR (High/Low or Rising/Falling) registers. The
+ * corresponding NVIC IRQ is disabled during the configuration process to prevent spurious interrupt
+ * requests.
  *
- * @param[in]   extiCfg  Pointer to an EXTI_CFG_Type structure containing the configuration
- *                       information for the specified external interrupt line.
+ * @param extiCfg Pointer to an EXTI_CFG_T structure containing the settings.
  */
 void EXTI_Config(const EXTI_CFG_T* extiCfg);
 
 /**
- * @brief       Configures and enables a specific External Interrupt (EXTI) line.
+ * @brief Configures and enables an external interrupt line in a single operation.
  *
- * This function disables the corresponding external IRQ in the NVIC before making any changes,
- * sets the mode and polarity for the selected EXTI line, clears the interrupt flag for that line,
- * and finally enables the IRQ in the NVIC.
+ * Applies the mode and polarity settings through EXTI_Config and subsequently enables the
+ * corresponding interrupt in the NVIC.
  *
- * This sequence ensures safe configuration and activation of the external interrupt, preventing
- * spurious interrupts and guaranteeing that the interrupt flag is cleared before enabling.
- *
- * @param[in]   extiCfg  Pointer to an EXTI_CFG_Type structure containing the configuration
- *                       information for the specified external interrupt line.
+ * @param extiCfg Pointer to an EXTI_CFG_T structure containing the settings.
  */
 void EXTI_ConfigEnable(const EXTI_CFG_T* extiCfg);
 
 /**
- * @brief       Clears the external interrupt flag for the specified EXTI line.
+ * @brief Clears the pending flag for a specific external interrupt line.
  *
- * @param[in]   line  EXTI_EINTx [0...3].
+ * Writes a '1' to the corresponding bit in the EXTINT register. This action is required to
+ * acknowledge the interrupt and allow subsequent triggers.
+ *
+ * @param line The external interrupt line (EXTI_EINTx [0...3]).
  */
 void EXTI_ClearFlag(EXTI_LINE line);
 
 /**
- * @brief       Gets the status of the external interrupt flag for the specified EXTI line.
+ * @brief Retrieves the current status of an external interrupt flag.
  *
- * @param[in]   line  EXTI_EINTx [0...3].
+ * Reads the EXTINT register to determine if a trigger event has occurred on the specified line.
  *
- * @return      SET if the interrupt flag is set, RESET otherwise.
+ * @param line The external interrupt line to check (EXTI_EINTx [0...3]).
+ * @return SET if the interrupt is pending, RESET otherwise.
  */
 FlagStatus EXTI_GetFlag(EXTI_LINE line);
 
 /**
- * @brief       Clears the interrupt flag and enables the IRQ for the specified EXTI line.
+ * @brief Clears pending requests and enables the interrupt in the NVIC.
  *
- * @param[in]   line  EXTI_EINTx [0...3].
+ * Performs a safety clear of both the EXTI hardware flag and the NVIC pending state before enabling
+ * the IRQ to prevent immediate triggering from stale events.
+ *
+ * @param line The external interrupt line to enable (EXTI_EINTx [0...3]).
  */
 void EXTI_EnableIRQ(EXTI_LINE line);
 

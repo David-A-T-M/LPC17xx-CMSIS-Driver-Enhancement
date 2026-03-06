@@ -5,19 +5,16 @@
  * @date        21. May. 2010
  * @author      NXP MCU SW Application Team
  *
- * Software that is described herein is for illustrative purposes only
- * which provides customers with programming information regarding the
- * products. This software is supplied "AS IS" without any warranties.
- * NXP Semiconductors assumes no responsibility or liability for the
- * use of the software, conveys no license or title under any patent,
- * copyright, or mask work right to the product. NXP Semiconductors
- * reserves the right to make changes in the software without
- * notification. NXP Semiconductors also make no representation or
- * warranty that such application will be suitable for the specified
- * use without further testing or modification.
+ * Software that is described herein is for illustrative purposes only which provides customers with
+ * programming information regarding the products. This software is supplied "AS IS" without any
+ * warranties. NXP Semiconductors assumes no responsibility or liability for the use of the
+ * software, conveys no license or title under any patent, copyright, or mask work right to the
+ * product. NXP Semiconductors reserves the right to make changes in the software without
+ * notification. NXP Semiconductors also make no representation or warranty that such application
+ * will be suitable for the specified use without further testing or modification.
  *
  * @par Refactor:
- * Last update: 21/02/2025, Author: David Trujillo Medina
+ * Last update: 21/02/2026, Author: David Trujillo Medina
  */
 
 /* ---------------------------- Peripheral group ---------------------------- */
@@ -111,14 +108,20 @@ void PWM_DeInit(void) {
 void PWM_PinConfig(PWM_PIN_OPTION option) {
     CHECK_PARAM(PARAM_PWM_PIN_OPTION(option));
 
-    static const PINSEL_CFG_T PinCfg[14] = {
-        {PORT_1, PIN_18, PINSEL_FUNC_10, PINSEL_TRISTATE}, {PORT_2, PIN_0, PINSEL_FUNC_01, PINSEL_TRISTATE},
-        {PORT_1, PIN_20, PINSEL_FUNC_10, PINSEL_TRISTATE}, {PORT_2, PIN_1, PINSEL_FUNC_01, PINSEL_TRISTATE},
-        {PORT_3, PIN_25, PINSEL_FUNC_11, PINSEL_TRISTATE}, {PORT_1, PIN_21, PINSEL_FUNC_10, PINSEL_TRISTATE},
-        {PORT_2, PIN_2, PINSEL_FUNC_01, PINSEL_TRISTATE},  {PORT_3, PIN_26, PINSEL_FUNC_11, PINSEL_TRISTATE},
-        {PORT_1, PIN_23, PINSEL_FUNC_10, PINSEL_TRISTATE}, {PORT_2, PIN_3, PINSEL_FUNC_01, PINSEL_TRISTATE},
-        {PORT_1, PIN_24, PINSEL_FUNC_10, PINSEL_TRISTATE}, {PORT_2, PIN_4, PINSEL_FUNC_01, PINSEL_TRISTATE},
-        {PORT_1, PIN_26, PINSEL_FUNC_10, PINSEL_TRISTATE}, {PORT_2, PIN_5, PINSEL_FUNC_01, PINSEL_TRISTATE}};
+    static const PINSEL_CFG_T PinCfg[14] = {{PORT_1, PIN_18, PINSEL_FUNC_10, PINSEL_TRISTATE},
+                                            {PORT_2, PIN_0, PINSEL_FUNC_01, PINSEL_TRISTATE},
+                                            {PORT_1, PIN_20, PINSEL_FUNC_10, PINSEL_TRISTATE},
+                                            {PORT_2, PIN_1, PINSEL_FUNC_01, PINSEL_TRISTATE},
+                                            {PORT_3, PIN_25, PINSEL_FUNC_11, PINSEL_TRISTATE},
+                                            {PORT_1, PIN_21, PINSEL_FUNC_10, PINSEL_TRISTATE},
+                                            {PORT_2, PIN_2, PINSEL_FUNC_01, PINSEL_TRISTATE},
+                                            {PORT_3, PIN_26, PINSEL_FUNC_11, PINSEL_TRISTATE},
+                                            {PORT_1, PIN_23, PINSEL_FUNC_10, PINSEL_TRISTATE},
+                                            {PORT_2, PIN_3, PINSEL_FUNC_01, PINSEL_TRISTATE},
+                                            {PORT_1, PIN_24, PINSEL_FUNC_10, PINSEL_TRISTATE},
+                                            {PORT_2, PIN_4, PINSEL_FUNC_01, PINSEL_TRISTATE},
+                                            {PORT_1, PIN_26, PINSEL_FUNC_10, PINSEL_TRISTATE},
+                                            {PORT_2, PIN_5, PINSEL_FUNC_01, PINSEL_TRISTATE}};
 
     PINSEL_ConfigPin(&PinCfg[option]);
 }
@@ -179,24 +182,26 @@ void PWM_ConfigMatch(const PWM_MATCHCFG_T* pwmMatchCfg) {
 
     LPC_PWM1->MCR &= ~PWM_MCR_CHANNEL_MASKBIT(pwmMatchCfg->channel);
 
-    const uint32_t mcrMask = pwmMatchCfg->intEn | pwmMatchCfg->resetEn << 1 | pwmMatchCfg->stopEn << 2;
+    const uint32_t mcrMask =
+        pwmMatchCfg->intEn | pwmMatchCfg->resetEn << 1 | pwmMatchCfg->stopEn << 2;
     LPC_PWM1->MCR &= ~PWM_MCR_CHANNEL_MASKBIT(pwmMatchCfg->channel);
     LPC_PWM1->MCR |= mcrMask << (pwmMatchCfg->channel * 3);
 
     PWM_MatchUpdateSingle(pwmMatchCfg->channel, pwmMatchCfg->matchValue);
 }
 
-void PWM_MatchUpdateSingle(PWM_MATCH_OPT match, uint32_t newMatchValue) {
+void PWM_MatchUpdateSingle(PWM_MATCH_OPT match, uint32_t matchValue) {
     CHECK_PARAM(PARAM_PWM_MATCH_OPT(match));
 
     volatile uint32_t* MR[] = {&LPC_PWM1->MR0, &LPC_PWM1->MR1, &LPC_PWM1->MR2, &LPC_PWM1->MR3,
                                &LPC_PWM1->MR4, &LPC_PWM1->MR5, &LPC_PWM1->MR6};
 
-    *MR[match] = newMatchValue;
+    *MR[match] = matchValue;
     LPC_PWM1->LER |= _BIT(match);
 }
 
-void PWM_MatchUpdateDouble(PWM_MATCH_OPT matchA, uint32_t newValueA, PWM_MATCH_OPT matchB, uint32_t newValueB) {
+void PWM_MatchUpdateDouble(PWM_MATCH_OPT matchA, uint32_t newValueA, PWM_MATCH_OPT matchB,
+                           uint32_t newValueB) {
     CHECK_PARAM(PARAM_PWM_MATCH_OPT(matchA));
     CHECK_PARAM(PARAM_PWM_MATCH_OPT(matchB));
 

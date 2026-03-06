@@ -26,9 +26,7 @@ void ADC_Setup(void) {
     ADC_ChannelEnable(ADC_CHANNEL_0);
 }
 
-void ADC_TearDown(void) {
-
-}
+void ADC_TearDown(void) {}
 
 void ADC_RunTests(void) {
     RUN_TESTS_INIT();
@@ -203,4 +201,4 @@ static uint8_t ADC_ChannelGetDataTest(void) {
     ASSERT_TEST();
 }
 
-#endif // UNIT_TESTING_ENABLED
+#endif  // UNIT_TESTING_ENABLED
