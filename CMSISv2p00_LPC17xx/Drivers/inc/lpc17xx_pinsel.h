@@ -28,7 +28,7 @@
 #define LPC17XX_PINSEL_H_
 
 /* -------------------------------- Includes -------------------------------- */
-#include "lpc17xx.h"
+#include "LPC17xx.h"
 #include "lpc17xx_common.h"
 #include "lpc_types.h"
 
