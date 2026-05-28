@@ -1,3 +1,5 @@
 Release
+Debug
+.settings/language.settings.xml
 ../CMakeLists.txt
 ../.clang-format
